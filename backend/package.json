@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "knex:migrate": "npx tsx ./node_modules/knex/bin/cli.js migrate:latest",
-		"knex:seed": "npx tsx ./node_modules/knex/bin/cli.js seed:run",
+    "knex:seed": "npx tsx ./node_modules/knex/bin/cli.js seed:run",
     "start": "tsx app.ts"
   },
   "keywords": [],
@@ -22,6 +22,8 @@
     "typescript": "^6.0.3"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/knex": "^0.15.2",
     "@types/node": "^25.6.0"
   }

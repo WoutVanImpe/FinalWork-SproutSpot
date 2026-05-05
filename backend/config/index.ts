@@ -1,5 +1,8 @@
-const PORT = process.env.API_PORT;
-
-module.exports = {
-	PORT,
-};
+export const PORT = process.env.API_PORT;
+export const DATABASE_HOST = process.env.DATABASE_HOST || "localhost";
+export const DATABASE_PORT = process.env.DATABASE_PORT;
+export const DATABASE_USER = process.env.DATABASE_USER;
+export const DATABASE_PASSWORD = process.env.DATABASE_PASSWORD;
+export const DATABASE_DB = process.env.DATABASE_DB;
+export const DEEP_SLEEP_INTERVAL_MINUTES = 60;
+export const ANTI_SPAM_MEASUREMENT_THRESHOLD = 3;

@@ -1,14 +1,14 @@
-const path = require("node:path");
+import path from "node:path";
 
-module.exports = {
+const knexConfig = {
 	development: {
 		client: "pg",
 		connection: {
-			host: process.env.DATABASE_HOST,
-			port: process.env.DATABASE_PORT,
-			user: process.env.DATABASE_USER,
-			password: process.env.DATABASE_PASSWORD,
-			database: process.env.DATABASE_DB,
+			host: process.env.DATABASE_HOST || "localhost",
+			port: Number.parseInt(process.env.DATABASE_PORT || "5432"),
+			user: process.env.DATABASE_USER || "postgres",
+			password: process.env.DATABASE_PASSWORD || "postgres",
+			database: process.env.DATABASE_DB || "sproutspot",
 		},
 		migrations: {
 			directory: path.join(__dirname, "migrations"),
@@ -19,3 +19,5 @@ module.exports = {
 		},
 	},
 };
+
+export default knexConfig;
