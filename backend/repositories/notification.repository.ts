@@ -90,18 +90,18 @@ export class NotificationRepository {
 				title: input.title,
 				message: input.message,
 				notification_type: input.notificationType,
-				notification_state: "pending",
+				notification_state: "sent",
 			})
 			.returning("*");
 
 		return notification;
 	}
 
-	async findPendingNotification(userId: number, issueId: number): Promise<PendingNotificationRecord | undefined> {
+	async findSentNotification(userId: number, issueId: number): Promise<PendingNotificationRecord | undefined> {
 		const notification = await db("pending_notifications")
 			.where("user_id", userId)
 			.andWhere("issue_id", issueId)
-			.andWhere("notification_state", "pending")
+			.andWhere("notification_state", "sent")
 			.orderBy("created_at", "desc")
 			.first();
 
@@ -131,10 +131,10 @@ export class NotificationRepository {
 		return notification;
 	}
 
-	async dismissNotification(notificationId: number): Promise<PendingNotificationRecord> {
+	async acknowledgeNotification(notificationId: number): Promise<PendingNotificationRecord> {
 		const [notification] = await db("pending_notifications")
 			.where("id", notificationId)
-			.update({ notification_state: "dismissed" })
+			.update({ notification_state: "acknowledged" })
 			.returning("*");
 
 		return notification;

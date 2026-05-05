@@ -35,7 +35,7 @@ export class GardenController {
 			if (!userId) {
 				res.status(401).json({ error: "Unauthorized", message: "User authentication required" });
 				return;
-			}
+			}  
 
 			if (Number.isNaN(gardenId)) {
 				res.status(400).json({ error: "Validation Error", message: "Invalid garden ID" });

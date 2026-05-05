@@ -24,6 +24,7 @@ export async function up(knex: Knex): Promise<void> {
 				table.string("water").notNullable();
 				table.string("difficulty").notNullable();
 				table.string("temperature").notNullable();
+				table.enum("planting_type", ["indoor", "outdoor", "both"]).notNullable();
 				table.string("image").notNullable();
 				table.float("sowing_depth").notNullable();
 				table.float("sowing_distance").notNullable();
@@ -120,7 +121,7 @@ export async function up(knex: Knex): Promise<void> {
 				table.string("title").notNullable();
 				table.text("message").notNullable();
 				table.enum("notification_type", ["sensor_alert", "stage_validation", "system_status"]);
-				table.enum("notification_state", ["sent", "dismissed", "snoozed", "pending"]);
+				table.enum("notification_state", ["sent", "acknowledged", "snoozed"]);
 				table.timestamp("snoozed_until").nullable();
 				table.timestamp("created_at").defaultTo(knex.fn.now());
 			})

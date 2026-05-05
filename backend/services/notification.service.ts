@@ -46,6 +46,12 @@ export class NotificationService {
 			if (snoozedNotification) {
 				return null;
 			}
+
+			const sentNotification = await this.repository.findSentNotification(input.userId, input.issueId);
+
+			if (sentNotification) {
+				return null;
+			}
 		}
 
 		return this.repository.createNotification(input);
@@ -78,8 +84,8 @@ export class NotificationService {
 			throw new Error("Notification not found");
 		}
 
-		if (notification.notification_state === "dismissed") {
-			throw new Error("Cannot snooze a dismissed notification");
+		if (notification.notification_state === "acknowledged") {
+			throw new Error("Cannot snooze an acknowledged notification");
 		}
 
 		const snoozedUntil = new Date();
@@ -88,14 +94,14 @@ export class NotificationService {
 		return this.repository.snoozeNotification(notificationId, snoozedUntil);
 	}
 
-	async dismissNotification(notificationId: number): Promise<PendingNotificationRecord> {
+	async acknowledgeNotification(notificationId: number): Promise<PendingNotificationRecord> {
 		const notification = await this.repository.getNotificationById(notificationId);
 
 		if (!notification) {
 			throw new Error("Notification not found");
 		}
 
-		return this.repository.dismissNotification(notificationId);
+		return this.repository.acknowledgeNotification(notificationId);
 	}
 
 	async getUserNotifications(userId: number): Promise<PendingNotificationRecord[]> {

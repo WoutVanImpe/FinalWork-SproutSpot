@@ -108,7 +108,7 @@ export class NotificationController {
 			res.status(200).json({ success: true, message: `Notification snoozed for ${snoozeMinutes} minutes`, data: notification });
 		} catch (error) {
 			const msg = (error as Error).message;
-			if (msg.includes("not found") || msg.includes("dismissed")) {
+			if (msg.includes("not found") || msg.includes("acknowledged")) {
 				res.status(400).json({ error: "Bad Request", message: msg });
 				return;
 			}
@@ -118,7 +118,7 @@ export class NotificationController {
 		}
 	};
 
-	dismissNotification = async (req: AuthenticatedRequest, res: Response) => {
+	acknowledgeNotification = async (req: AuthenticatedRequest, res: Response) => {
 		try {
 			const id = Number.parseInt(req.params.notificationId as string);
 
@@ -127,9 +127,9 @@ export class NotificationController {
 				return;
 			}
 
-			const notification = await this.service.dismissNotification(id);
+			const notification = await this.service.acknowledgeNotification(id);
 
-			res.status(200).json({ success: true, message: "Notification dismissed", data: notification });
+			res.status(200).json({ success: true, message: "Notification acknowledged", data: notification });
 		} catch (error) {
 			if ((error as Error).message === "Notification not found") {
 				res.status(404).json({ error: "Not Found", message: (error as Error).message });
@@ -137,7 +137,7 @@ export class NotificationController {
 			}
 
 			console.error("[NotificationController] Error:", error);
-			res.status(500).json({ error: "Internal Server Error", message: "Failed to dismiss notification" });
+			res.status(500).json({ error: "Internal Server Error", message: "Failed to acknowledge notification" });
 		}
 	};
 }

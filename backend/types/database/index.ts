@@ -28,6 +28,7 @@ export interface PlantRecord {
 	water: string;
 	difficulty: string;
 	temperature: string;
+	planting_type: "indoor" | "outdoor" | "both";
 	image: string;
 	sowing_depth: number;
 	sowing_distance: number;
@@ -117,7 +118,7 @@ export interface PendingNotificationRecord {
 	title: string;
 	message: string;
 	notification_type: "sensor_alert" | "stage_validation" | "system_status";
-	notification_state: "sent" | "dismissed" | "snoozed" | "pending";
+	notification_state: "sent" | "acknowledged" | "snoozed";
 	snoozed_until: Date | null;
 	created_at: Date;
 }
