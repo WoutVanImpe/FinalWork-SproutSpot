@@ -7,12 +7,12 @@ const router = Router();
 const controller = new ProbeController();
 
 router.post("/register", validateBody(["hardware_id", "name"]), controller.registerProbe);
-router.get("/available", controller.getAvailableProbes);
 
 router.use(authenticate);
 
 router.get("/", controller.getUserProbes);
-router.post("/:id/pair", controller.pairProbe);
-router.post("/:id/unpair", controller.unpairProbe);
+router.get("/:id", controller.getUserProbes);
+router.post("/:id/pair", validateBody(["user_plant_id"]), controller.pairProbe);
+router.post("/unpair/:userPlantId", controller.unpairProbe);
 
 export default router;

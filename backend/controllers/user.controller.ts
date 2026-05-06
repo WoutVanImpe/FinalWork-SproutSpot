@@ -10,6 +10,12 @@ export class UserController {
 		this.service = new UserService();
 	}
 
+	/**
+	 * @description Create a new user account with name, email, and password.
+	 * @param {Request} req - Express request with { name, email, password } in body.
+	 * @param {Response} res - Express response with created user data or error.
+	 * @returns {void}
+	 */
 	signup = async (req: Request, res: Response) => {
 		try {
 			const { name, email, password } = req.body;
@@ -38,6 +44,12 @@ export class UserController {
 		}
 	};
 
+	/**
+	 * @description Authenticate a user with email and password.
+	 * @param {Request} req - Express request with { email, password } in body.
+	 * @param {Response} res - Express response with authenticated user data or error.
+	 * @returns {void}
+	 */
 	login = async (req: Request, res: Response) => {
 		try {
 			const { email, password } = req.body;
@@ -65,6 +77,12 @@ export class UserController {
 		}
 	};
 
+	/**
+	 * @description Retrieve the authenticated user's full profile.
+	 * @param {AuthenticatedRequest} req - Authenticated request containing user ID.
+	 * @param {Response} res - Express response with user profile data.
+	 * @returns {void}
+	 */
 	getProfile = async (req: AuthenticatedRequest, res: Response) => {
 		try {
 			const userId = req.user?.id;
@@ -100,6 +118,12 @@ export class UserController {
 		}
 	};
 
+	/**
+	 * @description Update the authenticated user's profile fields (name, profile picture, push token, notification window).
+	 * @param {AuthenticatedRequest} req - Authenticated request with profile fields in body.
+	 * @param {Response} res - Express response with updated user data.
+	 * @returns {void}
+	 */
 	updateProfile = async (req: AuthenticatedRequest, res: Response) => {
 		try {
 			const userId = req.user?.id;
@@ -139,6 +163,12 @@ export class UserController {
 		}
 	};
 
+	/**
+	 * @description Update the user's push notification token for mobile alerts.
+	 * @param {AuthenticatedRequest} req - Authenticated request with { push_token } in body.
+	 * @param {Response} res - Express response with success confirmation.
+	 * @returns {void}
+	 */
 	updatePushToken = async (req: AuthenticatedRequest, res: Response) => {
 		try {
 			const userId = req.user?.id;

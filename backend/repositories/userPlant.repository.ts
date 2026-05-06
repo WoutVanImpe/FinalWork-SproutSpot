@@ -1,8 +1,13 @@
 import { db } from "../db/connection";
-import { UserPlantRecord } from "../types/database";
+import { UserPlantRecord, PlantStageRecord } from "../types/database";
 import { CreateUserPlantDto, UpdatePlantStageDto, DeactivatePlantDto } from "../types/dto";
 
 export class UserPlantRepository {
+	/**
+	 * @description Create a new user plant record with default stage_order of 1 (germination).
+	 * @param {CreateUserPlantDto} input - Plant data including user_id, plant_id, garden_id, position coordinates, and optional sonde_id.
+	 * @returns {Promise<UserPlantRecord>} The created user plant record.
+	 */
 	async create(input: CreateUserPlantDto): Promise<UserPlantRecord> {
 		const [plant] = await db("user_plants")
 			.insert({
@@ -19,47 +24,49 @@ export class UserPlantRepository {
 		return plant;
 	}
 
-	async findById(id: number): Promise<UserPlantRecord | undefined> {
-		const plant = await db("user_plants").where("id", id).first();
-		return plant;
-	}
-
+	/**
+	 * @description Retrieve all user plants for a given user, including inactive ones.
+	 * @param {number} userId - The user's database ID.
+	 * @returns {Promise<UserPlantRecord[]>} List of plant records ordered newest first.
+	 */
 	async findByUserId(userId: number): Promise<UserPlantRecord[]> {
-		const plants = await db("user_plants")
-			.where("user_id", userId)
-			.orderBy("created_at", "desc");
-		return plants;
+		return db("user_plants").where("user_id", userId).orderBy("created_at", "desc");
 	}
 
+	/**
+	 * @description Retrieve only the currently active (growing) plants for a given user.
+	 * @param {number} userId - The user's database ID.
+	 * @returns {Promise<UserPlantRecord[]>} List of active plant records where is_active is true.
+	 */
 	async findActiveByUserId(userId: number): Promise<UserPlantRecord[]> {
-		const plants = await db("user_plants")
+		return db("user_plants")
 			.where("user_id", userId)
 			.andWhere("is_active", true)
 			.orderBy("created_at", "desc");
-		return plants;
 	}
 
+	/**
+	 * @description Find a user plant by ID with joined plant details (name, image).
+	 * @param {number} id - The user plant's database ID.
+	 * @returns {Promise<any>} User plant record with plant_name and plant_image fields, or undefined if not found.
+	 */
 	async findByIdWithDetails(id: number) {
-		const plant = await db("user_plants as up")
+		return db("user_plants as up")
 			.join("plants as p", "up.plant_id", "p.id")
-			.leftJoin("plant_stages as ps", function () {
-				this.on("ps.plant_id", "up.plant_id").andOn("ps.stage_order", "up.current_stage_order");
-			})
 			.where("up.id", id)
 			.select(
 				"up.*",
 				"p.name as plant_name",
-				"p.image as plant_image",
-				"ps.stage_name",
-				"ps.thresholds",
-				"ps.validation_description",
-				"ps.instructions"
+				"p.image as plant_image"
 			)
 			.first();
-
-		return plant;
 	}
 
+	/**
+	 * @description Update a user plant's current_stage_order and last_stage_update timestamp.
+	 * @param {UpdatePlantStageDto} input - Object containing user_plant_id and new_stage_order.
+	 * @returns {Promise<UserPlantRecord>} The updated user plant record.
+	 */
 	async updateStage(input: UpdatePlantStageDto): Promise<UserPlantRecord> {
 		const [plant] = await db("user_plants")
 			.where("id", input.user_plant_id)
@@ -72,6 +79,11 @@ export class UserPlantRepository {
 		return plant;
 	}
 
+	/**
+	 * @description Deactivate a user plant by setting is_active to false and recording the deactivation reason and timestamp.
+	 * @param {DeactivatePlantDto} input - Object containing user_plant_id and deactivation reason (harvested, died, removed, reused).
+	 * @returns {Promise<UserPlantRecord>} The deactivated user plant record.
+	 */
 	async deactivate(input: DeactivatePlantDto): Promise<UserPlantRecord> {
 		const [plant] = await db("user_plants")
 			.where("id", input.user_plant_id)
@@ -85,48 +97,32 @@ export class UserPlantRepository {
 		return plant;
 	}
 
-	async getNextStage(userPlantId: number) {
-		const nextStage = await db("plant_stages as ps")
+	/**
+	 * @description Find the next growth stage for a user plant by looking up the stage with the next higher stage_order.
+	 * @param {number} userPlantId - The user plant's database ID.
+	 * @returns {Promise<PlantStageRecord | undefined>} The next stage record, or undefined if the plant is at its final stage.
+	 */
+	async getNextStage(userPlantId: number): Promise<PlantStageRecord | undefined> {
+		return db("plant_stages as ps")
 			.join("user_plants as up", "ps.plant_id", "up.plant_id")
 			.where("up.id", userPlantId)
 			.andWhere("ps.stage_order", ">", db.raw("up.current_stage_order"))
 			.orderBy("ps.stage_order", "asc")
 			.select("ps.*")
 			.first();
-
-		return nextStage;
 	}
 
-	async isPositionOccupied(gardenId: number, x_pos: number, y_pos: number, excludePlantId?: number): Promise<boolean> {
-		const query = db("user_plants")
-			.where("garden_id", gardenId)
-			.andWhere("x_pos", x_pos)
-			.andWhere("y_pos", y_pos)
-			.andWhere("is_active", true);
-
-		if (excludePlantId) {
-			query.andWhereNot("id", excludePlantId);
-		}
-
-		const result = await query.first();
-		return !!result;
-	}
-
-	async updatePosition(userPlantId: number, x_pos: number, y_pos: number): Promise<UserPlantRecord> {
-		const [plant] = await db("user_plants")
-			.where("id", userPlantId)
-			.update({ x_pos, y_pos })
-			.returning("*");
-
-		return plant;
-	}
-
-	async linkProbe(userPlantId: number, sondeId: string): Promise<UserPlantRecord> {
-		const [plant] = await db("user_plants")
-			.where("id", userPlantId)
-			.update({ sonde_id: sondeId })
-			.returning("*");
-
-		return plant;
+	/**
+	 * @description Find the current growth stage for a user plant by matching stage_order.
+	 * @param {number} userPlantId - The user plant's database ID.
+	 * @returns {Promise<PlantStageRecord | undefined>} The current stage record with care requirements.
+	 */
+	async getCurrentStage(userPlantId: number): Promise<PlantStageRecord | undefined> {
+		return db("plant_stages as ps")
+			.join("user_plants as up", "ps.plant_id", "up.plant_id")
+			.where("up.id", userPlantId)
+			.andWhere("ps.stage_order", "up.current_stage_order")
+			.select("ps.*")
+			.first();
 	}
 }

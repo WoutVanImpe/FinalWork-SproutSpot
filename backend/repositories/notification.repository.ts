@@ -2,135 +2,30 @@ import { db } from "../db/connection";
 import { ActiveIssueRecord, PendingNotificationRecord } from "../types/database";
 
 export class NotificationRepository {
-	async createIssue(userPlantId: number, issueType: string): Promise<ActiveIssueRecord> {
-		const [issue] = await db("active_issues")
-			.insert({
-				user_plant_id: userPlantId,
-				issue_type: issueType,
-			})
-			.returning("*");
-
-		return issue;
-	}
-
-	async findActiveIssue(userPlantId: number, issueType: string): Promise<ActiveIssueRecord | undefined> {
-		const issue = await db("active_issues")
-			.where("user_plant_id", userPlantId)
-			.andWhere("issue_type", issueType)
-			.whereNull("resolved_at")
-			.first();
-
-		return issue;
-	}
-
-	async incrementIssueOccurrence(issueId: number): Promise<ActiveIssueRecord> {
-		const [issue] = await db("active_issues")
-			.where("id", issueId)
-			.increment("occurrence_count", 1)
-			.update({ last_seen: db.fn.now() })
-			.returning("*");
-
-		return issue;
-	}
-
-	async resolveIssue(issueId: number): Promise<ActiveIssueRecord> {
-		const [issue] = await db("active_issues")
-			.where("id", issueId)
-			.update({
-				resolved_at: db.fn.now(),
-				user_acknowledged: true,
-			})
-			.returning("*");
-
-		return issue;
-	}
-
-	async acknowledgeIssue(issueId: number): Promise<ActiveIssueRecord> {
-		const [issue] = await db("active_issues")
-			.where("id", issueId)
-			.update({ user_acknowledged: true })
-			.returning("*");
-
-		return issue;
-	}
-
-	async getActiveIssuesByUserPlant(userPlantId: number): Promise<ActiveIssueRecord[]> {
-		const issues = await db("active_issues")
-			.where("user_plant_id", userPlantId)
-			.whereNull("resolved_at")
-			.orderBy("last_seen", "desc");
-
-		return issues;
-	}
-
-	async getActiveIssuesByUser(userId: number): Promise<ActiveIssueRecord[]> {
-		const issues = await db("active_issues as ai")
-			.join("user_plants as up", "ai.user_plant_id", "up.id")
-			.where("up.user_id", userId)
-			.whereNull("ai.resolved_at")
-			.select("ai.*")
-			.orderBy("ai.last_seen", "desc");
-
-		return issues;
-	}
-
-	async createNotification(input: {
-		userId: number;
-		userPlantId: number;
-		issueId: number | null;
-		title: string;
-		message: string;
-		notificationType: "sensor_alert" | "stage_validation" | "system_status";
-	}): Promise<PendingNotificationRecord> {
-		const [notification] = await db("pending_notifications")
-			.insert({
-				user_id: input.userId,
-				user_plant_id: input.userPlantId,
-				issue_id: input.issueId,
-				title: input.title,
-				message: input.message,
-				notification_type: input.notificationType,
-				notification_state: "sent",
-			})
-			.returning("*");
-
-		return notification;
-	}
-
-	async findSentNotification(userId: number, issueId: number): Promise<PendingNotificationRecord | undefined> {
-		const notification = await db("pending_notifications")
+	/**
+	 * @description Retrieve notifications for a user, optionally filtering out acknowledged ones. Limited to 50 results ordered newest first.
+	 * @param {number} userId - The user's database ID.
+	 * @param {boolean} onlyUnacknowledged - When true, excludes notifications with state "acknowledged".
+	 * @returns {Promise<PendingNotificationRecord[]>} List of notification records.
+	 */
+	async getNotificationsByUser(userId: number, onlyUnacknowledged: boolean): Promise<PendingNotificationRecord[]> {
+		let query = db("pending_notifications")
 			.where("user_id", userId)
-			.andWhere("issue_id", issueId)
-			.andWhere("notification_state", "sent")
 			.orderBy("created_at", "desc")
-			.first();
+			.limit(50);
 
-		return notification;
+		if (onlyUnacknowledged) {
+			query = query.andWhereNot("notification_state", "acknowledged");
+		}
+
+		return query;
 	}
 
-	async findSnoozedNotification(userId: number, issueId: number): Promise<PendingNotificationRecord | undefined> {
-		const notification = await db("pending_notifications")
-			.where("user_id", userId)
-			.andWhere("issue_id", issueId)
-			.andWhere("notification_state", "snoozed")
-			.andWhere("snoozed_until", ">", db.fn.now())
-			.first();
-
-		return notification;
-	}
-
-	async snoozeNotification(notificationId: number, snoozedUntil: Date): Promise<PendingNotificationRecord> {
-		const [notification] = await db("pending_notifications")
-			.where("id", notificationId)
-			.update({
-				notification_state: "snoozed",
-				snoozed_until: snoozedUntil,
-			})
-			.returning("*");
-
-		return notification;
-	}
-
+	/**
+	 * @description Set a notification's state to "acknowledged".
+	 * @param {number} notificationId - The notification's database ID.
+	 * @returns {Promise<PendingNotificationRecord>} The updated notification record.
+	 */
 	async acknowledgeNotification(notificationId: number): Promise<PendingNotificationRecord> {
 		const [notification] = await db("pending_notifications")
 			.where("id", notificationId)
@@ -140,31 +35,69 @@ export class NotificationRepository {
 		return notification;
 	}
 
-	async getNotificationsByUser(userId: number): Promise<PendingNotificationRecord[]> {
-		const notifications = await db("pending_notifications")
-			.where("user_id", userId)
-			.orderBy("created_at", "desc")
-			.limit(50);
+	/**
+	 * @description Mark an active issue as user-acknowledged, but only if it has not been resolved yet.
+	 * @param {number} issueId - The active issue's database ID.
+	 * @returns {Promise<ActiveIssueRecord | undefined>} The updated issue record or undefined if already resolved.
+	 */
+	async acknowledgeIssue(issueId: number): Promise<ActiveIssueRecord | undefined> {
+		const [issue] = await db("active_issues")
+			.where("id", issueId)
+			.whereNull("resolved_at")
+			.update({ user_acknowledged: true })
+			.returning("*");
 
-		return notifications;
+		return issue;
 	}
 
-	async markNotificationSent(notificationId: number): Promise<PendingNotificationRecord> {
+	/**
+	 * @description Resolve an active issue by setting its resolved_at timestamp to the current time.
+	 * @param {number} issueId - The active issue's database ID.
+	 * @returns {Promise<ActiveIssueRecord | undefined>} The resolved issue record.
+	 */
+	async resolveIssue(issueId: number): Promise<ActiveIssueRecord | undefined> {
+		const [issue] = await db("active_issues")
+			.where("id", issueId)
+			.update({ resolved_at: db.fn.now() })
+			.returning("*");
+
+		return issue;
+	}
+
+	/**
+	 * @description Reset a notification's state back to "sent" and clear any snooze timer.
+	 * @param {number} notificationId - The notification's database ID.
+	 * @returns {Promise<PendingNotificationRecord>} The reset notification record.
+	 */
+	async resetNotificationState(notificationId: number): Promise<PendingNotificationRecord> {
 		const [notification] = await db("pending_notifications")
 			.where("id", notificationId)
-			.update({ notification_state: "sent" })
+			.update({ notification_state: "sent", snoozed_until: null })
 			.returning("*");
 
 		return notification;
 	}
 
-	async getActiveIssueById(issueId: number): Promise<ActiveIssueRecord | undefined> {
-		const issue = await db("active_issues").where("id", issueId).first();
-		return issue;
+	/**
+	 * @description Find a single notification by its database ID.
+	 * @param {number} notificationId - The notification's database ID.
+	 * @returns {Promise<PendingNotificationRecord | undefined>} The notification record or undefined if not found.
+	 */
+	async getNotificationById(notificationId: number): Promise<PendingNotificationRecord | undefined> {
+		return db("pending_notifications").where("id", notificationId).first();
 	}
 
-	async getNotificationById(notificationId: number): Promise<PendingNotificationRecord | undefined> {
-		const notification = await db("pending_notifications").where("id", notificationId).first();
-		return notification;
+	/**
+	 * @description Retrieve the issue_id associated with a specific notification.
+	 * @param {number} notificationId - The notification's database ID.
+	 * @returns {Promise<number | null>} The linked issue ID or null if none.
+	 */
+	async getIssueByNotification(notificationId: number): Promise<number | null> {
+		const result = await db("pending_notifications")
+			.where("id", notificationId)
+			.select("issue_id")
+			.first();
+
+		return result?.issue_id ?? null;
 	}
 }

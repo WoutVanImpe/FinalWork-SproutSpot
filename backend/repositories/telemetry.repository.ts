@@ -3,6 +3,11 @@ import { ProbeEntryRecord } from "../types/database";
 import { TelemetryPayloadDto } from "../types/dto";
 
 export class TelemetryRepository {
+	/**
+	 * @description Create a new probe entry record with mapped telemetry data (soil moisture already converted to percentage).
+	 * @param {TelemetryPayloadDto} payload - Telemetry data with hardware_id, temperature, humidity, light, mapped soil moisture, battery, and WiFi.
+	 * @returns {Promise<ProbeEntryRecord>} The created probe entry record.
+	 */
 	async createEntry(payload: TelemetryPayloadDto): Promise<ProbeEntryRecord> {
 		const [entry] = await db("probe_entries")
 			.insert({
@@ -19,48 +24,13 @@ export class TelemetryRepository {
 		return entry;
 	}
 
-	async getLatestEntryBySondeId(sondeId: string): Promise<ProbeEntryRecord | undefined> {
-		const entry = await db("probe_entries")
-			.where("sonde_id", sondeId)
-			.orderBy("created_at", "desc")
-			.first();
-
-		return entry;
-	}
-
-	async getRecentEntriesBySondeId(sondeId: string, limit: number): Promise<ProbeEntryRecord[]> {
-		const entries = await db("probe_entries")
-			.where("sonde_id", sondeId)
-			.orderBy("created_at", "desc")
-			.limit(limit);
-
-		return entries;
-	}
-
-	async getActiveUserPlantBySondeId(sondeId: string) {
-		const userPlant = await db("user_plants as up")
-			.join("users as u", "up.user_id", "u.id")
-			.join("plants as p", "up.plant_id", "p.id")
-			.leftJoin("plant_stages as ps", function () {
-				this.on("ps.plant_id", "up.plant_id").andOn("ps.stage_order", "up.current_stage_order");
-			})
-			.where("up.sonde_id", sondeId)
-			.andWhere("up.is_active", true)
-			.select(
-				"up.id as user_plant_id",
-				"up.user_id",
-				"up.plant_id",
-				"up.current_stage_order",
-				"p.name as plant_name",
-				"ps.thresholds",
-				"u.notification_window_start",
-				"u.notification_window_end"
-			)
-			.first();
-
-		return userPlant;
-	}
-
+	/**
+	 * @description Update a probe's battery voltage, WiFi RSSI, and last_seen timestamp. Called during telemetry upload to keep hardware health current.
+	 * @param {string} hardwareId - The probe's hardware identifier.
+	 * @param {number} batteryVoltage - Current battery voltage reading.
+	 * @param {number} wifiRssi - Current WiFi signal strength in dBm.
+	 * @returns {Promise<void>}
+	 */
 	async updateProbeHealth(hardwareId: string, batteryVoltage: number, wifiRssi: number): Promise<void> {
 		await db("probes")
 			.where("hardware_id", hardwareId)
@@ -69,5 +39,33 @@ export class TelemetryRepository {
 				wifi_rssi: wifiRssi,
 				last_seen: db.fn.now(),
 			});
+	}
+
+	/**
+	 * @description Retrieve recent telemetry entries for a specific probe, ordered newest first.
+	 * @param {string} sondeId - The probe's hardware identifier.
+	 * @param {number} limit - Maximum number of entries to return.
+	 * @returns {Promise<ProbeEntryRecord[]>} List of recent probe entries.
+	 */
+	async getRecentEntriesBySondeId(sondeId: string, limit: number): Promise<ProbeEntryRecord[]> {
+		return db("probe_entries")
+			.where("sonde_id", sondeId)
+			.orderBy("created_at", "desc")
+			.limit(limit);
+	}
+
+	/**
+	 * @description Retrieve recent telemetry entries for all probes linked to a specific user plant, ordered newest first.
+	 * @param {number} userPlantId - The user plant's database ID.
+	 * @param {number} limit - Maximum number of entries to return.
+	 * @returns {Promise<ProbeEntryRecord[]>} List of recent probe entries from the linked probe.
+	 */
+	async getRecentEntriesByUserPlantId(userPlantId: number, limit: number): Promise<ProbeEntryRecord[]> {
+		return db("probe_entries as pe")
+			.join("user_plants as up", "pe.sonde_id", "up.sonde_id")
+			.where("up.id", userPlantId)
+			.orderBy("pe.created_at", "desc")
+			.limit(limit)
+			.select("pe.*");
 	}
 }

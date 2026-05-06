@@ -2,6 +2,12 @@ import { db } from "../db/connection";
 import { ProbeRecord } from "../types/database";
 
 export class ProbeRepository {
+	/**
+	 * @description Create a new probe record with hardware ID, name, and initial state as "available".
+	 * @param {string} hardwareId - The probe's unique hardware identifier (MAC address).
+	 * @param {string} name - Human-readable name for the probe.
+	 * @returns {Promise<ProbeRecord>} The created probe record.
+	 */
 	async create(hardwareId: string, name: string): Promise<ProbeRecord> {
 		const [probe] = await db("probes")
 			.insert({
@@ -16,75 +22,87 @@ export class ProbeRepository {
 		return probe;
 	}
 
+	/**
+	 * @description Find a probe by its hardware ID (MAC address).
+	 * @param {string} hardwareId - The probe's unique hardware identifier.
+	 * @returns {Promise<ProbeRecord | undefined>} The probe record or undefined if not found.
+	 */
 	async findByHardwareId(hardwareId: string): Promise<ProbeRecord | undefined> {
-		const probe = await db("probes").where("hardware_id", hardwareId).first();
-		return probe;
+		return db("probes").where("hardware_id", hardwareId).first();
 	}
 
+	/**
+	 * @description Find a probe by its database ID.
+	 * @param {number} id - The probe's database ID.
+	 * @returns {Promise<ProbeRecord | undefined>} The probe record or undefined if not found.
+	 */
 	async findById(id: number): Promise<ProbeRecord | undefined> {
-		const probe = await db("probes").where("id", id).first();
-		return probe;
+		return db("probes").where("id", id).first();
 	}
 
+	/**
+	 * @description Retrieve all probes belonging to a user, ordered by last_seen descending.
+	 * @param {number} userId - The user's database ID.
+	 * @returns {Promise<ProbeRecord[]>} List of probe records.
+	 */
 	async findByUserId(userId: number): Promise<ProbeRecord[]> {
-		const probes = await db("probes")
+		return db("probes")
 			.where("user_id", userId)
 			.orderBy("last_seen", "desc");
-
-		return probes;
 	}
 
-	async pairProbe(probeId: number, userId: number): Promise<ProbeRecord> {
+	/**
+	 * @description Assign a probe to a user and update its state to "paired".
+	 * @param {number} probeId - The probe's database ID.
+	 * @param {number} userId - The user's database ID.
+	 * @returns {Promise<ProbeRecord>} The updated probe record.
+	 */
+	async assignToUser(probeId: number, userId: number): Promise<ProbeRecord> {
 		const [probe] = await db("probes")
 			.where("id", probeId)
-			.update({
-				user_id: userId,
-				state: "paired",
-			})
+			.update({ user_id: userId, state: "paired" })
 			.returning("*");
 
 		return probe;
 	}
 
-	async unpairProbe(probeId: number): Promise<ProbeRecord> {
-		const [probe] = await db("probes")
-			.where("id", probeId)
-			.update({
-				user_id: null,
-				state: "available",
-			})
-			.returning("*");
-
-		return probe;
-	}
-
-	async updateHealth(probeId: number, batteryVoltage: number, wifiRssi: number): Promise<ProbeRecord> {
-		const [probe] = await db("probes")
-			.where("id", probeId)
+	/**
+	 * @description Update a probe's battery voltage, WiFi RSSI, and last_seen timestamp.
+	 * @param {string} hardwareId - The probe's hardware identifier.
+	 * @param {number} batteryVoltage - Current battery voltage reading.
+	 * @param {number} wifiRssi - Current WiFi signal strength in dBm.
+	 * @returns {Promise<void>}
+	 */
+	async updateHealth(hardwareId: string, batteryVoltage: number, wifiRssi: number): Promise<void> {
+		await db("probes")
+			.where("hardware_id", hardwareId)
 			.update({
 				battery_voltage: batteryVoltage,
 				wifi_rssi: wifiRssi,
 				last_seen: db.fn.now(),
-			})
-			.returning("*");
-
-		return probe;
+			});
 	}
 
-	async markOffline(probeId: number): Promise<ProbeRecord> {
-		const [probe] = await db("probes")
-			.where("id", probeId)
-			.update({ state: "offline" })
-			.returning("*");
-
-		return probe;
+	/**
+	 * @description Link a probe to a user plant by setting the plant's sonde_id to the probe's hardware_id.
+	 * @param {string} hardwareId - The probe's hardware identifier.
+	 * @param {number} userPlantId - The user plant's database ID.
+	 * @returns {Promise<void>}
+	 */
+	async linkToUserPlant(hardwareId: string, userPlantId: number): Promise<void> {
+		await db("user_plants")
+			.where("id", userPlantId)
+			.update({ sonde_id: hardwareId });
 	}
 
-	async getAvailableProbes(): Promise<ProbeRecord[]> {
-		const probes = await db("probes")
-			.where("state", "available")
-			.orderBy("created_at", "desc");
-
-		return probes;
+	/**
+	 * @description Unlink a probe from a user plant by setting the plant's sonde_id to null.
+	 * @param {number} userPlantId - The user plant's database ID.
+	 * @returns {Promise<void>}
+	 */
+	async unlinkFromUserPlant(userPlantId: number): Promise<void> {
+		await db("user_plants")
+			.where("id", userPlantId)
+			.update({ sonde_id: null });
 	}
 }

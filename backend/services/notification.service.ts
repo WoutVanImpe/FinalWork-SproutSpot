@@ -1,130 +1,72 @@
 import { NotificationRepository } from "../repositories/notification.repository";
-import { UserRepository } from "../repositories/user.repository";
 import { ActiveIssueRecord, PendingNotificationRecord } from "../types/database";
 
 export class NotificationService {
 	private repository: NotificationRepository;
-	private userRepository: UserRepository;
 
 	constructor() {
 		this.repository = new NotificationRepository();
-		this.userRepository = new UserRepository();
 	}
 
-	async createOrUpdateIssue(input: { userPlantId: number; issueType: string }): Promise<ActiveIssueRecord | null> {
-		const existingIssue = await this.repository.findActiveIssue(input.userPlantId, input.issueType);
-
-		if (existingIssue) {
-			return this.repository.incrementIssueOccurrence(existingIssue.id);
-		}
-
-		return this.repository.createIssue(input.userPlantId, input.issueType);
+	/**
+	 * @description Retrieve notifications for a user. Can filter to only unacknowledged notifications.
+	 * @param {number} userId - The user's database ID.
+	 * @param {boolean} onlyUnacknowledged - When true, excludes acknowledged notifications (default).
+	 * @returns {Promise<PendingNotificationRecord[]>} List of notification records ordered newest first.
+	 */
+	async getUserNotifications(userId: number, onlyUnacknowledged: boolean = true): Promise<PendingNotificationRecord[]> {
+		return this.repository.getNotificationsByUser(userId, onlyUnacknowledged);
 	}
 
-	async createCoachNotification(input: {
-		userId: number;
-		userPlantId: number;
-		issueId: number | null;
-		title: string;
-		message: string;
-		notificationType: "sensor_alert" | "stage_validation" | "system_status";
-	}): Promise<PendingNotificationRecord | null> {
-		const user = await this.userRepository.findById(input.userId);
+	/**
+	 * @description Acknowledge a notification and its linked active issue, marking both as seen by the user.
+	 * @param {number} notificationId - The notification's database ID.
+	 * @returns {Promise<{ notification: PendingNotificationRecord; issue: ActiveIssueRecord | null }>} Updated notification and optionally the acknowledged issue.
+	 */
+	async acknowledgeNotification(notificationId: number): Promise<{ notification: PendingNotificationRecord; issue?: ActiveIssueRecord | null }> {
+		const notification = await this.repository.getNotificationById(notificationId);
 
-		if (!user) {
-			return null;
+		if (!notification) {
+			throw new Error("Notification not found");
 		}
 
-		const isInWindow = await this.isWithinNotificationWindow(input.userId);
-		if (!isInWindow) {
-			return null;
+		const updatedNotification = await this.repository.acknowledgeNotification(notificationId);
+
+		let issue: ActiveIssueRecord | null = null;
+		if (notification.issue_id) {
+			issue = await this.repository.acknowledgeIssue(notification.issue_id) ?? null;
 		}
 
-		if (input.issueId) {
-			const snoozedNotification = await this.repository.findSnoozedNotification(input.userId, input.issueId);
-
-			if (snoozedNotification) {
-				return null;
-			}
-
-			const sentNotification = await this.repository.findSentNotification(input.userId, input.issueId);
-
-			if (sentNotification) {
-				return null;
-			}
-		}
-
-		return this.repository.createNotification(input);
+		return { notification: updatedNotification, issue };
 	}
 
-	async acknowledgeIssue(issueId: number): Promise<ActiveIssueRecord> {
-		const issue = await this.repository.getActiveIssueById(issueId);
-
-		if (!issue) {
-			throw new Error("Issue not found");
-		}
-
-		return this.repository.acknowledgeIssue(issueId);
-	}
-
+	/**
+	 * @description Resolve an active issue by setting its resolved_at timestamp.
+	 * @param {number} issueId - The active issue's database ID.
+	 * @returns {Promise<ActiveIssueRecord>} The resolved issue record.
+	 */
 	async resolveIssue(issueId: number): Promise<ActiveIssueRecord> {
-		const issue = await this.repository.getActiveIssueById(issueId);
+		const issue = await this.repository.resolveIssue(issueId);
 
 		if (!issue) {
 			throw new Error("Issue not found");
 		}
 
-		return this.repository.resolveIssue(issueId);
+		return issue;
 	}
 
-	async snoozeNotification(notificationId: number, minutes: number = 60): Promise<PendingNotificationRecord> {
+	/**
+	 * @description Reset a notification's state back to "sent" and clear any snooze timer, effectively re-triggering it.
+	 * @param {number} notificationId - The notification's database ID.
+	 * @returns {Promise<PendingNotificationRecord>} The reset notification record.
+	 */
+	async resetNotificationState(notificationId: number): Promise<PendingNotificationRecord> {
 		const notification = await this.repository.getNotificationById(notificationId);
 
 		if (!notification) {
 			throw new Error("Notification not found");
 		}
 
-		if (notification.notification_state === "acknowledged") {
-			throw new Error("Cannot snooze an acknowledged notification");
-		}
-
-		const snoozedUntil = new Date();
-		snoozedUntil.setMinutes(snoozedUntil.getMinutes() + minutes);
-
-		return this.repository.snoozeNotification(notificationId, snoozedUntil);
-	}
-
-	async acknowledgeNotification(notificationId: number): Promise<PendingNotificationRecord> {
-		const notification = await this.repository.getNotificationById(notificationId);
-
-		if (!notification) {
-			throw new Error("Notification not found");
-		}
-
-		return this.repository.acknowledgeNotification(notificationId);
-	}
-
-	async getUserNotifications(userId: number): Promise<PendingNotificationRecord[]> {
-		return this.repository.getNotificationsByUser(userId);
-	}
-
-	async getUserActiveIssues(userId: number): Promise<ActiveIssueRecord[]> {
-		return this.repository.getActiveIssuesByUser(userId);
-	}
-
-	async isWithinNotificationWindow(userId: number): Promise<boolean> {
-		const user = await this.userRepository.findById(userId);
-
-		if (!user) {
-			return true;
-		}
-
-		const now = new Date();
-		const currentTime = now.toTimeString().slice(0, 8);
-
-		const windowStart = user.notification_window_start || "08:00:00";
-		const windowEnd = user.notification_window_end || "22:00:00";
-
-		return currentTime >= windowStart && currentTime <= windowEnd;
+		return this.repository.resetNotificationState(notificationId);
 	}
 }

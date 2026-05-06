@@ -1,7 +1,6 @@
 import { ProbeRepository } from "../repositories/probe.repository";
 import { ProbeRecord } from "../types/database";
 import { ProbeHealthResponse, ProbeWifiResponse } from "../types/response";
-import { DEEP_SLEEP_INTERVAL_MINUTES } from "../config";
 
 export class ProbeService {
 	private repository: ProbeRepository;
@@ -10,6 +9,12 @@ export class ProbeService {
 		this.repository = new ProbeRepository();
 	}
 
+	/**
+	 * @description Register a new probe with its unique hardware ID (MAC address) and a friendly name. Fails if the hardware ID already exists.
+	 * @param {string} hardwareId - The probe's unique hardware identifier (MAC address).
+	 * @param {string} name - Human-readable name for the probe.
+	 * @returns {Promise<ProbeRecord>} The created probe record.
+	 */
 	async registerProbe(hardwareId: string, name: string): Promise<ProbeRecord> {
 		const existing = await this.repository.findByHardwareId(hardwareId);
 
@@ -20,70 +25,58 @@ export class ProbeService {
 		return this.repository.create(hardwareId, name);
 	}
 
-	async pairProbe(probeId: number, userId: number): Promise<ProbeRecord> {
+	/**
+	 * @description Pair a probe to a user plant by linking the probe's hardware_id to the plant's sonde_id field.
+	 * @param {number} probeId - The probe's database ID.
+	 * @param {number} userPlantId - The user plant's database ID to link to.
+	 * @returns {Promise<ProbeRecord>} The probe record.
+	 */
+	async pairProbe(probeId: number, userPlantId: number): Promise<ProbeRecord> {
 		const probe = await this.repository.findById(probeId);
 
 		if (!probe) {
 			throw new Error("Probe not found");
 		}
 
-		if (probe.state === "paired" && probe.user_id === userId) {
-			throw new Error("Probe is already paired to your account");
-		}
+		await this.repository.linkToUserPlant(probe.hardware_id, userPlantId);
 
-		return this.repository.pairProbe(probeId, userId);
+		return probe;
 	}
 
-	async unpairProbe(probeId: number, userId: number): Promise<ProbeRecord> {
-		const probe = await this.repository.findById(probeId);
-
-		if (!probe) {
-			throw new Error("Probe not found");
-		}
-
-		if (probe.user_id !== userId) {
-			throw new Error("You do not own this probe");
-		}
-
-		return this.repository.unpairProbe(probeId);
+	/**
+	 * @description Unpair a probe from a user plant by setting the plant's sonde_id to null.
+	 * @param {number} userPlantId - The user plant's database ID to unlink.
+	 * @returns {Promise<void>}
+	 */
+	async unpairProbe(userPlantId: number): Promise<void> {
+		await this.repository.unlinkFromUserPlant(userPlantId);
 	}
 
-	async getUserProbes(userId: number): Promise<ProbeRecord[]> {
+	/**
+	 * @description Retrieve probes belonging to a user. If probeId is provided, returns a single probe; otherwise returns all probes.
+	 * @param {number} userId - The user's database ID.
+	 * @param {number} [probeId] - Optional probe ID to filter to a single probe.
+	 * @returns {Promise<ProbeRecord[] | ProbeRecord>} Single probe record or array of all probes.
+	 */
+	async getUserProbes(userId: number, probeId?: number): Promise<ProbeRecord[] | ProbeRecord> {
+		if (probeId) {
+			const probe = await this.repository.findById(probeId);
+
+			if (!probe || probe.user_id !== userId) {
+				throw new Error("Probe not found");
+			}
+
+			return probe;
+		}
+
 		return this.repository.findByUserId(userId);
 	}
 
-	async getAvailableProbes(): Promise<ProbeRecord[]> {
-		return this.repository.getAvailableProbes();
-	}
-
-	async updateHealth(probeId: number, batteryVoltage: number, wifiRssi: number): Promise<ProbeRecord> {
-		const probe = await this.repository.findById(probeId);
-
-		if (!probe) {
-			throw new Error("Probe not found");
-		}
-
-		return this.repository.updateHealth(probeId, batteryVoltage, wifiRssi);
-	}
-
-	async checkProbeHealth(): Promise<ProbeRecord[]> {
-		const offlineThreshold = new Date();
-		offlineThreshold.setMinutes(offlineThreshold.getMinutes() - (DEEP_SLEEP_INTERVAL_MINUTES * 3));
-
-		const probes = await this.repository.findByUserId(0);
-		const offlineProbes: ProbeRecord[] = [];
-
-		for (const probe of probes) {
-			const lastSeen = new Date(probe.last_seen);
-			if (lastSeen < offlineThreshold && probe.state !== "offline") {
-				await this.repository.markOffline(probe.id);
-				offlineProbes.push({ ...probe, state: "offline" });
-			}
-		}
-
-		return offlineProbes;
-	}
-
+	/**
+	 * @description Calculate battery health as a percentage and human-readable level based on LiPo voltage (3.0V-4.2V range).
+	 * @param {number} batteryVoltage - Current battery voltage reading.
+	 * @returns {ProbeHealthResponse} Object with level ("Good"/"Medium"/"Low"/"Critical") and percentage (0-100).
+	 */
 	getBatteryStatus(batteryVoltage: number): ProbeHealthResponse {
 		const MIN_VOLTAGE = 3.0;
 		const MAX_VOLTAGE = 4.2;
@@ -100,6 +93,11 @@ export class ProbeService {
 		return { level, percentage: clampedPercentage };
 	}
 
+	/**
+	 * @description Evaluate WiFi signal quality based on RSSI value and return a human-readable assessment with advice.
+	 * @param {number} rssi - WiFi signal strength in dBm (typically -30 to -90).
+	 * @returns {ProbeWifiResponse} Object with quality ("Excellent"/"Good"/"Fair"/"Poor") and actionable advice.
+	 */
 	getWifiStatus(rssi: number): ProbeWifiResponse {
 		if (rssi >= -60) return { quality: "Excellent", advice: "Connection is strong" };
 		if (rssi >= -70) return { quality: "Good", advice: "Connection is stable" };

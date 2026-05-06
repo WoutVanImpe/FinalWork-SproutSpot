@@ -3,12 +3,18 @@ import { ProbeService } from "../services/probe.service";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 
 export class ProbeController {
-	private readonly service: ProbeService;
+	private service: ProbeService;
 
 	constructor() {
 		this.service = new ProbeService();
 	}
 
+	/**
+	 * @description Register a new probe with its hardware ID (MAC address) and a friendly name.
+	 * @param {Request} req - Express request with { hardware_id, name } in body.
+	 * @param {Response} res - Express response with created probe data.
+	 * @returns {void}
+	 */
 	registerProbe = async (req: Request, res: Response) => {
 		try {
 			const { hardware_id, name } = req.body;
@@ -20,7 +26,7 @@ export class ProbeController {
 
 			const probe = await this.service.registerProbe(hardware_id, name);
 
-			res.status(201).json({ success: true, message: "Probe registered successfully", data: probe });
+			res.status(201).json({ success: true, message: "Probe registered", data: probe });
 		} catch (error) {
 			if ((error as Error).message === "Probe with this hardware ID already exists") {
 				res.status(409).json({ error: "Conflict", message: (error as Error).message });
@@ -32,29 +38,29 @@ export class ProbeController {
 		}
 	};
 
-	pairProbe = async (req: AuthenticatedRequest, res: Response) => {
+	/**
+	 * @description Pair a probe to a specific user plant by linking the probe's hardware_id to the plant's sonde_id.
+	 * @param {Request} req - Express request with probe ID as URL parameter and { user_plant_id } in body.
+	 * @param {Response} res - Express response with paired probe data.
+	 * @returns {void}
+	 */
+	pairProbe = async (req: Request, res: Response) => {
 		try {
-			const userId = req.user?.id;
-
-			if (!userId) {
-				res.status(401).json({ error: "Unauthorized", message: "User authentication required" });
-				return;
-			}
-
 			const probeId = Number.parseInt(req.params.id as string);
+			const { user_plant_id } = req.body;
 
-			if (Number.isNaN(probeId)) {
-				res.status(400).json({ error: "Validation Error", message: "Invalid probe ID" });
+			if (Number.isNaN(probeId) || !user_plant_id) {
+				res.status(400).json({ error: "Validation Error", message: "probe ID and user_plant_id are required" });
 				return;
 			}
 
-			const probe = await this.service.pairProbe(probeId, userId);
+			const probe = await this.service.pairProbe(probeId, user_plant_id);
 
-			res.status(200).json({ success: true, message: "Probe paired successfully", data: probe });
+			res.status(200).json({ success: true, message: "Probe paired to plant", data: probe });
 		} catch (error) {
 			const msg = (error as Error).message;
-			if (msg.includes("not found") || msg.includes("already paired")) {
-				res.status(400).json({ error: "Bad Request", message: msg });
+			if (msg.includes("not found")) {
+				res.status(404).json({ error: "Not Found", message: msg });
 				return;
 			}
 
@@ -63,69 +69,74 @@ export class ProbeController {
 		}
 	};
 
-	unpairProbe = async (req: AuthenticatedRequest, res: Response) => {
+	/**
+	 * @description Unpair a probe from a user plant by setting the plant's sonde_id to null.
+	 * @param {Request} req - Express request with userPlantId as URL parameter.
+	 * @param {Response} res - Express response with success confirmation.
+	 * @returns {void}
+	 */
+	unpairProbe = async (req: Request, res: Response) => {
 		try {
-			const userId = req.user?.id;
+			const userPlantId = Number.parseInt(req.params.userPlantId as string);
 
-			if (!userId) {
-				res.status(401).json({ error: "Unauthorized", message: "User authentication required" });
+			if (Number.isNaN(userPlantId)) {
+				res.status(400).json({ error: "Validation Error", message: "userPlantId is required" });
 				return;
 			}
 
-			const probeId = Number.parseInt(req.params.id as string);
+			await this.service.unpairProbe(userPlantId);
 
-			if (Number.isNaN(probeId)) {
-				res.status(400).json({ error: "Validation Error", message: "Invalid probe ID" });
-				return;
-			}
-
-			const probe = await this.service.unpairProbe(probeId, userId);
-
-			res.status(200).json({ success: true, message: "Probe unpaired", data: probe });
+			res.status(200).json({ success: true, message: "Probe unpaired from plant" });
 		} catch (error) {
-			const msg = (error as Error).message;
-			if (msg.includes("not found") || msg.includes("do not own")) {
-				res.status(400).json({ error: "Bad Request", message: msg });
-				return;
-			}
-
 			console.error("[ProbeController] Error:", error);
 			res.status(500).json({ error: "Internal Server Error", message: "Failed to unpair probe" });
 		}
 	};
 
+	/**
+	 * @description Retrieve the authenticated user's probes with computed battery and WiFi health status. Optionally filter by a single probe ID.
+	 * @param {AuthenticatedRequest} req - Authenticated request with optional probe ID as URL parameter.
+	 * @param {Response} res - Express response with probe data including battery level percentage and WiFi quality.
+	 * @returns {void}
+	 */
 	getUserProbes = async (req: AuthenticatedRequest, res: Response) => {
 		try {
 			const userId = req.user?.id;
 
 			if (!userId) {
-				res.status(401).json({ error: "Unauthorized", message: "User authentication required" });
+				res.status(401).json({ error: "Unauthorized", message: "Authentication required" });
 				return;
 			}
 
-			const probes = await this.service.getUserProbes(userId);
+			const probeId = req.params.id ? Number.parseInt(req.params.id as string) : undefined;
 
-			const probesWithHealth = probes.map((probe) => ({
-				...probe,
-				battery: this.service.getBatteryStatus(probe.battery_voltage),
-				wifi: this.service.getWifiStatus(probe.wifi_rssi),
-			}));
+			if (probeId && Number.isNaN(probeId)) {
+				res.status(400).json({ error: "Validation Error", message: "Invalid probe ID" });
+				return;
+			}
 
-			res.status(200).json({ success: true, count: probes.length, data: probesWithHealth });
+			const result = await this.service.getUserProbes(userId, probeId);
+			const data = Array.isArray(result)
+				? result.map((probe) => ({
+					...probe,
+					battery: this.service.getBatteryStatus(probe.battery_voltage),
+					wifi: this.service.getWifiStatus(probe.wifi_rssi),
+				}))
+				: {
+					...(result as any),
+					battery: this.service.getBatteryStatus((result as any).battery_voltage),
+					wifi: this.service.getWifiStatus((result as any).wifi_rssi),
+				};
+
+			res.status(200).json({ success: true, data });
 		} catch (error) {
+			if ((error as Error).message === "Probe not found") {
+				res.status(404).json({ error: "Not Found", message: (error as Error).message });
+				return;
+			}
+
 			console.error("[ProbeController] Error:", error);
 			res.status(500).json({ error: "Internal Server Error", message: "Failed to retrieve probes" });
-		}
-	};
-
-	getAvailableProbes = async (req: Request, res: Response) => {
-		try {
-			const probes = await this.service.getAvailableProbes();
-
-			res.status(200).json({ success: true, count: probes.length, data: probes });
-		} catch (error) {
-			console.error("[ProbeController] Error:", error);
-			res.status(500).json({ error: "Internal Server Error", message: "Failed to retrieve available probes" });
 		}
 	};
 }
