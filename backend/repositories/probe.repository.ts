@@ -3,16 +3,18 @@ import { ProbeRecord } from "../types/database";
 
 export class ProbeRepository {
 	/**
-	 * @description Create a new probe record with hardware ID, name, and initial state as "available".
+	 * @description Create a new probe record with hardware ID, name, and user association.
 	 * @param {string} hardwareId - The probe's unique hardware identifier (MAC address).
 	 * @param {string} name - Human-readable name for the probe.
+	 * @param {number} userId - The user to assign this probe to (resolved via pairing code).
 	 * @returns {Promise<ProbeRecord>} The created probe record.
 	 */
-	async create(hardwareId: string, name: string): Promise<ProbeRecord> {
+	async create(hardwareId: string, name: string, userId: number): Promise<ProbeRecord> {
 		const [probe] = await db("probes")
 			.insert({
 				hardware_id: hardwareId,
 				name,
+				user_id: userId,
 				state: "available",
 				battery_voltage: 0,
 				wifi_rssi: 0,

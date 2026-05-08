@@ -6,7 +6,7 @@ import { authenticate } from "../middlewares/auth.middleware";
 const router = Router();
 const controller = new ProbeController();
 
-router.post("/register", validateBody(["hardware_id", "name"]), controller.registerProbe);
+router.post("/register", validateBody(["hardware_id", "name", "pairing_code"]), controller.registerProbe);
 
 router.use(authenticate);
 

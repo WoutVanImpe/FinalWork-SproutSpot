@@ -11,9 +11,9 @@ export class UserController {
 	}
 
 	/**
-	 * @description Create a new user account with name, email, and password.
+	 * @description Create a new user account with name, email, and password. Returns an auto-generated pairing_code for hardware registration.
 	 * @param {Request} req - Express request with { name, email, password } in body.
-	 * @param {Response} res - Express response with created user data or error.
+	 * @param {Response} res - Express response with created user data (including pairing_code) or error.
 	 * @returns {void}
 	 */
 	signup = async (req: Request, res: Response) => {
@@ -31,7 +31,7 @@ export class UserController {
 			res.status(201).json({
 				success: true,
 				message: "Account created successfully",
-				data: { id: user.id, name: user.name, email: user.email, created_at: user.created_at },
+				data: { id: user.id, name: user.name, email: user.email, pairing_code: user.pairing_code, created_at: user.created_at },
 			});
 		} catch (error) {
 			if ((error as Error).message === "Email already registered") {

@@ -10,9 +10,40 @@ export class UserService {
 	}
 
 	/**
-	 * @description Register a new user after verifying the email is not already taken.
+	 * @description Generate a raw pairing code in format XX###### (2 uppercase letters + 6 digits).
+	 * @returns {string} A random pairing code string.
+	 */
+	private generatePairingCode(): string {
+		const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		const digits = "0123456789";
+		let code = "";
+		for (let i = 0; i < 2; i++) {
+			code += letters[Math.floor(Math.random() * letters.length)];
+		}
+		for (let i = 0; i < 6; i++) {
+			code += digits[Math.floor(Math.random() * digits.length)];
+		}
+		return code;
+	}
+
+	/**
+	 * @description Generate a unique pairing code by retrying until no database collision is found.
+	 * @returns {Promise<string>} A unique pairing code not used by any other user.
+	 */
+	private async generateUniquePairingCode(): Promise<string> {
+		let code: string;
+		let existing: UserRecord | undefined;
+		do {
+			code = this.generatePairingCode();
+			existing = await this.repository.findByPairingCode(code);
+		} while (existing);
+		return code;
+	}
+
+	/**
+	 * @description Register a new user after verifying the email is not already taken. Auto-generates a unique hardware pairing code.
 	 * @param {CreateUserDto} input - User registration data containing name, email, and password.
-	 * @returns {Promise<UserRecord>} The created user record.
+	 * @returns {Promise<UserRecord>} The created user record with a pairing_code for probe registration.
 	 */
 	async signup(input: CreateUserDto): Promise<UserRecord> {
 		const existingUser = await this.repository.findByEmail(input.email);
@@ -21,7 +52,9 @@ export class UserService {
 			throw new Error("Email already registered");
 		}
 
-		return this.repository.create(input);
+		const pairingCode = await this.generateUniquePairingCode();
+
+		return this.repository.create(input, pairingCode);
 	}
 
 	/**
@@ -82,6 +115,26 @@ export class UserService {
 	 * @param {string} newPassword - The new password to set.
 	 * @returns {Promise<UserRecord>} The updated user record.
 	 */
+	/**
+	 * @description Look up a user by their hardware pairing code.
+	 * @param {string} pairingCode - The pairing code to search for.
+	 * @returns {Promise<UserRecord | undefined>} The user record or undefined if not found.
+	 */
+	async findByPairingCode(pairingCode: string): Promise<UserRecord | undefined> {
+		return this.repository.findByPairingCode(pairingCode);
+	}
+
+	/**
+	 * @description Rotate a user's pairing code to a new unique value (called after successful probe registration).
+	 * @param {number} userId - The user's database ID.
+	 * @returns {Promise<string>} The newly generated pairing code.
+	 */
+	async regeneratePairingCode(userId: number): Promise<string> {
+		const newCode = await this.generateUniquePairingCode();
+		await this.repository.updatePairingCode(userId, newCode);
+		return newCode;
+	}
+
 	async updatePassword(userId: number, currentPassword: string, newPassword: string): Promise<UserRecord> {
 		const user = await this.repository.findById(userId);
 

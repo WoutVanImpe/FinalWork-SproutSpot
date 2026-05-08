@@ -13,6 +13,7 @@ export async function up(knex: Knex): Promise<void> {
 				table.string("push_token");
 				table.time("notification_window_start").defaultTo("08:00:00");
 				table.time("notification_window_end").defaultTo("22:00:00");
+				table.string("pairing_code").unique().notNullable();
 				table.timestamp("created_at").defaultTo(knex.fn.now());
 			})
 

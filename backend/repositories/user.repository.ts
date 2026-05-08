@@ -4,16 +4,18 @@ import { CreateUserDto, UpdateProfileDto } from "../types/dto";
 
 export class UserRepository {
 	/**
-	 * @description Create a new user record in the database.
+	 * @description Create a new user record in the database with an auto-generated pairing code.
 	 * @param {CreateUserDto} input - User data containing name, email, and password_hash.
+	 * @param {string} pairingCode - The initial hardware pairing code (2 letters + 6 digits).
 	 * @returns {Promise<UserRecord>} The created user record.
 	 */
-	async create(input: CreateUserDto): Promise<UserRecord> {
+	async create(input: CreateUserDto, pairingCode: string): Promise<UserRecord> {
 		const [user] = await db("users")
 			.insert({
 				name: input.name,
 				email: input.email,
 				password_hash: input.password,
+				pairing_code: pairingCode,
 			})
 			.returning("*");
 
@@ -36,6 +38,15 @@ export class UserRepository {
 	 */
 	async findById(id: number): Promise<UserRecord | undefined> {
 		return db("users").where("id", id).first();
+	}
+
+	/**
+	 * @description Find a user by their hardware pairing code.
+	 * @param {string} pairingCode - The user's current pairing code (2 letters + 6 digits).
+	 * @returns {Promise<UserRecord | undefined>} The user record or undefined if not found.
+	 */
+	async findByPairingCode(pairingCode: string): Promise<UserRecord | undefined> {
+		return db("users").where("pairing_code", pairingCode).first();
 	}
 
 	/**
@@ -78,5 +89,20 @@ export class UserRepository {
 		await db("users")
 			.where("id", userId)
 			.update({ push_token: pushToken });
+	}
+
+	/**
+	 * @description Replace a user's pairing code with a new one (rotated after successful probe registration).
+	 * @param {number} userId - The user's database ID.
+	 * @param {string} pairingCode - The new pairing code to assign.
+	 * @returns {Promise<UserRecord>} The updated user record.
+	 */
+	async updatePairingCode(userId: number, pairingCode: string): Promise<UserRecord> {
+		const [user] = await db("users")
+			.where("id", userId)
+			.update({ pairing_code: pairingCode })
+			.returning("*");
+
+		return user;
 	}
 }

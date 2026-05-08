@@ -10,26 +10,31 @@ export class ProbeController {
 	}
 
 	/**
-	 * @description Register a new probe with its hardware ID (MAC address) and a friendly name.
-	 * @param {Request} req - Express request with { hardware_id, name } in body.
-	 * @param {Response} res - Express response with created probe data.
+	 * @description Register a new probe by validating a user's pairing code. On success the probe is linked to the user and the pairing code is rotated.
+	 * @param {Request} req - Express request with { hardware_id, name, pairing_code } in body.
+	 * @param {Response} res - Express response with created probe data or 401 on invalid code.
 	 * @returns {void}
 	 */
 	registerProbe = async (req: Request, res: Response) => {
 		try {
-			const { hardware_id, name } = req.body;
+			const { hardware_id, name, pairing_code } = req.body;
 
-			if (!hardware_id || !name) {
-				res.status(400).json({ error: "Validation Error", message: "hardware_id and name are required" });
+			if (!hardware_id || !name || !pairing_code) {
+				res.status(400).json({ error: "Validation Error", message: "hardware_id, name, and pairing_code are required" });
 				return;
 			}
 
-			const probe = await this.service.registerProbe(hardware_id, name);
+			const probe = await this.service.registerProbe(hardware_id, name, pairing_code);
 
 			res.status(201).json({ success: true, message: "Probe registered", data: probe });
 		} catch (error) {
 			if ((error as Error).message === "Probe with this hardware ID already exists") {
 				res.status(409).json({ error: "Conflict", message: (error as Error).message });
+				return;
+			}
+
+			if ((error as Error).message === "Invalid pairing code") {
+				res.status(401).json({ error: "Unauthorized", message: (error as Error).message });
 				return;
 			}
 

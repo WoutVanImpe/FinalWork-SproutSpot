@@ -18,6 +18,7 @@ export interface UserRecord {
 	push_token: string | null;
 	notification_window_start: string | null;
 	notification_window_end: string | null;
+	pairing_code: string;
 	created_at: Date;
 }
 
