@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { TelemetryService } from "../services/telemetry.service";
-import { TelemetryPayloadDto } from "../types/dto";
+import { TelemetryBatchUploadDto } from "../types/dto";
 
 export class TelemetryController {
 	private service: TelemetryService;
@@ -10,33 +10,29 @@ export class TelemetryController {
 	}
 
 	/**
-	 * @description Accept telemetry data from an XIAO ESP32-C3 probe. Maps raw soil moisture values and updates probe battery/WiFi health in the same call.
-	 * @param {Request} req - Express request with { hardware_id, temp_c, humidity_pct, light_lux, soil_raw, battery_voltage, wifi_rssi } in body.
-	 * @param {Response} res - Express response with created telemetry entry.
+	 * @description Accept a batch of telemetry entries from an XIAO ESP32-C3 probe. Each entry uses the hardware's time_t (Unix epoch) as its timestamp.
+	 * @param {Request} req - Express request with { hardware_id, entries } in body, where entries is an array of 4 telemetry readings.
+	 * @param {Response} res - Express response with created telemetry entries.
 	 * @returns {void}
 	 */
 	uploadTelemetry = async (req: Request, res: Response) => {
 		try {
-			const { hardware_id, temp_c, humidity_pct, light_lux, soil_raw, battery_voltage, wifi_rssi } = req.body;
+			const { hardware_id, entries } = req.body;
 
 			if (!hardware_id) {
 				res.status(400).json({ error: "Validation Error", message: "hardware_id is required" });
 				return;
 			}
 
-			const payload: TelemetryPayloadDto = {
-				hardware_id,
-				temp_c,
-				humidity_pct,
-				light_lux,
-				soil_raw,
-				battery_voltage,
-				wifi_rssi,
-			};
+			if (!Array.isArray(entries) || entries.length === 0) {
+				res.status(400).json({ error: "Validation Error", message: "entries must be a non-empty array" });
+				return;
+			}
 
-			const entry = await this.service.uploadTelemetry(payload);
+			const payload: TelemetryBatchUploadDto = { hardware_id, entries };
+			const created = await this.service.uploadTelemetry(payload);
 
-			res.status(201).json({ success: true, message: "Telemetry uploaded", data: entry });
+			res.status(201).json({ success: true, message: "Telemetry uploaded", count: created.length, data: created });
 		} catch (error) {
 			console.error("[TelemetryController] Error:", error);
 			res.status(500).json({ error: "Internal Server Error", message: "Failed to upload telemetry" });

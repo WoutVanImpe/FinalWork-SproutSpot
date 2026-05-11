@@ -3,17 +3,16 @@ import { ProbeRecord } from "../types/database";
 
 export class ProbeRepository {
 	/**
-	 * @description Create a new probe record with hardware ID, name, and user association.
+	 * @description Create a new probe record with hardware ID and user association. Name defaults to "Unnamed Probe" until the user sets it.
 	 * @param {string} hardwareId - The probe's unique hardware identifier (MAC address).
-	 * @param {string} name - Human-readable name for the probe.
 	 * @param {number} userId - The user to assign this probe to (resolved via pairing code).
 	 * @returns {Promise<ProbeRecord>} The created probe record.
 	 */
-	async create(hardwareId: string, name: string, userId: number): Promise<ProbeRecord> {
+	async create(hardwareId: string, userId: number): Promise<ProbeRecord> {
 		const [probe] = await db("probes")
 			.insert({
 				hardware_id: hardwareId,
-				name,
+				name: "Unnamed Probe",
 				user_id: userId,
 				state: "available",
 				battery_voltage: 0,
@@ -106,5 +105,20 @@ export class ProbeRepository {
 		await db("user_plants")
 			.where("id", userPlantId)
 			.update({ sonde_id: null });
+	}
+
+	/**
+	 * @description Update a probe's friendly name.
+	 * @param {number} probeId - The probe's database ID.
+	 * @param {string} name - The new name for the probe.
+	 * @returns {Promise<ProbeRecord>} The updated probe record.
+	 */
+	async rename(probeId: number, name: string): Promise<ProbeRecord> {
+		const [probe] = await db("probes")
+			.where("id", probeId)
+			.update({ name })
+			.returning("*");
+
+		return probe;
 	}
 }

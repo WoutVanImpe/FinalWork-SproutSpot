@@ -37,6 +37,21 @@ export interface DeactivatePlantDto {
 	reason: "harvested" | "died" | "removed" | "reused";
 }
 
+export interface TelemetryEntryDto {
+	temp_c: number;
+	humidity_pct: number;
+	light_lux: number;
+	soil_raw: number;
+	battery_voltage: number;
+	wifi_rssi: number;
+	time_t: number;
+}
+
+export interface TelemetryBatchUploadDto {
+	hardware_id: string;
+	entries: TelemetryEntryDto[];
+}
+
 export interface TelemetryPayloadDto {
 	hardware_id: string;
 	temp_c: number;
@@ -70,4 +85,8 @@ export interface MovePlantDto {
 
 export interface SnoozeNotificationDto {
 	minutes?: number;
+}
+
+export interface RenameProbeDto {
+	name: string;
 }

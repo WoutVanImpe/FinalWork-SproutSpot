@@ -15,13 +15,12 @@ export class ProbeService {
 	/**
 	 * @description Register a new probe by validating the pairing code against an existing user. On success, the user's pairing code is rotated (security: once a code is used, it expires).
 	 * @param {string} hardwareId - The probe's unique hardware identifier (MAC address).
-	 * @param {string} name - Human-readable name for the probe.
 	 * @param {string} pairingCode - The user's current pairing code to validate against.
-	 * @returns {Promise<ProbeRecord>} The created probe record linked to the matched user.
+	 * @returns {Promise<ProbeRecord>} The created probe record linked to the matched user with a default name.
 	 * @throws {Error} "Invalid pairing code" if no user matches.
 	 * @throws {Error} "Probe with this hardware ID already exists" on duplicate hardware.
 	 */
-	async registerProbe(hardwareId: string, name: string, pairingCode: string): Promise<ProbeRecord> {
+	async registerProbe(hardwareId: string, pairingCode: string): Promise<ProbeRecord> {
 		const user = await this.userRepository.findByPairingCode(pairingCode);
 
 		if (!user) {
@@ -34,7 +33,7 @@ export class ProbeService {
 			throw new Error("Probe with this hardware ID already exists");
 		}
 
-		const probe = await this.repository.create(hardwareId, name, user.id);
+		const probe = await this.repository.create(hardwareId, user.id);
 
 		const newPairingCode = await this.generateUniquePairingCode();
 		await this.userRepository.updatePairingCode(user.id, newPairingCode);
@@ -118,6 +117,24 @@ export class ProbeService {
 		}
 
 		return this.repository.findByUserId(userId);
+	}
+
+	/**
+	 * @description Rename a probe. Only the owning user can rename their probe.
+	 * @param {number} userId - The authenticated user's database ID.
+	 * @param {number} probeId - The probe's database ID.
+	 * @param {string} name - The new name for the probe.
+	 * @returns {Promise<ProbeRecord>} The updated probe record.
+	 * @throws {Error} "Probe not found" if the probe doesn't exist or doesn't belong to the user.
+	 */
+	async renameProbe(userId: number, probeId: number, name: string): Promise<ProbeRecord> {
+		const probe = await this.repository.findById(probeId);
+
+		if (!probe || probe.user_id !== userId) {
+			throw new Error("Probe not found");
+		}
+
+		return this.repository.rename(probeId, name);
 	}
 
 	/**

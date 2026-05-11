@@ -1,8 +1,29 @@
 import { db } from "../db/connection";
 import { ProbeEntryRecord } from "../types/database";
-import { TelemetryPayloadDto } from "../types/dto";
+import { TelemetryEntryDto, TelemetryPayloadDto } from "../types/dto";
 
 export class TelemetryRepository {
+	/**
+	 * @description Batch insert multiple telemetry entries for a single probe. Each entry's time_t (Unix epoch seconds) is converted to a created_at timestamp.
+	 * @param {string} hardwareId - The probe's hardware identifier (MAC address).
+	 * @param {TelemetryEntryDto[]} entries - Array of telemetry entries with already-mapped soil moisture.
+	 * @returns {Promise<ProbeEntryRecord[]>} The created probe entry records.
+	 */
+	async createEntries(hardwareId: string, entries: TelemetryEntryDto[]): Promise<ProbeEntryRecord[]> {
+		const rows = entries.map((e) => ({
+			sonde_id: hardwareId,
+			temp_c: e.temp_c,
+			humidity_pct: e.humidity_pct,
+			light_lux: e.light_lux,
+			soil_moist_pct: e.soil_raw,
+			battery_voltage: e.battery_voltage,
+			wifi_rssi: e.wifi_rssi,
+			created_at: new Date(e.time_t * 1000),
+		}));
+
+		return db("probe_entries").insert(rows).returning("*");
+	}
+
 	/**
 	 * @description Create a new probe entry record with mapped telemetry data (soil moisture already converted to percentage).
 	 * @param {TelemetryPayloadDto} payload - Telemetry data with hardware_id, temperature, humidity, light, mapped soil moisture, battery, and WiFi.

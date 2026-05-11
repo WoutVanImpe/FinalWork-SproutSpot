@@ -11,20 +11,20 @@ export class ProbeController {
 
 	/**
 	 * @description Register a new probe by validating a user's pairing code. On success the probe is linked to the user and the pairing code is rotated.
-	 * @param {Request} req - Express request with { hardware_id, name, pairing_code } in body.
+	 * @param {Request} req - Express request with { hardware_id, pairing_code } in body.
 	 * @param {Response} res - Express response with created probe data or 401 on invalid code.
 	 * @returns {void}
 	 */
 	registerProbe = async (req: Request, res: Response) => {
 		try {
-			const { hardware_id, name, pairing_code } = req.body;
+			const { hardware_id, pairing_code } = req.body;
 
-			if (!hardware_id || !name || !pairing_code) {
-				res.status(400).json({ error: "Validation Error", message: "hardware_id, name, and pairing_code are required" });
+			if (!hardware_id || !pairing_code) {
+				res.status(400).json({ error: "Validation Error", message: "hardware_id and pairing_code are required" });
 				return;
 			}
 
-			const probe = await this.service.registerProbe(hardware_id, name, pairing_code);
+			const probe = await this.service.registerProbe(hardware_id, pairing_code);
 
 			res.status(201).json({ success: true, message: "Probe registered", data: probe });
 		} catch (error) {
@@ -95,6 +95,42 @@ export class ProbeController {
 		} catch (error) {
 			console.error("[ProbeController] Error:", error);
 			res.status(500).json({ error: "Internal Server Error", message: "Failed to unpair probe" });
+		}
+	};
+
+	/**
+	 * @description Rename an existing probe. Only the owning user can rename their probe.
+	 * @param {AuthenticatedRequest} req - Authenticated request with probe ID as URL parameter and { name } in body.
+	 * @param {Response} res - Express response with updated probe data.
+	 * @returns {void}
+	 */
+	renameProbe = async (req: AuthenticatedRequest, res: Response) => {
+		try {
+			const userId = req.user?.id;
+			const probeId = Number.parseInt(req.params.id as string);
+			const { name } = req.body;
+
+			if (!userId) {
+				res.status(401).json({ error: "Unauthorized", message: "Authentication required" });
+				return;
+			}
+
+			if (Number.isNaN(probeId) || !name) {
+				res.status(400).json({ error: "Validation Error", message: "probe ID and name are required" });
+				return;
+			}
+
+			const probe = await this.service.renameProbe(userId, probeId, name);
+
+			res.status(200).json({ success: true, message: "Probe renamed", data: probe });
+		} catch (error) {
+			if ((error as Error).message === "Probe not found") {
+				res.status(404).json({ error: "Not Found", message: (error as Error).message });
+				return;
+			}
+
+			console.error("[ProbeController] Error:", error);
+			res.status(500).json({ error: "Internal Server Error", message: "Failed to rename probe" });
 		}
 	};
 

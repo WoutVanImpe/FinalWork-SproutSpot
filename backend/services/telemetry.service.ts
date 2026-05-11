@@ -1,5 +1,5 @@
 import { TelemetryRepository } from "../repositories/telemetry.repository";
-import { TelemetryPayloadDto } from "../types/dto";
+import { TelemetryBatchUploadDto, TelemetryEntryDto } from "../types/dto";
 import { ProbeEntryRecord } from "../types/database";
 
 export class TelemetryService {
@@ -10,21 +10,22 @@ export class TelemetryService {
 	}
 
 	/**
-	 * @description Process and store telemetry data from a probe. Maps raw soil moisture to a percentage and updates probe battery/WiFi health in a single operation.
-	 * @param {TelemetryPayloadDto} payload - Telemetry data containing hardware_id, temperature, humidity, light, soil raw value, battery voltage, and WiFi RSSI.
-	 * @returns {Promise<ProbeEntryRecord>} The created probe entry record with mapped soil moisture.
+	 * @description Process and store a batch of telemetry entries from a probe. Maps raw soil moisture per entry, batch-inserts all 4, and updates probe battery/WiFi health once.
+	 * @param {TelemetryBatchUploadDto} payload - Batch telemetry data with hardware_id and 4 entries.
+	 * @returns {Promise<ProbeEntryRecord[]>} The created probe entry records with mapped soil moisture.
 	 */
-	async uploadTelemetry(payload: TelemetryPayloadDto): Promise<ProbeEntryRecord> {
-		const mappedSoil = this.mapSoilMoisture(payload.soil_raw);
+	async uploadTelemetry(payload: TelemetryBatchUploadDto): Promise<ProbeEntryRecord[]> {
+		const mappedEntries: TelemetryEntryDto[] = payload.entries.map((entry) => ({
+			...entry,
+			soil_raw: this.mapSoilMoisture(entry.soil_raw),
+		}));
 
-		const entry = await this.repository.createEntry({
-			...payload,
-			soil_raw: mappedSoil,
-		});
+		const entries = await this.repository.createEntries(payload.hardware_id, mappedEntries);
 
-		await this.repository.updateProbeHealth(payload.hardware_id, payload.battery_voltage, payload.wifi_rssi);
+		const lastEntry = payload.entries[payload.entries.length - 1]!;
+		await this.repository.updateProbeHealth(payload.hardware_id, lastEntry.battery_voltage, lastEntry.wifi_rssi);
 
-		return entry;
+		return entries;
 	}
 
 	/**
