@@ -1,10 +1,20 @@
 import { StyleSheet, View, ViewStyle } from "react-native";
 import { Styling } from "../../constants/Styling";
 import React, { ReactNode } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const StyledView = ({ style, children, ...props }: { style?: ViewStyle; children?: ReactNode }) => {
+const StyledView = ({ style, safe = false, children, ...props }: { style?: ViewStyle; safe?: boolean; children?: ReactNode }) => {
+	const insets = useSafeAreaInsets();
+	
+	if (!safe)
+		return (
+			<View style={[styles.view, style]} {...props}>
+				{children}
+			</View>
+		);
+
 	return (
-		<View style={[styles.view, style]} {...props}>
+		<View style={[styles.view, { paddingTop: insets.top, paddingBottom: insets.bottom }, style]} {...props}>
 			{children}
 		</View>
 	);

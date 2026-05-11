@@ -12,9 +12,11 @@ import {
 	routeIcons,
 	routeOrder,
 } from "../constants/tabConfig";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CustomTabBar = ({ state, navigation }: any) => {
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
+	const insets = useSafeAreaInsets()
 	const barWidth = SCREEN_WIDTH - BAR_MARGIN * 2;
 	const activeIndex = state.index;
 
@@ -54,7 +56,7 @@ const CustomTabBar = ({ state, navigation }: any) => {
 	}, [activeIndex]);
 
 	return (
-		<View style={[styles.wrapper, { width: SCREEN_WIDTH }]}>
+		<View style={[styles.wrapper, { width: SCREEN_WIDTH, bottom: insets.bottom }]}>
 			<CurvedBackground width={barWidth} cx={cx} />
 			<View style={[styles.bar, { width: barWidth }]}>
 				{visibleRoutes.map((route: any, index: number) => (
@@ -81,7 +83,7 @@ const CustomTabBar = ({ state, navigation }: any) => {
 	);
 };
 
-const Footer = () => {
+const NavBar = () => {
 	const [fontsLoaded] = useFonts({
 		"SpaceGrotesk-Regular": require("../assets/fonts/SpaceGrotesk-Regular.ttf"),
 		"SpaceGrotesk-Bold": require("../assets/fonts/SpaceGrotesk-Bold.ttf"),
@@ -102,12 +104,11 @@ const Footer = () => {
 	);
 };
 
-export default Footer;
+export default NavBar;
 
 const styles = StyleSheet.create({
 	wrapper: {
 		position: "absolute",
-		bottom: 25,
 		alignItems: "center",
 	},
 	bar: {
