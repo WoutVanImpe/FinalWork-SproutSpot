@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import React from "react";
 import Svg, { Path } from "react-native-svg";
 import { Styling } from "../../../constants/Styling";
@@ -28,20 +28,23 @@ const CurvedBackground = ({ width, cx }: { width: number; cx: number }) => {
 	].join(" ");
 
 	return (
-		<Svg width={width} height={BAR_HEIGHT} style={styles.svg}>
-			<Path d={path} fill={Styling.Colors.white} />
-		</Svg>
+		<View style={[styles.shadowContainer, { width, height: BAR_HEIGHT }]}>
+			<Svg width={width} height={BAR_HEIGHT}>
+				<Path d={path} fill={Styling.Colors.white} />
+			</Svg>
+		</View>
 	);
 };
 
 export default CurvedBackground;
 
 const styles = StyleSheet.create({
-	svg: {
+	shadowContainer: {
+		borderRadius: CORNER_RADIUS,
 		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 10 },
-		shadowOpacity: 0.1,
-		shadowRadius: 10,
-		elevation: 5,
+		shadowOffset: { width: 0, height: 8 },
+		shadowOpacity: 0.15,
+		shadowRadius: 12,
+		elevation: 8,
 	},
 });
