@@ -1,5 +1,5 @@
-import { StyleSheet, View, TouchableOpacity, useWindowDimensions } from "react-native";
-import React from "react";
+import { StyleSheet, View, TouchableOpacity, useWindowDimensions, Animated } from "react-native";
+import React, { useRef, useState, useEffect } from "react";
 import { Tabs } from "expo-router";
 import { useFonts } from "expo-font";
 import Svg, { Path } from "react-native-svg";
@@ -25,11 +25,7 @@ const routeIcons: Record<string, React.FC<any>> = {
 
 const routeOrder = ["index", "(garden)/garden", "(explore)/explore"];
 
-const CurvedBackground = ({ width, activeIndex }: { width: number; activeIndex: number }) => {
-    const totalTabsWidth = TAB_WIDTH * 3 + TAB_GAP * 2;
-    const startOffset = (width - totalTabsWidth) / 2;
-    const cx = startOffset + TAB_WIDTH / 2 + activeIndex * (TAB_WIDTH + TAB_GAP);
-    
+const CurvedBackground = ({ width, cx }: { width: number; cx: number }) => {
     const r = SCOOP_RADIUS;
     const d = SCOOP_DEPTH;
     const s = 16;
@@ -64,11 +60,44 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
 	const barWidth = SCREEN_WIDTH - BAR_MARGIN * 2;
 	const activeIndex = state.index;
 
+	const totalTabsWidth = TAB_WIDTH * 3 + TAB_GAP * 2;
+	const startOffset = (barWidth - totalTabsWidth) / 2;
+	const getCx = (index: number) => startOffset + TAB_WIDTH / 2 + index * (TAB_WIDTH + TAB_GAP);
+
+	const animatedCx = useRef(new Animated.Value(getCx(0))).current;
+	const [cx, setCx] = useState(getCx(0));
+
 	const visibleRoutes = state.routes.filter((r: any) => routeOrder.includes(r.name));
+	const tabAnims = useRef(visibleRoutes.map(() => new Animated.Value(0))).current;
+
+	useEffect(() => {
+		const listener = animatedCx.addListener(({ value }) => setCx(value));
+		return () => animatedCx.removeListener(listener);
+	}, []);
+
+	useEffect(() => {
+		Animated.spring(animatedCx, {
+			toValue: getCx(activeIndex),
+			useNativeDriver: false,
+			friction: 8,
+			tension: 40,
+		}).start();
+	}, [activeIndex]);
+
+	useEffect(() => {
+		tabAnims.forEach((anim: Animated.Value, index: number) => {
+			Animated.spring(anim, {
+				toValue: index === activeIndex ? 1 : 0,
+				useNativeDriver: true,
+				friction: 8,
+				tension: 40,
+			}).start();
+		});
+	}, [activeIndex]);
 
 	return (
 		<View style={[styles.wrapper, { width: SCREEN_WIDTH }]}>
-			<CurvedBackground width={barWidth} activeIndex={activeIndex} />
+			<CurvedBackground width={barWidth} cx={cx} />
 			<View style={[styles.bar, { width: barWidth }]}>
 				{visibleRoutes.map((route: any, index: number) => {
 					const isFocused = state.index === index;
@@ -85,6 +114,14 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
 					};
 
 					const Icon = routeIcons[route.name];
+					const translateY = tabAnims[index].interpolate({
+						inputRange: [0, 1],
+						outputRange: [0, -40],
+					});
+					const circleScale = tabAnims[index].interpolate({
+						inputRange: [0, 1],
+						outputRange: [0, 1],
+					});
 
 					return (
 						<TouchableOpacity
@@ -93,14 +130,24 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
 							activeOpacity={1}
 							style={[styles.tabContainer, { width: TAB_WIDTH }]}
 						>
-							<View style={isFocused ? styles.activeBtn : styles.inactiveBtn}>
-								{isFocused && <View style={styles.focusedCircle} />}
+							<Animated.View
+								style={[
+									styles.iconWrapper,
+									{ transform: [{ translateY }] },
+								]}
+							>
+								<Animated.View
+									style={[
+										styles.focusedCircle,
+										{ transform: [{ scale: circleScale }], opacity: circleScale },
+									]}
+								/>
 								<StyledIcon
 									Icon={Icon}
 									fill={isFocused ? Styling.Colors.white : Styling.Colors.lightGrey}
 									size="med"
 								/>
-							</View>
+							</Animated.View>
 						</TouchableOpacity>
 					);
 				})}
@@ -159,18 +206,11 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-	inactiveBtn: {
-		flex: 1,
-		width: "100%",
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	activeBtn: {
+	iconWrapper: {
 		width: 60,
 		height: 60,
 		justifyContent: "center",
 		alignItems: "center",
-		top: -40,
 	},
 	focusedCircle: {
 		position: "absolute",
