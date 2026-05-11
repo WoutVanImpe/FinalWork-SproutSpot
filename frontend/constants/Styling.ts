@@ -1,4 +1,64 @@
-export const Styling = {
+interface Styling {
+	Colors: {
+		green: string;
+		red: string;
+		white: string;
+		lightGrey: string;
+		gradGrey: string;
+	};
+	Fonts: {
+		Family: {
+			reg: string;
+			bold: string;
+		};
+		Size: {
+			sml: number;
+			reg: number;
+			med: number;
+			lrg: number;
+			xlg: number;
+			xxl: number;
+		};
+		Weight: {
+			reg: "500";
+			bold: "700";
+		};
+	};
+	Spacing: {
+		xsm: number;
+		sml: number;
+		reg: number;
+		med: number;
+		lrg: number;
+		xlg: number;
+		xxl: number;
+	};
+	Padding: {
+		xsm: number;
+		sml: number;
+		reg: number;
+		med: number;
+		lrg: number;
+		xlg: number;
+		xxl: number;
+	};
+	BorderRadius: {
+		sml: number;
+		reg: number;
+		med: number;
+		lrg: string;
+	};
+	IconSize: {
+		sml: number;
+		reg: number;
+		med: number;
+		lrg: number;
+		xlg: number;
+	};
+	Shadow: string;
+}
+
+export const Styling: Styling = {
 	Colors: {
 		green: "#00CA68",
 		red: "#C44028",
@@ -8,17 +68,23 @@ export const Styling = {
 	},
 
 	Fonts: {
+		Family: {
+			reg: "SpaceGrotesk-Regular",
+			bold: "SpaceGrotesk-Bold",
+		},
+
 		Size: {
 			sml: 10,
 			reg: 14,
-			med: 18,
-			lrg: 24,
-			xlg: 32,
+			med: 16,
+			lrg: 18,
+			xlg: 24,
+			xxl: 32,
 		},
 
 		Weight: {
-			reg: 500,
-			bold: 700,
+			reg: "500",
+			bold: "700",
 		},
 	},
 
@@ -47,6 +113,14 @@ export const Styling = {
 		reg: 8,
 		med: 32,
 		lrg: "50%",
+	},
+
+	IconSize: {
+		sml: 16,
+		reg: 24,
+		med: 32,
+		lrg: 48,
+		xlg: 64,
 	},
 
 	Shadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
