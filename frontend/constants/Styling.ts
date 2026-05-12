@@ -77,7 +77,7 @@ export const Styling: Styling = {
 			sml: 10,
 			reg: 14,
 			med: 16,
-			lrg: 18,
+			lrg: 20,
 			xlg: 24,
 			xxl: 32,
 		},
