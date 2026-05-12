@@ -1,11 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import StyledView from '../../components/style/StyledView'
+import StyledText from '../../components/style/StyledText'
 
 const Explore = () => {
   return (
-    <View>
-      <Text>Explore</Text>
-    </View>
+    <StyledView safe>
+      <StyledText type='head1'>Explore</StyledText>
+    </StyledView>
   )
 }
 

@@ -1,11 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet } from 'react-native'
 import React from 'react'
+import StyledView from '../../components/style/StyledView'
+import StyledText from '../../components/style/StyledText'
 
 const Account = () => {
   return (
-    <View>
-      <Text>Account</Text>
-    </View>
+    <StyledView>
+      <StyledText type='head1'>Account</StyledText>
+    </StyledView>
   )
 }
 
