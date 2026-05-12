@@ -25,6 +25,7 @@ const CustomTabBar = ({ state, navigation }: any) => {
 
 	const activeRoute = state.routes[state.index];
 	const visibleIndex = visibleRoutes.findIndex((r: any) => r.key === activeRoute.key);
+	const prevVisibleIndex = useRef(visibleIndex);
 
 	useEffect(() => {
 		const listener = animatedCx.addListener(({ value }) => setCx(value));
@@ -32,13 +33,20 @@ const CustomTabBar = ({ state, navigation }: any) => {
 	}, []);
 
 	useEffect(() => {
-		if (visibleIndex < 0) return;
+		if (visibleIndex < 0) {
+			prevVisibleIndex.current = visibleIndex;
+			return;
+		}
+		if (prevVisibleIndex.current < 0) {
+			animatedCx.setValue(getCx(visibleIndex));
+		}
 		Animated.spring(animatedCx, {
 			toValue: getCx(visibleIndex),
 			useNativeDriver: false,
 			friction: 8,
 			tension: 40,
 		}).start();
+		prevVisibleIndex.current = visibleIndex;
 	}, [visibleIndex]);
 
 	useEffect(() => {
