@@ -14,7 +14,7 @@ const StyledView = ({ style, safe = false, children, ...props }: { style?: ViewS
 		);
 
 	return (
-		<View style={[styles.view, { paddingTop: insets.top, paddingBottom: insets.bottom }, style]} {...props}>
+		<View style={[styles.view, { paddingBottom: insets.bottom }, style]} {...props}>
 			{children}
 		</View>
 	);
@@ -25,6 +25,7 @@ export default StyledView;
 const styles = StyleSheet.create({
 	view: {
 		backgroundColor: Styling.Colors.gradGrey,
+		paddingTop:	110,
 		flex: 1,
 		alignItems: "center",
 		justifyContent: "flex-start",
