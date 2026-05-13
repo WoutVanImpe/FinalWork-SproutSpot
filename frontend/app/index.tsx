@@ -1,11 +1,11 @@
 import { StyleSheet } from "react-native";
 import React from "react";
 import StyledView from "../components/style/StyledView";
-import StatusHeader from "../components/shared/home/statusHeader/StatusHeader";
 import StyledText from "../components/style/StyledText";
 import Spacer from "../components/style/Spacer";
 import { Styling } from "../constants/Styling";
 import CardContainer from "../components/shared/vegetableCard/CardContainer";
+import StatusHeader from "../components/pages/home/statusHeader/StatusHeader";
 
 const index = () => {
 	const myPlants = [
