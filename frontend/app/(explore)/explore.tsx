@@ -20,7 +20,7 @@ const candidates = allVegetables.slice(0, 5);
 
 const Explore = () => {
 	return (
-		<StyledView safe>
+		<StyledView>
 			<ExploreHeader onButtonPress={() => {}} />
 			<Spacer space={Styling.Spacing.reg} />
 			<MonthlyCandidates data={candidates} />

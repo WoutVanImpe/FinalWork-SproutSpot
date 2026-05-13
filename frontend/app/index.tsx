@@ -18,7 +18,7 @@ const index = () => {
 	];
 
 	return (
-		<StyledView safe>
+		<StyledView>
 			<StatusHeader items={myPlants} />
 			<Spacer space={Styling.Spacing.xxl} />
 			<StyledText type="head2" style={styles.head2}>

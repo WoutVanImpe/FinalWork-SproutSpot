@@ -6,7 +6,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { BAR_MARGIN } from "../../constants/tabConfig";
 import { ScrollContext } from "../../context/ScrollContext";
 
-const StyledView = ({ style, safe = false, children, ...props }: { style?: ViewStyle; safe?: boolean; children?: ReactNode }) => {
+const StyledView = ({ style, children, ...props }: { style?: ViewStyle; safe?: boolean; children?: ReactNode }) => {
 	const insets = useSafeAreaInsets();
 	const scrollRef = useRef<ScrollView>(null);
 
@@ -19,13 +19,6 @@ const StyledView = ({ style, safe = false, children, ...props }: { style?: ViewS
 			scrollRef.current?.scrollTo({ y: 0, animated: false });
 		}, [])
 	);
-
-	if (!safe)
-		return (
-			<View style={[styles.base, style]} {...props}>
-				{children}
-			</View>
-		);
 
 	return (
 		<ScrollView
