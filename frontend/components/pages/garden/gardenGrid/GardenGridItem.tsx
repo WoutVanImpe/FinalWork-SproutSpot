@@ -1,8 +1,15 @@
-import { Image, StyleSheet, View } from "react-native";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import React from "react";
 import WarningIcon from "../../../../assets/icons/warning.svg";
 import StyledIcon from "../../../style/StyledIcon";
 import { Styling } from "../../../../constants/Styling";
+
+export interface PlantStatusData {
+	level: number;
+	label: string;
+	optimalMin: number;
+	optimalMax: number;
+}
 
 export interface GardenPlant {
 	id: string;
@@ -10,14 +17,21 @@ export interface GardenPlant {
 	warning: boolean;
 	x: number;
 	y: number;
+	nickname: string;
+	stage: { current: number; max: number; label: string };
+	water: PlantStatusData;
+	light: PlantStatusData;
+	temperature: PlantStatusData;
+	advice: string;
+	battery: number;
 }
 
-const GardenGridItem = ({ plant }: { plant: GardenPlant }) => {
+const GardenGridItem = ({ plant, onPress }: { plant: GardenPlant; onPress?: () => void }) => {
 	return (
-		<View style={styles.wrapper}>
+		<TouchableOpacity style={styles.wrapper} onPress={onPress} activeOpacity={0.7}>
 			<Image source={plant.image} style={styles.image} resizeMode="contain" />
 			{plant.warning && <StyledIcon Icon={WarningIcon} style={styles.icon} size="reg"/>}
-		</View>
+		</TouchableOpacity>
 	);
 };
 
