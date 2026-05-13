@@ -9,7 +9,7 @@ export interface VegetableCardProps {
 	id: string | number;
 	name: string;
 	image: number | { uri: string };
-	warning: boolean;
+	warning?: boolean;
 }
 
 const VegetableCard = ({ vegetable }: { vegetable: VegetableCardProps }) => {
@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
 		position: "relative",
 		alignItems: "center",
 		elevation: 2,
+		minHeight: 130,
 	},
 	image: {
 		width: "100%",
