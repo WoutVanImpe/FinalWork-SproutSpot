@@ -21,7 +21,7 @@ interface ExploreHeaderProps {
 const WaveShape = ({ fill, d, style }: { fill: string; d: string; style?: any }) => (
     <View style={style}>
         <Svg width={WAVE_W} height={WAVE_H} viewBox={WAVE_VIEWBOX} preserveAspectRatio="none">
-            <Path d={d} fill={fill} transform={`translate(1284, 0) scale(-1, 1) rotate(0 642 128)`} />
+            <Path d={d} fill={fill} transform={`translate(1284, 0) scale(-1, 1) rotate(5 642 128)`} />
         </Svg>
     </View>
 );
@@ -70,8 +70,8 @@ const styles = StyleSheet.create({
     },
     svgWrapper: {
         position: 'absolute',
-        top: 28,
-        left: -SCREEN_WIDTH - 70,
+        top: 15,
+        left: -SCREEN_WIDTH - 75,
         zIndex: 1,
     },
     shadowLayer1: {
