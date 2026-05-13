@@ -15,7 +15,7 @@ type TextTypeKey = keyof typeof TextType;
 
 const StyledText = ({ type, fullCap = false, style, children, ...props }: { type?: TextTypeKey; fullCap?: boolean; style?: TextStyle; children?: ReactNode }) => {
 	return (
-		<Text style={[styles.text, { fontSize: type ? TextType[type] : undefined }, { textTransform: fullCap ? "uppercase" : "capitalize" }, style]} {...props}>
+		<Text style={[styles.text, { fontSize: type ? TextType[type] : undefined }, { textTransform: fullCap ? "uppercase" : "none" }, style]} {...props}>
 			{children}
 		</Text>
 	);
