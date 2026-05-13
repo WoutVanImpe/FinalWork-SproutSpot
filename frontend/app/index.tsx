@@ -20,14 +20,16 @@ const index = () => {
 	return (
 		<StyledView safe>
 			<StatusHeader items={myPlants} />
-			<Spacer space={Styling.Spacing.xxl}/>
-			<StyledText type="head2" style={styles.head2}>Mijn tuin</StyledText>
-			<CardContainer data={myPlants} />
+			<Spacer space={Styling.Spacing.xxl} />
+			<StyledText type="head2" style={styles.head2}>
+				Mijn tuin
+			</StyledText>
+			<CardContainer data={myPlants} style={{ marginBottom: 175 }} />
 		</StyledView>
 	);
 };
 
-export default index; 
+export default index;
 
 const styles = StyleSheet.create({
 	head2: {
