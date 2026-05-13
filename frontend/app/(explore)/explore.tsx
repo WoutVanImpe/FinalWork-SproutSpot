@@ -24,7 +24,7 @@ const Explore = () => {
 			<ExploreHeader onButtonPress={() => {}} />
 			<Spacer space={Styling.Spacing.reg} />
 			<MonthlyCandidates data={candidates} />
-      <Spacer space={Styling.Spacing.lrg} />
+			<Spacer space={Styling.Spacing.lrg} />
 			<VegetableList data={allVegetables} />
 		</StyledView>
 	);
