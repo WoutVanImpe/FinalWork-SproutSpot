@@ -1,34 +1,49 @@
-import { StyleSheet, View, ViewStyle } from "react-native";
+import { ScrollView, StyleSheet, View, ViewStyle } from "react-native";
 import { Styling } from "../../constants/Styling";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useRef, useCallback } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useFocusEffect } from "@react-navigation/native";
 import { BAR_MARGIN } from "../../constants/tabConfig";
 
 const StyledView = ({ style, safe = false, children, ...props }: { style?: ViewStyle; safe?: boolean; children?: ReactNode }) => {
 	const insets = useSafeAreaInsets();
-	
+	const scrollRef = useRef<ScrollView>(null);
+
+	useFocusEffect(
+		useCallback(() => {
+			scrollRef.current?.scrollTo({ y: 0, animated: false });
+		}, [])
+	);
+
 	if (!safe)
 		return (
-			<View style={[styles.view, style]} {...props}>
+			<View style={[styles.base, style]} {...props}>
 				{children}
 			</View>
 		);
 
 	return (
-		<View style={[styles.view, { paddingBottom: insets.bottom }, style]} {...props}>
+		<ScrollView
+			ref={scrollRef}
+			style={[styles.base, { paddingBottom: insets.bottom }, style]}
+			contentContainerStyle={styles.content}
+			{...props}
+		>
 			{children}
-		</View>
+		</ScrollView>
 	);
 };
 
 export default StyledView;
 
 const styles = StyleSheet.create({
-	view: {
+	base: {
 		backgroundColor: Styling.Colors.gradGrey,
 		paddingTop:	110,
 		paddingHorizontal: BAR_MARGIN,
 		flex: 1,
+	},
+	content: {
 		alignItems: "center",
 		justifyContent: "flex-start",
 	},
