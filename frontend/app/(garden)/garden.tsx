@@ -7,6 +7,7 @@ import ZoomInIcon from "../../assets/icons/zoom_in.svg";
 import ZoomOutIcon from "../../assets/icons/zoom_out.svg";
 import { Styling } from "../../constants/Styling";
 import { BAR_HEIGHT, BAR_MARGIN } from "../../constants/tabConfig";
+import Spacer from "../../components/style/Spacer";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -133,6 +134,7 @@ const Garden = () => {
 
 	return (
 		<View style={styles.page}>
+			<Spacer space={Styling.Spacing.xxl} />
 			<View style={styles.controlBar}>
 				<TouchableOpacity style={styles.editBtn}>
 					<StyledText type="head4" style={styles.editBtnText}>
@@ -200,21 +202,23 @@ const styles = StyleSheet.create({
 		width: "100%",
 	},
 	editBtn: {
-		flex: 1,
-		backgroundColor: Styling.Colors.lightGrey,
+		width: 150,
+		backgroundColor: Styling.Colors.green,
 		paddingVertical: Styling.Padding.sml,
 		paddingHorizontal: Styling.Padding.lrg,
 		borderRadius: Styling.BorderRadius.reg,
 		alignItems: "center",
+		marginRight: "auto",
 	},
 	editBtnText: {
 		color: Styling.Colors.white,
 	},
 	zoomBtn: {
-		width: 36,
-		height: 36,
-		borderRadius: 18,
+		aspectRatio: 1,
 		backgroundColor: Styling.Colors.green,
+		paddingVertical: Styling.Padding.sml,
+		paddingHorizontal: Styling.Padding.sml,
+		borderRadius: Styling.BorderRadius.reg,
 		alignItems: "center",
 		justifyContent: "center",
 	},
