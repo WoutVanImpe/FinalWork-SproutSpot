@@ -1,16 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import StyledView from '../../components/style/StyledView'
-import StyledText from '../../components/style/StyledText'
+import { StyleSheet } from "react-native";
+import React from "react";
+import StyledView from "../../components/style/StyledView";
+import ExploreHeader from "../../components/pages/explore/header/ExploreHeader";
 
 const Explore = () => {
-  return (
-    <StyledView safe>
-      <StyledText type='head1'>Explore</StyledText>
-    </StyledView>
-  )
-}
+	return (
+		<StyledView safe>
+			<ExploreHeader onButtonPress={() => {}} />
+		</StyledView>
+	);
+};
 
-export default Explore
+export default Explore;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});
