@@ -25,13 +25,15 @@ function clampOffset(
 	vw: number,
 	vh: number,
 ): { x: number; y: number } {
+	const cx = GRID_W / 2;
+	const cy = GRID_H / 2;
 	const gw = GRID_W * scale;
 	const gh = GRID_H * scale;
 
-	const minX = gw <= vw ? (vw - gw) / 2 : vw - gw;
-	const maxX = gw <= vw ? (vw - gw) / 2 : 0;
-	const minY = gh <= vh ? (vh - gh) / 2 : vh - gh;
-	const maxY = gh <= vh ? (vh - gh) / 2 : 0;
+	const minX = gw <= vw ? vw / 2 - cx : vw - cx * (1 - scale) - GRID_W * scale;
+	const maxX = gw <= vw ? vw / 2 - cx : cx * (scale - 1);
+	const minY = gh <= vh ? vh / 2 - cy : vh - cy * (1 - scale) - GRID_H * scale;
+	const maxY = gh <= vh ? vh / 2 - cy : cy * (scale - 1);
 
 	return {
 		x: Math.min(maxX, Math.max(minX, desired.x)),
@@ -105,35 +107,35 @@ const Garden = () => {
 		}),
 	).current;
 
-	const recomputeOffsetForZoom = (prevScale: number, newScale: number) => {
+	const zoom = (dir: "in" | "out") => {
+		const prevScale = scaleRef.current;
+		const newScale =
+			dir === "in"
+				? Math.min(MAX_SCALE, Math.round((prevScale + SCALE_STEP) * 10) / 10)
+				: Math.max(MIN_SCALE, Math.round((prevScale - SCALE_STEP) * 10) / 10);
+		if (newScale === prevScale) return;
+
+		setScale(newScale);
+
 		const vw = viewportSizeRef.current.width;
 		const vh = viewportSizeRef.current.height;
 		if (vw === 0 || vh === 0) return;
+
 		setOffset((prevOffset) => {
-			const gridCx = (vw / 2 - prevOffset.x) / prevScale;
-			const gridCy = (vh / 2 - prevOffset.y) / prevScale;
+			const cx = GRID_W / 2;
+			const cy = GRID_H / 2;
+			const ratio = newScale / prevScale;
 			return clampOffset(
-				{ x: vw / 2 - gridCx * newScale, y: vh / 2 - gridCy * newScale },
+				{
+					x: prevOffset.x * ratio + (vw / 2 - cx) * (1 - ratio),
+					y: prevOffset.y * ratio + (vh / 2 - cy) * (1 - ratio),
+				},
 				newScale,
 				vw,
 				vh,
 			);
 		});
 	};
-
-	const zoomIn = () =>
-		setScale((prev) => {
-			const newScale = Math.min(MAX_SCALE, Math.round((prev + SCALE_STEP) * 10) / 10);
-			recomputeOffsetForZoom(prev, newScale);
-			return newScale;
-		});
-
-	const zoomOut = () =>
-		setScale((prev) => {
-			const newScale = Math.max(MIN_SCALE, Math.round((prev - SCALE_STEP) * 10) / 10);
-			recomputeOffsetForZoom(prev, newScale);
-			return newScale;
-		});
 
 	const plantMap = new Map(gardenPlants.map((p) => [`${p.x}-${p.y}`, p]));
 
@@ -150,10 +152,10 @@ const Garden = () => {
 				<TouchableOpacity style={styles.editBtn}>
 					<StyledText type="head4" style={styles.editBtnText}>Bewerken</StyledText>
 				</TouchableOpacity>
-				<TouchableOpacity style={styles.zoomBtn} onPress={zoomOut}>
+				<TouchableOpacity style={styles.zoomBtn} onPress={() => zoom("out")}>
 					<StyledIcon Icon={ZoomOutIcon} size="sml" fill={Styling.Colors.white} />
 				</TouchableOpacity>
-				<TouchableOpacity style={styles.zoomBtn} onPress={zoomIn}>
+				<TouchableOpacity style={styles.zoomBtn} onPress={() => zoom("in")}>
 					<StyledIcon Icon={ZoomInIcon} size="sml" fill={Styling.Colors.white} />
 				</TouchableOpacity>
 			</View>
@@ -173,9 +175,9 @@ const Garden = () => {
 						styles.gridTransform,
 						{
 							transform: [
+								{ scale },
 								{ translateX: offset.x },
 								{ translateY: offset.y },
-								{ scale },
 							],
 						},
 					]}
