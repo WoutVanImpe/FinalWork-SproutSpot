@@ -29,7 +29,9 @@ const StyledView = ({ style, safe = false, children, ...props }: { style?: ViewS
 			contentContainerStyle={styles.content}
 			{...props}
 		>
-			{children}
+			<View style={styles.contentPadding}>
+				{children}
+			</View>
 		</ScrollView>
 	);
 };
@@ -39,12 +41,14 @@ export default StyledView;
 const styles = StyleSheet.create({
 	base: {
 		backgroundColor: Styling.Colors.gradGrey,
-		paddingTop:	110,
-		paddingHorizontal: BAR_MARGIN,
 		flex: 1,
 	},
 	content: {
 		alignItems: "center",
 		justifyContent: "flex-start",
+	},
+	contentPadding: {
+		paddingTop: 110,
+		paddingHorizontal: BAR_MARGIN,
 	},
 });
