@@ -8,6 +8,7 @@ import { BAR_MARGIN, TAB_WIDTH, TAB_GAP, BAR_HEIGHT, routeIcons, routeOrder } fr
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import NavHeader from "../components/shared/header/NavHeader";
+import { OverlayProvider } from "../context/OverlayContext";
 
 const CustomTabBar = ({ state, navigation }: any) => {
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
@@ -97,7 +98,7 @@ const NavOverlay = () => {
 	if (!fontsLoaded) return null;
 
 	return (
-		<>
+		<OverlayProvider>
 			<StatusBar style="light" />
 			<NavHeader />
 			<Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
@@ -106,7 +107,7 @@ const NavOverlay = () => {
 				<Tabs.Screen name="(explore)/explore" />
 				<Tabs.Screen name="(account)/account" options={{ href: null }} />
 			</Tabs>
-		</>
+		</OverlayProvider>
 	);
 };
 

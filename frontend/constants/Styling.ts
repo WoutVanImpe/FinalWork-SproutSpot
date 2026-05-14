@@ -4,6 +4,8 @@ interface Styling {
 		red: string;
 		white: string;
 		lightGrey: string;
+		darkGrey: string;
+		black: string;
 		gradGrey: string;
 	};
 	Fonts: {
@@ -64,6 +66,8 @@ export const Styling: Styling = {
 		red: "#C44028",
 		white: "#fff",
 		lightGrey: "#a1a1a1",
+		darkGrey: "#555",
+		black: "#222222",
 		gradGrey: "linear-gradient(25deg,rgba(109, 118, 126, 1) 0%, rgba(69, 78, 86, 1) 100%)",
 	},
 
