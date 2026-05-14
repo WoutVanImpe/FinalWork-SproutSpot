@@ -1,188 +1,78 @@
-import { Dimensions, PanResponder, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, PanResponder, StyleSheet, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import StyledIcon from "../../components/style/StyledIcon";
-import StyledText from "../../components/style/StyledText";
-import GardenGridItem, { GardenPlant } from "../../components/pages/garden/gardenGrid/GardenGridItem";
-import ZoomInIcon from "../../assets/icons/zoom_in.svg";
-import ZoomOutIcon from "../../assets/icons/zoom_out.svg";
+import { CELL, MAX_SCALE, MIN_SCALE, SCALE_STEP, clampOffset, gridDimensions } from "../../constants/garden";
 import { Styling } from "../../constants/Styling";
-import { BAR_HEIGHT, BAR_MARGIN } from "../../constants/tabConfig";
+import { BAR_HEIGHT } from "../../constants/tabConfig";
+import { initialPlants } from "../../data/gardenPlants";
 import Spacer from "../../components/style/Spacer";
 import PlantSheet from "../../components/pages/garden/plantSheet/PlantSheet";
-
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
-
-const COLS = 5;
-const ROWS = 6;
-const CELL = 80;
-const GRID_W = COLS * CELL;
-const GRID_H = ROWS * CELL;
-const MIN_SCALE = 0.5;
-const MAX_SCALE = 2;
-const SCALE_STEP = 0.2;
-
-function clampOffset(desired: { x: number; y: number }, scale: number, vw: number, vh: number): { x: number; y: number } {
-	const cx = GRID_W / 2;
-	const cy = GRID_H / 2;
-	const gw = GRID_W * scale;
-	const gh = GRID_H * scale;
-
-	const minX = gw <= vw ? vw / 2 - cx : vw - cx * (1 - scale) - GRID_W * scale;
-	const maxX = gw <= vw ? vw / 2 - cx : cx * (scale - 1);
-	const minY = gh <= vh ? vh / 2 - cy : vh - cy * (1 - scale) - GRID_H * scale;
-	const maxY = gh <= vh ? vh / 2 - cy : cy * (scale - 1);
-
-	return {
-		x: Math.min(maxX, Math.max(minX, desired.x)),
-		y: Math.min(maxY, Math.max(minY, desired.y)),
-	};
-}
-
-const gardenPlants: GardenPlant[] = [
-	{
-		id: "1",
-		image: require("../../assets/vegetables/tomato.png"),
-		warning: false,
-		x: 0,
-		y: 0,
-		nickname: "Tomaat Toby",
-		stage: { current: 3, max: 4, label: "Groeispurt" },
-		water: { level: 20, label: "Staat droog", optimalMin: 40, optimalMax: 80 },
-		light: { level: 65, label: "Halfschaduw", optimalMin: 30, optimalMax: 70 },
-		temperature: { level: 55, label: "Aangenaam", optimalMin: 40, optimalMax: 75 },
-		advice: "Tomaat Toby maakt nu veel blad aan en verbruikt extra water. Geef die een flinke scheut.",
-		battery: 76,
-	},
-	{
-		id: "2",
-		image: require("../../assets/vegetables/cabbage.png"),
-		warning: true,
-		x: 2,
-		y: 0,
-		nickname: "Kool Karel",
-		stage: { current: 2, max: 4, label: "Bladachtig" },
-		water: { level: 85, label: "Kletsnat", optimalMin: 30, optimalMax: 70 },
-		light: { level: 90, label: "Veel zon", optimalMin: 40, optimalMax: 80 },
-		temperature: { level: 50, label: "Aangenaam", optimalMin: 35, optimalMax: 70 },
-		advice: "Kool Karel heeft te veel water gehad. Laat de grond eerst opdrogen voor je weer water geeft.",
-		battery: 42,
-	},
-	{
-		id: "3",
-		image: require("../../assets/vegetables/tomato.png"),
-		warning: false,
-		x: 4,
-		y: 1,
-		nickname: "Tomaat Tessa",
-		stage: { current: 1, max: 4, label: "Kiemvorming" },
-		water: { level: 50, label: "Perfect", optimalMin: 40, optimalMax: 80 },
-		light: { level: 45, label: "Halfschaduw", optimalMin: 30, optimalMax: 70 },
-		temperature: { level: 60, label: "Warm", optimalMin: 40, optimalMax: 75 },
-		advice: "Tessa ontkiemt goed! Blijf de grond licht vochtig houden en bescherm tegen felle middagzon.",
-		battery: 91,
-	},
-	{
-		id: "4",
-		image: require("../../assets/vegetables/cabbage.png"),
-		warning: true,
-		x: 1,
-		y: 2,
-		nickname: "Kool Kim",
-		stage: { current: 3, max: 4, label: "Groeispurt" },
-		water: { level: 15, label: "Droogtegevaar", optimalMin: 30, optimalMax: 70 },
-		light: { level: 80, label: "Veel zon", optimalMin: 40, optimalMax: 80 },
-		temperature: { level: 35, label: "Koel", optimalMin: 35, optimalMax: 70 },
-		advice: "Kool Kim heeft dringend water nodig! De grond is te droog voor deze groeifase.",
-		battery: 23,
-	},
-	{
-		id: "5",
-		image: require("../../assets/vegetables/tomato.png"),
-		warning: false,
-		x: 3,
-		y: 3,
-		nickname: "Tomaat Tim",
-		stage: { current: 4, max: 4, label: "Oogstklaar" },
-		water: { level: 70, label: "Vochtig", optimalMin: 40, optimalMax: 80 },
-		light: { level: 85, label: "Volle zon", optimalMin: 40, optimalMax: 80 },
-		temperature: { level: 70, label: "Warm", optimalMin: 40, optimalMax: 75 },
-		advice: "Tim is klaar om geoogst te worden! De tomaten zijn rijp en sappig.",
-		battery: 58,
-	},
-	{
-		id: "6",
-		image: require("../../assets/vegetables/cabbage.png"),
-		warning: false,
-		x: 0,
-		y: 4,
-		nickname: "Kool Lisa",
-		stage: { current: 2, max: 4, label: "Bladachtig" },
-		water: { level: 45, label: "Vochtig", optimalMin: 30, optimalMax: 70 },
-		light: { level: 55, label: "Halfschaduw", optimalMin: 30, optimalMax: 70 },
-		temperature: { level: 45, label: "Aangenaam", optimalMin: 35, optimalMax: 70 },
-		advice: "Lisa groeit gestaag. Blijf de grond gelijkmatig vochtig houden.",
-		battery: 67,
-	},
-	{
-		id: "7",
-		image: require("../../assets/vegetables/tomato.png"),
-		warning: true,
-		x: 2,
-		y: 4,
-		nickname: "Tomaat Pip",
-		stage: { current: 2, max: 4, label: "Bloei" },
-		water: { level: 95, label: "Te nat", optimalMin: 40, optimalMax: 80 },
-		light: { level: 30, label: "Te donker", optimalMin: 30, optimalMax: 70 },
-		temperature: { level: 75, label: "Te warm", optimalMin: 40, optimalMax: 75 },
-		advice: "Pip heeft het moeilijk. Minder water geven en verplaats naar een lichtere plek.",
-		battery: 34,
-	},
-	{
-		id: "8",
-		image: require("../../assets/vegetables/cabbage.png"),
-		warning: false,
-		x: 4,
-		y: 5,
-		nickname: "Kool Mo",
-		stage: { current: 1, max: 4, label: "Kiemvorming" },
-		water: { level: 60, label: "Perfect", optimalMin: 30, optimalMax: 70 },
-		light: { level: 50, label: "Halfschaduw", optimalMin: 30, optimalMax: 70 },
-		temperature: { level: 55, label: "Aangenaam", optimalMin: 35, optimalMax: 70 },
-		advice: "Mo komt goed op. Zorg voor voldoende licht en bescherm tegen slakken.",
-		battery: 82,
-	},
-];
+import ActionRow from "../../components/pages/garden/editMode/ActionRow";
+import EditTopBar from "../../components/pages/garden/editMode/EditTopBar";
+import LayoutControls from "../../components/pages/garden/editMode/LayoutControls";
+import SelectionInfo from "../../components/pages/garden/editMode/SelectionInfo";
+import ViewTopBar from "../../components/pages/garden/editMode/ViewTopBar";
+import GardenGridItem, { GardenPlant } from "../../components/pages/garden/gardenGrid/GardenGridItem";
 
 const Garden = () => {
+	const [plants, setPlants] = useState<GardenPlant[]>(initialPlants);
+	const [cols, setCols] = useState(5);
+	const [rows, setRows] = useState(6);
+	const [isEditing, setIsEditing] = useState(false);
+	const [hasChanges, setHasChanges] = useState(false);
+	const [selectedCell, setSelectedCell] = useState<{ x: number; y: number } | null>(null);
+	const [isMoving, setIsMoving] = useState(false);
 	const [selectedPlant, setSelectedPlant] = useState<GardenPlant | null>(null);
+
 	const [scale, setScale] = useState(1);
 	const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
-	const [offset, setOffset] = useState({
-		x: (SCREEN_WIDTH - BAR_MARGIN * 2 - GRID_W) / 2,
-		y: (SCREEN_HEIGHT - 160 - GRID_H) / 2,
-	});
+	const [offset, setOffset] = useState({ x: 0, y: 0 });
+
 	const offsetRef = useRef(offset);
 	const offsetAtDrag = useRef({ x: 0, y: 0 });
 	const scaleRef = useRef(scale);
 	const viewportSizeRef = useRef(viewportSize);
+	const gridSizeRef = useRef(gridDimensions(cols, rows));
+	const editSnapshotRef = useRef<{ plants: GardenPlant[]; cols: number; rows: number } | null>(null);
+	const hasCentered = useRef(false);
+	const pendingFitRef = useRef(false);
 
 	useEffect(() => {
 		offsetRef.current = offset;
 	}, [offset]);
-
 	useEffect(() => {
 		scaleRef.current = scale;
 	}, [scale]);
-
 	useEffect(() => {
 		viewportSizeRef.current = viewportSize;
+	}, [viewportSize]);
+	useEffect(() => {
+		gridSizeRef.current = gridDimensions(cols, rows);
+	}, [cols, rows]);
+
+	useEffect(() => {
+		if (!hasCentered.current && viewportSize.width > 0 && viewportSize.height > 0) {
+			hasCentered.current = true;
+			const { w, h } = gridSizeRef.current;
+			setOffset({
+				x: (viewportSize.width - w) / 2,
+				y: (viewportSize.height - h) / 2,
+			});
+		}
 	}, [viewportSize]);
 
 	useEffect(() => {
 		if (viewportSize.width > 0 && viewportSize.height > 0) {
-			setOffset((prev) => clampOffset(prev, scale, viewportSize.width, viewportSize.height));
+			const { w, h } = gridSizeRef.current;
+			setOffset((prev) => clampOffset(prev, scale, viewportSize.width, viewportSize.height, w, h));
 		}
 	}, [scale, viewportSize]);
+
+	useEffect(() => {
+		if (viewportSize.width > 0 && viewportSize.height > 0) {
+			const { w, h } = gridSizeRef.current;
+			setOffset((prev) => clampOffset(prev, scaleRef.current, viewportSize.width, viewportSize.height, w, h));
+		}
+	}, [cols, rows]);
 
 	const panResponder = useRef(
 		PanResponder.create({
@@ -192,11 +82,12 @@ const Garden = () => {
 				offsetAtDrag.current = { ...offsetRef.current };
 			},
 			onPanResponderMove: (_, gs) => {
+				const { w, h } = gridSizeRef.current;
 				const desired = {
 					x: offsetAtDrag.current.x + gs.dx,
 					y: offsetAtDrag.current.y + gs.dy,
 				};
-				setOffset(clampOffset(desired, scaleRef.current, viewportSizeRef.current.width, viewportSizeRef.current.height));
+				setOffset(clampOffset(desired, scaleRef.current, viewportSizeRef.current.width, viewportSizeRef.current.height, w, h));
 			},
 			onPanResponderRelease: () => {},
 		}),
@@ -208,16 +99,16 @@ const Garden = () => {
 		if (newScale === prevScale) return;
 
 		setScale(newScale);
-
 		const vw = viewportSizeRef.current.width;
 		const vh = viewportSizeRef.current.height;
 		if (vw === 0 || vh === 0) return;
 
-		setOffset((prevOffset) => {
-			const cx = GRID_W / 2;
-			const cy = GRID_H / 2;
-			const ratio = newScale / prevScale;
-			return clampOffset(
+		const { w, h } = gridSizeRef.current;
+		const cx = w / 2;
+		const cy = h / 2;
+		const ratio = newScale / prevScale;
+		setOffset((prevOffset) =>
+			clampOffset(
 				{
 					x: prevOffset.x * ratio + (vw / 2 - cx) * (1 - ratio),
 					y: prevOffset.y * ratio + (vh / 2 - cy) * (1 - ratio),
@@ -225,43 +116,198 @@ const Garden = () => {
 				newScale,
 				vw,
 				vh,
-			);
-		});
+				w,
+				h,
+			),
+		);
 	};
 
-	const plantMap = new Map(gardenPlants.map((p) => [`${p.x}-${p.y}`, p]));
+	const enterEditMode = () => {
+		editSnapshotRef.current = { plants: plants.map((p) => ({ ...p })), cols, rows };
+		setIsEditing(true);
+		setSelectedCell(null);
+		setIsMoving(false);
+		setHasChanges(false);
+		pendingFitRef.current = true;
+	};
+
+	const confirmExit = () => {
+		if (hasChanges) {
+			Alert.alert("Wijzigingen", "Wil je de wijzigingen opslaan?", [
+				{ text: "Annuleren", style: "cancel" },
+				{
+					text: "Opslaan",
+					onPress: () => {
+						setIsEditing(false);
+						setSelectedCell(null);
+						setIsMoving(false);
+						setHasChanges(false);
+						editSnapshotRef.current = null;
+					},
+				},
+				{
+					text: "Niet opslaan",
+					style: "destructive",
+					onPress: () => {
+						if (editSnapshotRef.current) {
+							setPlants(editSnapshotRef.current.plants);
+							setCols(editSnapshotRef.current.cols);
+							setRows(editSnapshotRef.current.rows);
+						}
+						setIsEditing(false);
+						setSelectedCell(null);
+						setIsMoving(false);
+						setHasChanges(false);
+						editSnapshotRef.current = null;
+					},
+				},
+			]);
+		} else {
+			setIsEditing(false);
+			setSelectedCell(null);
+			setIsMoving(false);
+			editSnapshotRef.current = null;
+		}
+	};
+
+	const selectCell = (x: number, y: number) => {
+		if (!isEditing) return;
+
+		if (isMoving && selectedCell) {
+			const srcPlant = plants.find((p) => p.x === selectedCell.x && p.y === selectedCell.y);
+			const dstPlant = plants.find((p) => p.x === x && p.y === y);
+
+			if (srcPlant) {
+				if (dstPlant) {
+					setPlants((prev) =>
+						prev.map((p) => {
+							if (p.id === srcPlant.id) return { ...p, x, y };
+							if (p.id === dstPlant.id) return { ...p, x: selectedCell.x, y: selectedCell.y };
+							return p;
+						}),
+					);
+				} else {
+					setPlants((prev) =>
+						prev.map((p) => {
+							if (p.id === srcPlant.id) return { ...p, x, y };
+							return p;
+						}),
+					);
+				}
+				setHasChanges(true);
+				setSelectedCell({ x, y });
+			}
+			setIsMoving(false);
+			return;
+		}
+
+		if (selectedCell?.x === x && selectedCell?.y === y) {
+			setSelectedCell(null);
+		} else {
+			const cellPlant = plants.find((p) => p.x === x && p.y === y);
+			if (cellPlant) {
+				setSelectedCell({ x, y });
+			} else {
+				setSelectedCell(null);
+			}
+		}
+	};
+
+	const deleteSelectedPlant = () => {
+		if (!selectedCell) return;
+		setPlants((prev) => prev.filter((p) => !(p.x === selectedCell.x && p.y === selectedCell.y)));
+		setSelectedCell(null);
+		setHasChanges(true);
+	};
+
+	const addRow = () => {
+		setRows((prev) => prev + 1);
+		setHasChanges(true);
+	};
+
+	const removeRow = () => {
+		if (rows <= 1) return;
+		if (plants.some((p) => p.y === rows - 1)) {
+			Alert.alert("Kan rij niet verwijderen", "Verwijder eerst de planten in de laatste rij.");
+			return;
+		}
+		setRows((prev) => prev - 1);
+		setHasChanges(true);
+	};
+
+	const addCol = () => {
+		setCols((prev) => prev + 1);
+		setHasChanges(true);
+	};
+
+	const removeCol = () => {
+		if (cols <= 1) return;
+		if (plants.some((p) => p.x === cols - 1)) {
+			Alert.alert("Kan kolom niet verwijderen", "Verwijder eerst de planten in de laatste kolom.");
+			return;
+		}
+		setCols((prev) => prev - 1);
+		setHasChanges(true);
+	};
+
+	const { w: GRID_W, h: GRID_H } = gridDimensions(cols, rows);
+	const plantMap = new Map(plants.map((p) => [`${p.x}-${p.y}`, p]));
 
 	const cells: { cx: number; cy: number }[] = [];
-	for (let row = 0; row < ROWS; row++) {
-		for (let col = 0; col < COLS; col++) {
+	for (let row = 0; row < rows; row++) {
+		for (let col = 0; col < cols; col++) {
 			cells.push({ cx: col, cy: row });
 		}
 	}
 
+	const isCellSelected = (x: number, y: number) => selectedCell?.x === x && selectedCell?.y === y;
+	const selectedPlantName = selectedCell ? (plants.find((p) => p.x === selectedCell.x && p.y === selectedCell.y)?.nickname ?? "") : "";
+
 	return (
 		<>
 			<View style={styles.page}>
-				<Spacer space={Styling.Spacing.xxl} />
-				<View style={styles.controlBar}>
-					<TouchableOpacity style={styles.editBtn}>
-						<StyledText type="head4" style={styles.editBtnText}>
-							Bewerken
-						</StyledText>
-					</TouchableOpacity>
-					<TouchableOpacity style={styles.zoomBtn} onPress={() => zoom("out")}>
-						<StyledIcon Icon={ZoomOutIcon} size="reg" fill={Styling.Colors.white} />
-					</TouchableOpacity>
-					<TouchableOpacity style={styles.zoomBtn} onPress={() => zoom("in")}>
-						<StyledIcon Icon={ZoomInIcon} size="reg" fill={Styling.Colors.white} />
-					</TouchableOpacity>
-				</View>
+				<Spacer space={110} />
+
+				{isEditing ? (
+					<>
+						<EditTopBar onExit={confirmExit} />
+						<Spacer space={Styling.Spacing.lrg} />
+						<LayoutControls
+							onRemoveCol={removeCol}
+							onAddCol={addCol}
+							onRemoveRow={removeRow}
+							onAddRow={addRow}
+							onZoomIn={() => zoom("in")}
+							onZoomOut={() => zoom("out")}
+						/>
+						<Spacer space={Styling.Spacing.sml} />
+					</>
+				) : (
+					<>
+						<ViewTopBar onEdit={enterEditMode} onZoom={zoom} />
+						<Spacer space={Styling.Spacing.reg} />
+					</>
+				)}
 
 				<View
-					style={styles.viewport}
+					style={styles.viewportFill}
 					onLayout={(e) => {
 						const { width, height } = e.nativeEvent.layout;
 						if (width > 0 && height > 0) {
 							setViewportSize({ width, height });
+							if (pendingFitRef.current) {
+								pendingFitRef.current = false;
+								const { w, h } = gridDimensions(cols, rows);
+								const fitScale = Math.max(MIN_SCALE, Math.min(1, Math.min(width / w, height / h)));
+								setScale(fitScale);
+								const cx = w / 2, cy = h / 2;
+								const desiredTop = (height - h * fitScale) / 2;
+								const desiredLeft = (width - w * fitScale) / 2;
+								setOffset({
+									x: desiredLeft - cx * (1 - fitScale),
+									y: desiredTop - cy * (1 - fitScale),
+								});
+							}
 						}
 					}}
 					{...panResponder.panHandlers}
@@ -278,15 +324,43 @@ const Garden = () => {
 							{cells.map(({ cx, cy }) => {
 								const key = `${cx}-${cy}`;
 								const plant = plantMap.get(key);
+								const selected = isCellSelected(cx, cy);
 								return (
-									<View key={key} style={[styles.cell, { left: cx * CELL, top: cy * CELL }]}>
-										{plant && <GardenGridItem plant={plant} onPress={() => setSelectedPlant(plant)} />}
-									</View>
+									<TouchableOpacity
+										key={key}
+										style={[styles.cell, { left: cx * CELL, top: cy * CELL }, selected && styles.cellSelected]}
+										onPress={() => {
+											if (isEditing) {
+												selectCell(cx, cy);
+											} else if (plant) {
+												setSelectedPlant(plant);
+											}
+										}}
+										activeOpacity={0.7}
+									>
+										{plant && <GardenGridItem plant={plant} />}
+										{selected && <View style={styles.selectionOverlay} />}
+									</TouchableOpacity>
 								);
 							})}
 						</View>
 					</View>
 				</View>
+
+				{isEditing && (
+					<>
+						<Spacer space={Styling.Padding.sml} />
+						<SelectionInfo isMoving={isMoving} selectedCell={selectedCell} selectedPlantName={selectedPlantName} />
+						<Spacer space={Styling.Spacing.reg} />
+						<View style={styles.actionArea}>
+							{(selectedCell || isMoving) && (
+								<ActionRow isMoving={isMoving} hasSelection={selectedCell !== null} onMove={() => setIsMoving(true)} onDelete={deleteSelectedPlant} onCancelMove={() => setIsMoving(false)} />
+							)}
+						</View>
+					</>
+				)}
+
+				<Spacer space={BAR_HEIGHT + Styling.Spacing.xlg *3} />
 			</View>
 			<PlantSheet plant={selectedPlant} isVisible={selectedPlant !== null} onClose={() => setSelectedPlant(null)} />
 		</>
@@ -299,45 +373,16 @@ const styles = StyleSheet.create({
 	page: {
 		flex: 1,
 		backgroundColor: Styling.Colors.gradGrey,
-		paddingTop: 110,
-		paddingBottom: BAR_HEIGHT + 65,
 	},
-	controlBar: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: Styling.Spacing.sml,
-		marginBottom: Styling.Spacing.reg,
-		paddingHorizontal: BAR_MARGIN,
-		width: "100%",
-	},
-	editBtn: {
-		width: 150,
-		backgroundColor: Styling.Colors.green,
-		paddingVertical: Styling.Padding.sml,
-		paddingHorizontal: Styling.Padding.lrg,
-		borderRadius: Styling.BorderRadius.reg,
-		alignItems: "center",
-		marginRight: "auto",
-	},
-	editBtnText: {
-		color: Styling.Colors.white,
-	},
-	zoomBtn: {
-		aspectRatio: 1,
-		backgroundColor: Styling.Colors.green,
-		paddingVertical: Styling.Padding.sml,
-		paddingHorizontal: Styling.Padding.sml,
-		borderRadius: Styling.BorderRadius.reg,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	viewport: {
+	viewportFill: {
 		flex: 1,
 		overflow: "hidden",
 		width: "100%",
 	},
 	gridTransform: {
 		position: "absolute",
+		top: 0,
+		left: 0,
 	},
 	cell: {
 		position: "absolute",
@@ -346,8 +391,24 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: Styling.Colors.green,
 		borderStyle: "dashed",
-
 		alignItems: "center",
 		justifyContent: "center",
+	},
+	cellSelected: {
+		borderWidth: 2,
+		borderColor: Styling.Colors.green,
+		borderStyle: "solid",
+	},
+	actionArea: {
+		height: 44,
+	},
+	selectionOverlay: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: "rgba(0, 202, 104, 0.15)",
+		borderRadius: 2,
 	},
 });

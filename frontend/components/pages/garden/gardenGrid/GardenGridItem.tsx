@@ -1,4 +1,4 @@
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 import React from "react";
 import WarningIcon from "../../../../assets/icons/warning.svg";
 import StyledIcon from "../../../style/StyledIcon";
@@ -26,12 +26,12 @@ export interface GardenPlant {
 	battery: number;
 }
 
-const GardenGridItem = ({ plant, onPress }: { plant: GardenPlant; onPress?: () => void }) => {
+const GardenGridItem = ({ plant }: { plant: GardenPlant }) => {
 	return (
-		<TouchableOpacity style={styles.wrapper} onPress={onPress} activeOpacity={0.7}>
+		<View style={styles.wrapper}>
 			<Image source={plant.image} style={styles.image} resizeMode="contain" />
 			{plant.warning && <StyledIcon Icon={WarningIcon} style={styles.icon} size="reg"/>}
-		</TouchableOpacity>
+		</View>
 	);
 };
 
