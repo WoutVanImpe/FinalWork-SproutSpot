@@ -20,7 +20,7 @@ const index = () => {
 	return (
 		<StyledView>
 			<StatusHeader items={myPlants} />
-			<Spacer space={Styling.Spacing.xxl} />
+			<Spacer space={Styling.Spacing.med} />
 			<StyledText type="head2" style={styles.head2}>
 				Mijn tuin
 			</StyledText>

@@ -22,9 +22,9 @@ const Explore = () => {
 	return (
 		<StyledView>
 			<ExploreHeader onButtonPress={() => {}} />
-			<Spacer space={Styling.Spacing.reg} />
+			<Spacer space={Styling.Spacing.xsm} />
 			<MonthlyCandidates data={candidates} />
-			<Spacer space={Styling.Spacing.lrg} />
+			<Spacer space={Styling.Spacing.reg} />
 			<VegetableList data={allVegetables} />
 		</StyledView>
 	);

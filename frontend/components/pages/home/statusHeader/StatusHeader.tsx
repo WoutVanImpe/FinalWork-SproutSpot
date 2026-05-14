@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     },
     svgWrapper: {
         position: 'absolute',
-        top: 35,
+        top: 10,
         left: -SCREEN_WIDTH + 60,
         zIndex: 1,
     },
@@ -241,6 +241,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '100%',
         zIndex: 2,
+        marginTop:-30,
     },
     centerSlideArea: {
         flex: 1,
