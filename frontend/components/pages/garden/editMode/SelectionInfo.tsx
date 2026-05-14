@@ -3,6 +3,7 @@ import React from "react";
 import StyledText from "../../../style/StyledText";
 import { Styling } from "../../../../constants/Styling";
 import { BAR_MARGIN } from "../../../../constants/tabConfig";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SelectionInfo = ({
 	isMoving,
@@ -21,7 +22,7 @@ const SelectionInfo = ({
 
 	return (
 		<View style={styles.row}>
-			<StyledText type="head3" style={styles.text}>
+			<StyledText type="paragh" style={styles.text}>
 				{text}
 			</StyledText>
 		</View>
@@ -37,6 +38,10 @@ const styles = StyleSheet.create({
 	},
 	text: {
 		color: Styling.Colors.white,
-		alignSelf: "flex-start",
+		fontFamily: Styling.Fonts.Family.reg,
+
+		textAlign: "center",
+		paddingTop: 10,
+		paddingBottom: 5,
 	},
 });

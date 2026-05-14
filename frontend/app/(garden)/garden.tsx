@@ -6,12 +6,13 @@ import { BAR_HEIGHT } from "../../constants/tabConfig";
 import { initialPlants } from "../../data/gardenPlants";
 import Spacer from "../../components/style/Spacer";
 import PlantSheet from "../../components/pages/garden/plantSheet/PlantSheet";
-import ActionRow from "../../components/pages/garden/editMode/ActionRow";
 import EditTopBar from "../../components/pages/garden/editMode/EditTopBar";
 import LayoutControls from "../../components/pages/garden/editMode/LayoutControls";
-import SelectionInfo from "../../components/pages/garden/editMode/SelectionInfo";
 import ViewTopBar from "../../components/pages/garden/editMode/ViewTopBar";
+import SelectionInfo from "../../components/pages/garden/editMode/SelectionInfo";
+import EditActionSheet from "../../components/pages/garden/editMode/EditActionSheet";
 import GardenGridItem, { GardenPlant } from "../../components/pages/garden/gardenGrid/GardenGridItem";
+import { useOverlay } from "../../context/OverlayContext";
 
 const Garden = () => {
 	const [plants, setPlants] = useState<GardenPlant[]>(initialPlants);
@@ -226,7 +227,10 @@ const Garden = () => {
 	};
 
 	const removeRow = () => {
-		if (rows <= 1) return;
+		if (rows <= 1) {
+			Alert.alert("Kan rij niet verwijderen", "Je tuin moet minstens 1 rij hoog zijn.");
+			return;
+		}
 		if (plants.some((p) => p.y === rows - 1)) {
 			Alert.alert("Kan rij niet verwijderen", "Verwijder eerst de planten in de laatste rij.");
 			return;
@@ -241,7 +245,10 @@ const Garden = () => {
 	};
 
 	const removeCol = () => {
-		if (cols <= 1) return;
+		if (cols <= 1) {
+			Alert.alert("Kan kolom niet verwijderen", "Je tuin moet minstens 1 kolom breed zijn.");
+			return;
+		}
 		if (plants.some((p) => p.x === cols - 1)) {
 			Alert.alert("Kan kolom niet verwijderen", "Verwijder eerst de planten in de laatste kolom.");
 			return;
@@ -261,7 +268,26 @@ const Garden = () => {
 	}
 
 	const isCellSelected = (x: number, y: number) => selectedCell?.x === x && selectedCell?.y === y;
-	const selectedPlantName = selectedCell ? (plants.find((p) => p.x === selectedCell.x && p.y === selectedCell.y)?.nickname ?? "") : "";
+	const selectedEditPlant = selectedCell ? (plantMap.get(`${selectedCell.x}-${selectedCell.y}`) ?? null) : null;
+
+	const { setOverlay } = useOverlay();
+
+	useEffect(() => {
+		const showSheet = isEditing && selectedCell !== null && !isMoving;
+		if (showSheet && selectedEditPlant) {
+			setOverlay(
+				<EditActionSheet
+					plant={selectedEditPlant}
+					isVisible={true}
+					onClose={() => setSelectedCell(null)}
+					onMove={() => setIsMoving(true)}
+					onDelete={deleteSelectedPlant}
+				/>,
+			);
+		} else {
+			setOverlay(null);
+		}
+	}, [isEditing, selectedCell, isMoving, selectedEditPlant]);
 
 	return (
 		<>
@@ -279,6 +305,8 @@ const Garden = () => {
 							onAddRow={addRow}
 							onZoomIn={() => zoom("in")}
 							onZoomOut={() => zoom("out")}
+							canRemoveCol={cols > 1 && !plants.some((p) => p.x === cols - 1)}
+							canRemoveRow={rows > 1 && !plants.some((p) => p.y === rows - 1)}
 						/>
 						<Spacer space={Styling.Spacing.sml} />
 					</>
@@ -300,7 +328,8 @@ const Garden = () => {
 								const { w, h } = gridDimensions(cols, rows);
 								const fitScale = Math.max(MIN_SCALE, Math.min(1, Math.min(width / w, height / h)));
 								setScale(fitScale);
-								const cx = w / 2, cy = h / 2;
+								const cx = w / 2,
+									cy = h / 2;
 								const desiredTop = (height - h * fitScale) / 2;
 								const desiredLeft = (width - w * fitScale) / 2;
 								setOffset({
@@ -348,19 +377,14 @@ const Garden = () => {
 				</View>
 
 				{isEditing && (
-					<>
-						<Spacer space={Styling.Padding.sml} />
-						<SelectionInfo isMoving={isMoving} selectedCell={selectedCell} selectedPlantName={selectedPlantName} />
-						<Spacer space={Styling.Spacing.reg} />
-						<View style={styles.actionArea}>
-							{(selectedCell || isMoving) && (
-								<ActionRow isMoving={isMoving} hasSelection={selectedCell !== null} onMove={() => setIsMoving(true)} onDelete={deleteSelectedPlant} onCancelMove={() => setIsMoving(false)} />
-							)}
-						</View>
-					</>
+					<SelectionInfo
+						isMoving={isMoving}
+						selectedCell={selectedCell}
+						selectedPlantName={selectedEditPlant?.nickname ?? ""}
+					/>
 				)}
 
-				<Spacer space={BAR_HEIGHT + Styling.Spacing.xlg *3} />
+				<Spacer space={BAR_HEIGHT + Styling.Spacing.xlg * 3} />
 			</View>
 			<PlantSheet plant={selectedPlant} isVisible={selectedPlant !== null} onClose={() => setSelectedPlant(null)} />
 		</>
@@ -398,9 +422,6 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		borderColor: Styling.Colors.green,
 		borderStyle: "solid",
-	},
-	actionArea: {
-		height: 44,
 	},
 	selectionOverlay: {
 		position: "absolute",
