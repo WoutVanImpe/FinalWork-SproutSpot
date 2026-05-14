@@ -1,4 +1,4 @@
-import { Alert, PanResponder, StyleSheet, TouchableOpacity, View } from "react-native";
+import { PanResponder, StyleSheet, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { CELL, MAX_SCALE, MIN_SCALE, SCALE_STEP, clampOffset, gridDimensions } from "../../constants/garden";
 import { Styling } from "../../constants/Styling";
@@ -13,6 +13,7 @@ import SelectionInfo from "../../components/pages/garden/editMode/SelectionInfo"
 import EditActionSheet from "../../components/pages/garden/editMode/EditActionSheet";
 import GardenGridItem, { GardenPlant } from "../../components/pages/garden/gardenGrid/GardenGridItem";
 import { useOverlay } from "../../context/OverlayContext";
+import StyledAlert, { AlertButton } from "../../components/shared/StyledAlert";
 
 const Garden = () => {
 	const [plants, setPlants] = useState<GardenPlant[]>(initialPlants);
@@ -23,6 +24,7 @@ const Garden = () => {
 	const [selectedCell, setSelectedCell] = useState<{ x: number; y: number } | null>(null);
 	const [isMoving, setIsMoving] = useState(false);
 	const [selectedPlant, setSelectedPlant] = useState<GardenPlant | null>(null);
+	const [alertConfig, setAlertConfig] = useState<{ title: string; message: string; buttons?: AlertButton[] } | null>(null);
 
 	const [scale, setScale] = useState(1);
 	const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
@@ -134,35 +136,39 @@ const Garden = () => {
 
 	const confirmExit = () => {
 		if (hasChanges) {
-			Alert.alert("Wijzigingen", "Wil je de wijzigingen opslaan?", [
-				{ text: "Annuleren", style: "cancel" },
-				{
-					text: "Opslaan",
-					onPress: () => {
-						setIsEditing(false);
-						setSelectedCell(null);
-						setIsMoving(false);
-						setHasChanges(false);
-						editSnapshotRef.current = null;
+			setAlertConfig({
+				title: "Wijzigingen",
+				message: "Wil je de wijzigingen opslaan?",
+				buttons: [
+					{ text: "Annuleren", style: "cancel" },
+					{
+						text: "Opslaan",
+						onPress: () => {
+							setIsEditing(false);
+							setSelectedCell(null);
+							setIsMoving(false);
+							setHasChanges(false);
+							editSnapshotRef.current = null;
+						},
 					},
-				},
-				{
-					text: "Niet opslaan",
-					style: "destructive",
-					onPress: () => {
-						if (editSnapshotRef.current) {
-							setPlants(editSnapshotRef.current.plants);
-							setCols(editSnapshotRef.current.cols);
-							setRows(editSnapshotRef.current.rows);
-						}
-						setIsEditing(false);
-						setSelectedCell(null);
-						setIsMoving(false);
-						setHasChanges(false);
-						editSnapshotRef.current = null;
+					{
+						text: "Niet opslaan",
+						style: "destructive",
+						onPress: () => {
+							if (editSnapshotRef.current) {
+								setPlants(editSnapshotRef.current.plants);
+								setCols(editSnapshotRef.current.cols);
+								setRows(editSnapshotRef.current.rows);
+							}
+							setIsEditing(false);
+							setSelectedCell(null);
+							setIsMoving(false);
+							setHasChanges(false);
+							editSnapshotRef.current = null;
+						},
 					},
-				},
-			]);
+				],
+			});
 		} else {
 			setIsEditing(false);
 			setSelectedCell(null);
@@ -228,11 +234,11 @@ const Garden = () => {
 
 	const removeRow = () => {
 		if (rows <= 1) {
-			Alert.alert("Kan rij niet verwijderen", "Je tuin moet minstens 1 rij hoog zijn.");
+			setAlertConfig({ title: "Kan rij niet verwijderen", message: "Je tuin moet minstens 1 rij hoog zijn." });
 			return;
 		}
 		if (plants.some((p) => p.y === rows - 1)) {
-			Alert.alert("Kan rij niet verwijderen", "Verwijder eerst de planten in de laatste rij.");
+			setAlertConfig({ title: "Kan rij niet verwijderen", message: "Verwijder eerst de planten in de laatste rij." });
 			return;
 		}
 		setRows((prev) => prev - 1);
@@ -246,11 +252,11 @@ const Garden = () => {
 
 	const removeCol = () => {
 		if (cols <= 1) {
-			Alert.alert("Kan kolom niet verwijderen", "Je tuin moet minstens 1 kolom breed zijn.");
+			setAlertConfig({ title: "Kan kolom niet verwijderen", message: "Je tuin moet minstens 1 kolom breed zijn." });
 			return;
 		}
 		if (plants.some((p) => p.x === cols - 1)) {
-			Alert.alert("Kan kolom niet verwijderen", "Verwijder eerst de planten in de laatste kolom.");
+			setAlertConfig({ title: "Kan kolom niet verwijderen", message: "Verwijder eerst de planten in de laatste kolom." });
 			return;
 		}
 		setCols((prev) => prev - 1);
@@ -387,6 +393,13 @@ const Garden = () => {
 				<Spacer space={BAR_HEIGHT + Styling.Spacing.xlg * 3} />
 			</View>
 			<PlantSheet plant={selectedPlant} isVisible={selectedPlant !== null} onClose={() => setSelectedPlant(null)} />
+			<StyledAlert
+				visible={alertConfig !== null}
+				title={alertConfig?.title ?? ""}
+				message={alertConfig?.message ?? ""}
+				buttons={alertConfig?.buttons}
+				onDismiss={() => setAlertConfig(null)}
+			/>
 		</>
 	);
 };
