@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
 		backgroundColor: Styling.Colors.green,
 		paddingVertical: Styling.Padding.sml,
 		paddingHorizontal: Styling.Padding.lrg,
-		borderRadius: 999,
+		borderRadius: Styling.BorderRadius.reg,
 		alignSelf: "center",
 		marginTop: Styling.Spacing.med,
 	},

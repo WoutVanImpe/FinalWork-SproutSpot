@@ -34,7 +34,7 @@ const BtnGroup = ({
 			/>
 		</TouchableOpacity>
 		<StyledText style={groupStyles.label}>{label}</StyledText>
-		<TouchableOpacity style={groupStyles.fillBtn} onPress={onAdd}>
+		<TouchableOpacity style={groupStyles.outlineBtn} onPress={onAdd}>
 			<StyledIcon Icon={AddIcon} size="sml" fill={Styling.Colors.white} />
 		</TouchableOpacity>
 	</View>
@@ -103,7 +103,7 @@ const LayoutControls = ({
 					<StyledIcon Icon={ZoomOutIcon} size="sml" fill={Styling.Colors.white} />
 				</TouchableOpacity>
 				<View style={{ width: Styling.Spacing.xsm }} />
-				<TouchableOpacity style={zoomStyles.fillBtn} onPress={onZoomIn}>
+				<TouchableOpacity style={zoomStyles.outlineBtn} onPress={onZoomIn}>
 					<StyledIcon Icon={ZoomInIcon} size="sml" fill={Styling.Colors.white} />
 				</TouchableOpacity>
 			</View>
