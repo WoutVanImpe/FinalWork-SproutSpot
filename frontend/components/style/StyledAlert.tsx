@@ -2,8 +2,10 @@ import { Modal, StyleSheet, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { Styling } from "../../constants/Styling";
-import Spacer from "../style/Spacer";
-import StyledText from "../style/StyledText";
+import CloseIcon from "../../assets/icons/close.svg";
+import StyledIcon from "./StyledIcon";
+import Spacer from "./Spacer";
+import StyledText from "./StyledText";
 
 export interface AlertButton {
 	text: string;
@@ -11,19 +13,7 @@ export interface AlertButton {
 	onPress?: () => void;
 }
 
-const StyledAlert = ({
-	visible,
-	title,
-	message,
-	buttons,
-	onDismiss,
-}: {
-	visible: boolean;
-	title: string;
-	message: string;
-	buttons?: AlertButton[];
-	onDismiss?: () => void;
-}) => {
+const StyledAlert = ({ visible, title, message, buttons, onDismiss, children, titleAlign }: { visible: boolean; title: string; message?: string; buttons?: AlertButton[]; onDismiss?: () => void; children?: React.ReactNode; titleAlign?: "left" | "center" }) => {
 	if (!visible) return null;
 
 	const handlePress = (btn?: AlertButton) => {
@@ -36,36 +26,35 @@ const StyledAlert = ({
 			<StatusBar style="light" />
 			<View style={styles.backdrop}>
 				<View style={styles.card}>
-					<StyledText type="head3" style={styles.title}>
+					<TouchableOpacity style={styles.closeBtn} onPress={() => onDismiss?.()}>
+						<StyledIcon Icon={CloseIcon} size="reg" fill={Styling.Colors.white} />
+					</TouchableOpacity>
+					<StyledText type="head3" style={titleAlign === "left" ? { ...styles.title, textAlign: "left", paddingRight: 50 } : styles.title}>
 						{title}
 					</StyledText>
-					<Spacer space={Styling.Spacing.sml} />
-					<StyledText type="paragh" style={styles.message}>
-						{message}
-					</StyledText>
+					{message ? (
+						<>
+							<Spacer space={Styling.Spacing.sml} />
+							<StyledText type="paragh" style={styles.message}>
+								{message}
+							</StyledText>
+						</>
+					) : null}
+					{children && <View style={styles.childrenContainer}>{children}</View>}
 					<Spacer space={Styling.Spacing.med} />
-					<View style={[styles.buttonRow, (buttons?.length ?? 1) > 2 && styles.buttonCol]}>
+					<View style={styles.buttonCol}>
 						{(buttons?.length ? buttons : [{ text: "OK" }]).map((btn, i) => (
 							<TouchableOpacity
 								key={i}
 								style={[
 									styles.btn,
-									(buttons?.length ?? 1) <= 2 && styles.btnRowFlex,
 									btn.style === "destructive" && styles.btnDanger,
 									btn.style === "cancel" && styles.btnCancel,
-									(buttons?.length ?? 1) <= 2 && i > 0 && { marginLeft: Styling.Spacing.sml },
-									(buttons?.length ?? 1) > 2 && i > 0 && { marginTop: Styling.Spacing.sml },
+									i > 0 && { marginTop: Styling.Spacing.sml },
 								]}
 								onPress={() => handlePress(btn)}
 							>
-								<StyledText
-									type="head4"
-									style={[
-										styles.btnText,
-										btn.style === "destructive" && styles.btnTextDanger,
-										btn.style === "cancel" && styles.btnTextCancel,
-									]}
-								>
+								<StyledText type="head4" style={btn.style === "cancel" ? styles.btnTextCancel : btn.style === "destructive" ? styles.btnTextDanger : styles.btnText}>
 									{btn.text}
 								</StyledText>
 							</TouchableOpacity>
@@ -99,6 +88,18 @@ const styles = StyleSheet.create({
 		shadowRadius: 12,
 		elevation: 8,
 	},
+	closeBtn: {
+		position: "absolute",
+		top: Styling.Padding.reg,
+		right: Styling.Padding.reg,
+		zIndex: 1,
+		width: 32,
+		height: 32,
+		borderRadius: 16,
+		backgroundColor: Styling.Colors.green,
+		justifyContent: "center",
+		alignItems: "center",
+	},
 	title: {
 		color: Styling.Colors.green,
 		textAlign: "center",
@@ -108,9 +109,8 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		lineHeight: 20,
 	},
-	buttonRow: {
-		flexDirection: "row",
-		justifyContent: "center",
+	childrenContainer: {
+		marginTop: Styling.Spacing.sml,
 	},
 	buttonCol: {
 		flexDirection: "column",
@@ -122,9 +122,6 @@ const styles = StyleSheet.create({
 		borderRadius: Styling.BorderRadius.reg,
 		alignItems: "center",
 		justifyContent: "center",
-	},
-	btnRowFlex: {
-		flex: 1,
 	},
 	btnDanger: {
 		backgroundColor: Styling.Colors.red,
