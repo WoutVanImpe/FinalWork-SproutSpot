@@ -6,6 +6,7 @@ import StyledButton from "../../../style/StyledButton";
 import StyledIcon from "../../../style/StyledIcon";
 import Spacer from "../../../style/Spacer";
 import AccountSvg from "../../../../assets/icons/account.svg";
+import { BAR_MARGIN } from "../../../../constants/tabConfig";
 
 interface AccountMainProps {
 	onNavigate: (view: string) => void;
@@ -21,16 +22,24 @@ const AccountMain = ({ onNavigate, onLogout }: AccountMainProps) => (
 			<Spacer space={Styling.Spacing.xxl} />
 			<View style={styles.buttonStack}>
 				<TouchableOpacity style={styles.fullWidth} onPress={() => onNavigate("notifications")}>
-					<StyledButton fullCap style={styles.fullWidth}>Notificaties</StyledButton>
+					<StyledButton fullCap style={styles.fullWidth}>
+						Notificaties
+					</StyledButton>
 				</TouchableOpacity>
 				<TouchableOpacity style={styles.fullWidth} onPress={() => onNavigate("history")}>
-					<StyledButton fullCap style={styles.fullWidth}>Historiek</StyledButton>
+					<StyledButton fullCap style={styles.fullWidth}>
+						Historiek
+					</StyledButton>
 				</TouchableOpacity>
 				<TouchableOpacity style={styles.fullWidth} onPress={() => onNavigate("settings")}>
-					<StyledButton fullCap style={styles.fullWidth}>Instellingen</StyledButton>
+					<StyledButton fullCap style={styles.fullWidth}>
+						Instellingen
+					</StyledButton>
 				</TouchableOpacity>
 				<TouchableOpacity style={styles.fullWidth} onPress={onLogout}>
-					<StyledButton fullCap style={styles.logoutButton}>Uitloggen</StyledButton>
+					<StyledButton fullCap style={styles.logoutButton}>
+						Uitloggen
+					</StyledButton>
 				</TouchableOpacity>
 			</View>
 		</View>
@@ -54,6 +63,7 @@ const styles = StyleSheet.create({
 	buttonStack: {
 		width: "100%",
 		gap: Styling.Spacing.lrg,
+		paddingHorizontal: BAR_MARGIN * 3,
 	},
 	fullWidth: {
 		alignSelf: "stretch",
