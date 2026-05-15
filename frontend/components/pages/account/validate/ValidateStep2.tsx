@@ -3,6 +3,7 @@ import React from "react";
 import { Styling } from "../../../../constants/Styling";
 import StyledView from "../../../style/StyledView";
 import StyledText from "../../../style/StyledText";
+import StyledButton from "../../../style/StyledButton";
 import Spacer from "../../../style/Spacer";
 import AccountHeader from "../header/AccountHeader";
 
@@ -14,8 +15,9 @@ interface ValidateStep2Props {
 const ValidateStep2 = ({ onBack, onConfirm }: ValidateStep2Props) => (
 	<StyledView>
 		<AccountHeader title="Fase aanpassingen" onBack={onBack} />
-		<ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}>
-			<StyledText type="head3" style={styles.greenSubheader}>
+		<Spacer space={Styling.Spacing.med} />
+		<ScrollView contentContainerStyle={styles.scrollContent}>
+			<StyledText type="head3" style={styles.subheader}>
 				Wat verandert er in deze fase?
 			</StyledText>
 			<Spacer space={Styling.Spacing.reg} />
@@ -39,10 +41,10 @@ const ValidateStep2 = ({ onBack, onConfirm }: ValidateStep2Props) => (
 				Houd een temperatuur aan van 18-25°C. Vermijd tocht en plotselinge temperatuurschommelingen.
 			</StyledText>
 			<Spacer space={Styling.Spacing.lrg} />
-			<TouchableOpacity style={styles.confirmButton} onPress={onConfirm}>
-				<StyledText type="head4" fullCap style={styles.confirmButtonText}>
+			<TouchableOpacity onPress={onConfirm}>
+				<StyledButton>
 					Bevestig & Klaar
-				</StyledText>
+				</StyledButton>
 			</TouchableOpacity>
 		</ScrollView>
 	</StyledView>
@@ -55,9 +57,10 @@ const styles = StyleSheet.create({
 		paddingTop: Styling.Padding.sml,
 		width: "100%",
 		padding: 0,
+		paddingBottom: 120,
 	},
-	greenSubheader: {
-		color: Styling.Colors.green,
+	subheader: {
+		color: Styling.Colors.white,
 	},
 	bodyText: {
 		color: Styling.Colors.white,
@@ -67,14 +70,5 @@ const styles = StyleSheet.create({
 		color: Styling.Colors.green,
 		marginBottom: Styling.Spacing.xsm,
 	},
-	confirmButton: {
-		width: "100%",
-		paddingVertical: Styling.Padding.med,
-		borderRadius: Styling.BorderRadius.med,
-		backgroundColor: Styling.Colors.green,
-		alignItems: "center",
-	},
-	confirmButtonText: {
-		color: Styling.Colors.white,
-	},
+
 });

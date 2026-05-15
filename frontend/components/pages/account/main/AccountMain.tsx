@@ -2,7 +2,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Styling } from "../../../../constants/Styling";
 import StyledView from "../../../style/StyledView";
-import StyledText from "../../../style/StyledText";
+import StyledButton from "../../../style/StyledButton";
 import StyledIcon from "../../../style/StyledIcon";
 import Spacer from "../../../style/Spacer";
 import AccountSvg from "../../../../assets/icons/account.svg";
@@ -20,25 +20,17 @@ const AccountMain = ({ onNavigate, onLogout }: AccountMainProps) => (
 			</View>
 			<Spacer space={Styling.Spacing.xxl} />
 			<View style={styles.buttonStack}>
-				<TouchableOpacity style={styles.pillButton} onPress={() => onNavigate("notifications")}>
-					<StyledText type="head4" fullCap style={styles.pillButtonText}>
-						Notificaties
-					</StyledText>
+				<TouchableOpacity style={styles.fullWidth} onPress={() => onNavigate("notifications")}>
+					<StyledButton fullCap style={styles.fullWidth}>Notificaties</StyledButton>
 				</TouchableOpacity>
-				<TouchableOpacity style={styles.pillButton} onPress={() => onNavigate("history")}>
-					<StyledText type="head4" fullCap style={styles.pillButtonText}>
-						Historiek
-					</StyledText>
+				<TouchableOpacity style={styles.fullWidth} onPress={() => onNavigate("history")}>
+					<StyledButton fullCap style={styles.fullWidth}>Historiek</StyledButton>
 				</TouchableOpacity>
-				<TouchableOpacity style={styles.pillButton} onPress={() => onNavigate("settings")}>
-					<StyledText type="head4" fullCap style={styles.pillButtonText}>
-						Instellingen
-					</StyledText>
+				<TouchableOpacity style={styles.fullWidth} onPress={() => onNavigate("settings")}>
+					<StyledButton fullCap style={styles.fullWidth}>Instellingen</StyledButton>
 				</TouchableOpacity>
-				<TouchableOpacity style={[styles.pillButton, styles.logoutButton]} onPress={onLogout}>
-					<StyledText type="head4" fullCap style={styles.logoutText}>
-						Uitloggen
-					</StyledText>
+				<TouchableOpacity style={styles.fullWidth} onPress={onLogout}>
+					<StyledButton fullCap style={styles.logoutButton}>Uitloggen</StyledButton>
 				</TouchableOpacity>
 			</View>
 		</View>
@@ -63,26 +55,11 @@ const styles = StyleSheet.create({
 		width: "100%",
 		gap: Styling.Spacing.lrg,
 	},
-	pillButton: {
-		width: "100%",
-		backgroundColor: Styling.Colors.green,
-		paddingVertical: Styling.Padding.sml,
+	fullWidth: {
 		alignSelf: "stretch",
-		borderRadius: Styling.BorderRadius.reg,
-		alignItems: "center",
-	},
-	pillButtonText: {
-		color: Styling.Colors.white,
 	},
 	logoutButton: {
-		width: "100%",
-		backgroundColor: Styling.Colors.red,
-		paddingVertical: Styling.Padding.sml,
 		alignSelf: "stretch",
-		borderRadius: Styling.BorderRadius.reg,
-		alignItems: "center",
-	},
-	logoutText: {
-		color: Styling.Colors.white,
+		backgroundColor: Styling.Colors.red,
 	},
 });

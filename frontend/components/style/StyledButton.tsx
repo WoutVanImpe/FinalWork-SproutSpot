@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
 		paddingVertical: Styling.Padding.sml,
 		paddingHorizontal: Styling.Padding.lrg,
 		alignSelf: "center",
+		alignItems: "center",
 		borderRadius: Styling.BorderRadius.reg,
 	},
 });

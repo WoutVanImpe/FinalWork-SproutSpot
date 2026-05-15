@@ -20,7 +20,7 @@ const SettingsView = ({ onBack, pushEnabled, onPushChange, reminderMorning, onMo
 	<StyledView>
 		<AccountHeader title="Instellingen" onBack={onBack} />
 		<Spacer space={Styling.Spacing.med}/>
-		<ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}>
+		<ScrollView contentContainerStyle={styles.scrollContent}>
 			<StyledText type="head3" style={styles.greenSubheader}>
 				Push Notificaties
 			</StyledText>
@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
 		paddingTop: Styling.Padding.sml,
 		width: "100%",
 		padding: 0,
+		paddingBottom: 120,
 	},
 	greenSubheader: {
 		color: Styling.Colors.green,

@@ -22,9 +22,9 @@ const Account = () => {
 	);
 
 	const [notifications, setNotifications] = useState<NotificationItem[]>([
-		{ id: "n1", type: "problem", title: "Tomaat Toby", description: "Water te laag - De grond is te droog. Geef direct water totdat het water uit de drainagegaten loopt.", image: TomatoImg },
+		{ id: "n1", type: "problem", title: "Tomaat Toby", description: "De grond is te droog. Geef direct water totdat het water uit de drainagegaten loopt.", image: TomatoImg },
 		{ id: "n2", type: "milestone", title: "Tomaat Toby", description: "Nieuw groeistadium bereikt! Tijd om te valideren of de plant klaar is voor de volgende stap.", image: TomatoImg },
-		{ id: "n3", type: "problem", title: "Basilicum Bella", description: "Licht te zwak - Verplaats de plant naar een plek met meer direct zonlicht.", image: TomatoImg },
+		{ id: "n3", type: "problem", title: "Basilicum Bella", description: "Verplaats de plant naar een plek met meer direct zonlicht.", image: TomatoImg },
 	]);
 
 	const [pushEnabled, setPushEnabled] = useState(true);
