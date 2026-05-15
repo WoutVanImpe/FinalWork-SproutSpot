@@ -1,6 +1,6 @@
 import { StyleSheet, View, useWindowDimensions, Animated } from "react-native";
 import React, { useRef, useState, useEffect } from "react";
-import { Tabs } from "expo-router";
+import { Tabs, useSegments } from "expo-router";
 import { useFonts } from "expo-font";
 import CurvedBackground from "../components/shared/navbar/CurvedBackground";
 import TabBarButton from "../components/shared/navbar/TabBarButton";
@@ -94,13 +94,15 @@ const NavOverlay = () => {
 		"SpaceGrotesk-Regular": require("../assets/fonts/SpaceGrotesk-Regular.ttf"),
 		"SpaceGrotesk-Bold": require("../assets/fonts/SpaceGrotesk-Bold.ttf"),
 	});
+	const segments = useSegments();
+	const isAccountPage = segments.includes("account");
 
 	if (!fontsLoaded) return null;
 
 	return (
 		<OverlayProvider>
 			<StatusBar style="light" />
-			<NavHeader />
+			{!isAccountPage && <NavHeader />}
 			<Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
 				<Tabs.Screen name="index" />
 				<Tabs.Screen name="(garden)/garden" />
