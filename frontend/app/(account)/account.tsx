@@ -18,7 +18,7 @@ const Account = () => {
 	useFocusEffect(
 		useCallback(() => {
 			setCurrentView("main");
-		}, [])
+		}, []),
 	);
 
 	const [notifications, setNotifications] = useState<NotificationItem[]>([
@@ -28,8 +28,9 @@ const Account = () => {
 	]);
 
 	const [pushEnabled, setPushEnabled] = useState(true);
-	const [reminderMorning, setReminderMorning] = useState(true);
-	const [reminderEvening, setReminderEvening] = useState(false);
+	const [activeHours, setActiveHours] = useState<number[]>([8, 9, 10]);
+
+	const [name, setName] = useState("Anna");
 
 	const [historyEntries] = useState<HistoryEntry[]>([
 		{ id: "h1", date: "14/05", time: "15:30", event: "Te droog: Tomaat Toby water gegeven", image: TomatoImg },
@@ -56,45 +57,32 @@ const Account = () => {
 		setCurrentView("main");
 	};
 
+	const handlePasswordChange = (currentPassword: string, newPassword: string) => {};
+
 	switch (currentView) {
 		case "main":
 			return <AccountMain onNavigate={setCurrentView} onLogout={handleLogout} />;
 		case "notifications":
-			return (
-				<NotificationsView
-					notifications={notifications}
-					onBack={() => setCurrentView("main")}
-					onDismiss={handleDismiss}
-					onSnooze={handleSnooze}
-					onValidate={() => setCurrentView("validate_step1")}
-				/>
-			);
+			return <NotificationsView notifications={notifications} onBack={() => setCurrentView("main")} onDismiss={handleDismiss} onSnooze={handleSnooze} onValidate={() => setCurrentView("validate_step1")} />;
 		case "validate_step1":
-			return (
-				<ValidateStep1
-					onBack={() => setCurrentView("notifications")}
-					onNext={() => setCurrentView("validate_step2")}
-				/>
-			);
+			return <ValidateStep1 onBack={() => setCurrentView("notifications")} onNext={() => setCurrentView("validate_step2")} />;
 		case "validate_step2":
-			return (
-				<ValidateStep2
-					onBack={() => setCurrentView("validate_step1")}
-					onConfirm={handleConfirmPhaseUpdate}
-				/>
-			);
+			return <ValidateStep2 onBack={() => setCurrentView("validate_step1")} onConfirm={handleConfirmPhaseUpdate} />;
 		case "history":
 			return <HistoryView entries={historyEntries} onBack={() => setCurrentView("main")} />;
 		case "settings":
 			return (
 				<SettingsView
 					onBack={() => setCurrentView("main")}
+					name={name}
+					email="anna@email.be"
+					pairingCode="TE123456"
 					pushEnabled={pushEnabled}
+					activeHours={activeHours}
+					onNameChange={setName}
+					onPasswordChange={handlePasswordChange}
 					onPushChange={setPushEnabled}
-					reminderMorning={reminderMorning}
-					onMorningChange={setReminderMorning}
-					reminderEvening={reminderEvening}
-					onEveningChange={setReminderEvening}
+					onActiveHoursChange={setActiveHours}
 				/>
 			);
 		default:
