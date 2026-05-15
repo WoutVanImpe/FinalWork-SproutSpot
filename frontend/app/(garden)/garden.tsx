@@ -8,12 +8,12 @@ import Spacer from "../../components/style/Spacer";
 import PlantSheet from "../../components/pages/garden/plantSheet/PlantSheet";
 import EditTopBar from "../../components/pages/garden/editMode/EditTopBar";
 import LayoutControls from "../../components/pages/garden/editMode/LayoutControls";
-import ViewTopBar from "../../components/pages/garden/editMode/ViewTopBar";
+import ViewTopBar from "../../components/pages/garden/gardenGrid/ViewTopBar";
 import SelectionInfo from "../../components/pages/garden/editMode/SelectionInfo";
 import EditActionSheet from "../../components/pages/garden/editMode/EditActionSheet";
 import GardenGridItem, { GardenPlant } from "../../components/pages/garden/gardenGrid/GardenGridItem";
 import { useOverlay } from "../../context/OverlayContext";
-import StyledAlert, { AlertButton } from "../../components/shared/StyledAlert";
+import StyledAlert, { AlertButton } from "../../components/style/StyledAlert";
 
 const Garden = () => {
 	const [plants, setPlants] = useState<GardenPlant[]>(initialPlants);
@@ -140,7 +140,6 @@ const Garden = () => {
 				title: "Wijzigingen",
 				message: "Wil je de wijzigingen opslaan?",
 				buttons: [
-					{ text: "Annuleren", style: "cancel" },
 					{
 						text: "Opslaan",
 						onPress: () => {
@@ -281,15 +280,7 @@ const Garden = () => {
 	useEffect(() => {
 		const showSheet = isEditing && selectedCell !== null && !isMoving;
 		if (showSheet && selectedEditPlant) {
-			setOverlay(
-				<EditActionSheet
-					plant={selectedEditPlant}
-					isVisible={true}
-					onClose={() => setSelectedCell(null)}
-					onMove={() => setIsMoving(true)}
-					onDelete={deleteSelectedPlant}
-				/>,
-			);
+			setOverlay(<EditActionSheet plant={selectedEditPlant} isVisible={true} onClose={() => setSelectedCell(null)} onMove={() => setIsMoving(true)} onDelete={deleteSelectedPlant} />);
 		} else {
 			setOverlay(null);
 		}
@@ -382,24 +373,12 @@ const Garden = () => {
 					</View>
 				</View>
 
-				{isEditing && (
-					<SelectionInfo
-						isMoving={isMoving}
-						selectedCell={selectedCell}
-						selectedPlantName={selectedEditPlant?.nickname ?? ""}
-					/>
-				)}
+				{isEditing && <SelectionInfo isMoving={isMoving} selectedCell={selectedCell} selectedPlantName={selectedEditPlant?.nickname ?? ""} />}
 
 				<Spacer space={BAR_HEIGHT + Styling.Spacing.xlg * 3} />
 			</View>
 			<PlantSheet plant={selectedPlant} isVisible={selectedPlant !== null} onClose={() => setSelectedPlant(null)} />
-			<StyledAlert
-				visible={alertConfig !== null}
-				title={alertConfig?.title ?? ""}
-				message={alertConfig?.message ?? ""}
-				buttons={alertConfig?.buttons}
-				onDismiss={() => setAlertConfig(null)}
-			/>
+			<StyledAlert visible={alertConfig !== null} title={alertConfig?.title ?? ""} message={alertConfig?.message ?? ""} buttons={alertConfig?.buttons} onDismiss={() => setAlertConfig(null)} />
 		</>
 	);
 };

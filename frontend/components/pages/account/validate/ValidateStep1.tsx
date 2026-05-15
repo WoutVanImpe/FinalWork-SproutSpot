@@ -3,6 +3,7 @@ import React from "react";
 import { Styling } from "../../../../constants/Styling";
 import StyledView from "../../../style/StyledView";
 import StyledText from "../../../style/StyledText";
+import StyledButton from "../../../style/StyledButton";
 import Spacer from "../../../style/Spacer";
 import AccountHeader from "../header/AccountHeader";
 
@@ -14,8 +15,9 @@ interface ValidateStep1Props {
 const ValidateStep1 = ({ onBack, onNext }: ValidateStep1Props) => (
 	<StyledView>
 		<AccountHeader title="Fase herkenning" onBack={onBack} />
-		<ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}>
-			<StyledText type="head3" style={styles.greenSubheader}>
+		<Spacer space={Styling.Spacing.med} />
+		<ScrollView contentContainerStyle={styles.scrollContent}>
+			<StyledText type="head3" style={styles.subheader}>
 				Hoe herken je het nieuwe stadium?
 			</StyledText>
 			<Spacer space={Styling.Spacing.sml} />
@@ -28,15 +30,11 @@ const ValidateStep1 = ({ onBack, onNext }: ValidateStep1Props) => (
 			</StyledText>
 			<Spacer space={Styling.Spacing.lrg} />
 			<View style={styles.validateFooter}>
-				<TouchableOpacity style={styles.notYetButton} onPress={onBack}>
-					<StyledText type="head4" fullCap style={styles.notYetButtonText}>
-						Nog niet
-					</StyledText>
+				<TouchableOpacity style={styles.flexButton} onPress={onBack}>
+					<StyledButton fullCap style={styles.outlinedButton}>Nog niet</StyledButton>
 				</TouchableOpacity>
-				<TouchableOpacity style={styles.nextPhaseButton} onPress={onNext}>
-					<StyledText type="head4" fullCap style={styles.nextPhaseButtonText}>
-						Volgende fase
-					</StyledText>
+				<TouchableOpacity style={styles.flexButton} onPress={onNext}>
+					<StyledButton fullCap style={styles.stretchButton}>Volgende fase</StyledButton>
 				</TouchableOpacity>
 			</View>
 		</ScrollView>
@@ -50,9 +48,10 @@ const styles = StyleSheet.create({
 		paddingTop: Styling.Padding.sml,
 		width: "100%",
 		padding: 0,
+		paddingBottom: 120,
 	},
-	greenSubheader: {
-		color: Styling.Colors.green,
+	subheader: {
+		color: Styling.Colors.white,
 	},
 	bodyText: {
 		color: Styling.Colors.white,
@@ -63,26 +62,16 @@ const styles = StyleSheet.create({
 		gap: Styling.Spacing.sml,
 		width: "100%",
 	},
-	notYetButton: {
+	flexButton: {
 		flex: 1,
-		paddingVertical: Styling.Padding.sml,
-		borderRadius: Styling.BorderRadius.reg,
-		backgroundColor: Styling.Colors.white,
+	},
+	outlinedButton: {
+		alignSelf: "stretch",
+		backgroundColor: "transparent",
 		borderWidth: 1,
-		borderColor: Styling.Colors.green,
-		alignItems: "center",
+		borderColor: Styling.Colors.white,
 	},
-	notYetButtonText: {
-		color: Styling.Colors.green,
-	},
-	nextPhaseButton: {
-		flex: 1,
-		paddingVertical: Styling.Padding.sml,
-		borderRadius: Styling.BorderRadius.reg,
-		backgroundColor: Styling.Colors.green,
-		alignItems: "center",
-	},
-	nextPhaseButtonText: {
-		color: Styling.Colors.white,
+	stretchButton: {
+		alignSelf: "stretch",
 	},
 });

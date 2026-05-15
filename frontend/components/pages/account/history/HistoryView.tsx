@@ -47,7 +47,7 @@ const HistoryView = ({ entries, onBack }: HistoryViewProps) => {
 		<StyledView>
 			<AccountHeader title="Historiek" onBack={onBack} />
 			<Spacer space={Styling.Spacing.med} />
-			<ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}>
+			<ScrollView contentContainerStyle={styles.scrollContent}>
 				{groups.map((group) => (
 					<View key={group.date}>
 						<StyledText type="head3" style={styles.dateHeader}>
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
 		paddingTop: Styling.Padding.sml,
 		width: "100%",
 		padding: 0,
+		paddingBottom: 120,
 	},
 	dateHeader: {
 		color: Styling.Colors.white,
