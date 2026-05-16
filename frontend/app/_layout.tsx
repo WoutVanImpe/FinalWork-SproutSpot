@@ -13,6 +13,7 @@ import { OverlayProvider } from "../context/OverlayContext";
 const CustomTabBar = ({ state, navigation }: any) => {
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const insets = useSafeAreaInsets();
+	const segments = useSegments();
 	const barWidth = SCREEN_WIDTH - BAR_MARGIN * 2;
 	const totalTabsWidth = TAB_WIDTH * 3 + TAB_GAP * 2;
 	const startOffset = (barWidth - totalTabsWidth) / 2;
@@ -24,8 +25,7 @@ const CustomTabBar = ({ state, navigation }: any) => {
 	const visibleRoutes = state.routes.filter((r: any) => routeOrder.includes(r.name));
 	const tabAnims = useRef(visibleRoutes.map(() => new Animated.Value(0))).current;
 
-	const activeRoute = state.routes[state.index];
-	const visibleIndex = visibleRoutes.findIndex((r: any) => r.key === activeRoute.key);
+	const visibleIndex = segments[0] === "(garden)" ? 1 : segments[0] === "(explore)" ? 2 : 0;
 	const prevVisibleIndex = useRef(visibleIndex);
 
 	useEffect(() => {
@@ -78,7 +78,14 @@ const CustomTabBar = ({ state, navigation }: any) => {
 								target: route.key,
 								canPreventDefault: true,
 							});
-							if (visibleIndex !== index && !event.defaultPrevented) {
+							if (event.defaultPrevented) return;
+							const routeSeg0 = route.name.split("/")[0];
+							const routeSeg1 = route.name.split("/")[1];
+							const isOnTab = segments[0] === routeSeg0;
+							const isSubPage = isOnTab && routeSeg1 !== undefined && segments.length > 1 && segments.at(1) !== routeSeg1;
+							if (visibleIndex !== index) {
+								navigation.navigate(route.name);
+							} else if (isSubPage) {
 								navigation.navigate(route.name);
 							}
 						}}

@@ -11,9 +11,10 @@ import { useScroll } from "../../../../context/ScrollContext";
 
 interface VegetableListProps {
 	data: VegetableCardProps[];
+	onItemPress?: (id: string) => void;
 }
 
-const VegetableList = ({ data }: VegetableListProps) => {
+const VegetableList = ({ data, onItemPress }: VegetableListProps) => {
 	const { scrollTo } = useScroll();
 	const inputRef = useRef<TextInput>(null);
 	const [containerY, setContainerY] = useState(0);
@@ -52,7 +53,7 @@ const VegetableList = ({ data }: VegetableListProps) => {
 				<TextInput ref={inputRef} style={styles.input} placeholder="Zoeken..." placeholderTextColor={Styling.Colors.white} onFocus={handleFocus} />
 			</View>
 			<Spacer space={Styling.Spacing.reg} />
-			<CardContainer data={data} style={{ marginBottom: 175 }} />
+			<CardContainer data={data} onItemPress={onItemPress} style={{ marginBottom: 300 }} />
 		</View>
 	);
 };

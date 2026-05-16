@@ -74,7 +74,7 @@ const PlantDetail = () => {
       <StyledView>
         <View style={styles.header}>
           <View style={styles.headerBack}>
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={() => router.navigate("/(garden)/garden")}>
               <StyledIcon Icon={BackIcon} size="med" fill={Styling.Colors.white} />
             </TouchableOpacity>
           </View>
@@ -113,7 +113,7 @@ const PlantDetail = () => {
             Bekijk grafieken
           </StyledText>
         </TouchableOpacity>
-        <Spacer space={150} />
+        <Spacer space={175} />
       </StyledView>
       <GraphModal visible={graphVisible} onDismiss={() => setGraphVisible(false)} />
     </>

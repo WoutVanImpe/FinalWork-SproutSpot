@@ -12,9 +12,10 @@ const CARD_WIDTH = (SCREEN_WIDTH - BAR_MARGIN - 1.1 * CARD_GAP) / 3.5;
 
 interface MonthlyCandidatesProps {
     data: VegetableCardProps[];
+    onItemPress?: (id: string) => void;
 }
 
-const MonthlyCandidates = ({ data }: MonthlyCandidatesProps) => {
+const MonthlyCandidates = ({ data, onItemPress }: MonthlyCandidatesProps) => {
     return (
         <View style={styles.container}>
             <StyledText type="head2">Kanshebbers voor april</StyledText>
@@ -27,7 +28,7 @@ const MonthlyCandidates = ({ data }: MonthlyCandidatesProps) => {
                 >
                     {data.map((item) => (
                         <View key={item.id} style={styles.cardWrapper}>
-                            <VegetableCard vegetable={item} />
+                            <VegetableCard vegetable={onItemPress ? { ...item, onPress: () => onItemPress(item.id) } : item} />
                         </View>
                     ))}
                 </ScrollView>
