@@ -137,7 +137,7 @@ const VegetableInfo = () => {
 			<Spacer space={Styling.Spacing.xlg} />
 
 			{/* Row 5: Action Button */}
-			<TouchableOpacity onPress={() => router.navigate("/(explore)/explore")} activeOpacity={0.7}>
+			<TouchableOpacity onPress={() => router.push(`/(explore)/plant-step1?vegId=${id}`)} activeOpacity={0.7}>
 				<StyledButton>{"Deze " + veg.name.toLowerCase() + " planten"}</StyledButton>
 			</TouchableOpacity>
 			<Spacer space={175} />
