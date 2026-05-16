@@ -28,6 +28,7 @@ interface CarouselItem {
 
 interface StatusHeaderProps {
     items: CarouselItem[];
+    onItemPress?: (id: string) => void;
 }
 
 const WaveShape = ({ fill, d, style }: { fill: string; d: string; style?: any }) => (
@@ -51,7 +52,7 @@ const CenterContent = ({ item }: { item: CarouselItem }) => (
     </>
 );
 
-const StatusHeader = ({ items }: StatusHeaderProps) => {
+const StatusHeader = ({ items, onItemPress }: StatusHeaderProps) => {
     const [displayIndex, setDisplayIndex] = useState(0);
     const slideAnim = useRef(new Animated.Value(0)).current;
     const colorAnim = useRef(new Animated.Value(items[0]?.warning ? 1 : 0)).current;
@@ -165,32 +166,38 @@ const StatusHeader = ({ items }: StatusHeaderProps) => {
                                     },
                                 ]}
                             >
-                                <CenterContent item={transition.leaving} />
-                            </Animated.View>
-                            <Animated.View
-                                style={[
-                                    styles.slidePage,
-                                    {
-                                        opacity: slideAnim.interpolate({
-                                            inputRange: [0, 0.4, 1],
-                                            outputRange: [0, 0, 1],
-                                        }),
-                                        transform: [
-                                            {
-                                                translateX: slideAnim.interpolate({
-                                                    inputRange: [0, 1],
-                                                    outputRange: [transition.direction * -SCREEN_WIDTH, 0],
-                                                }),
-                                            },
-                                        ],
-                                    },
-                                ]}
-                            >
-                                <CenterContent item={transition.entering} />
+                                    <TouchableOpacity onPress={onItemPress ? () => onItemPress(transition.leaving.id) : undefined} disabled={!onItemPress}>
+                                        <CenterContent item={transition.leaving} />
+                                    </TouchableOpacity>
+                                </Animated.View>
+                                <Animated.View
+                                    style={[
+                                        styles.slidePage,
+                                        {
+                                            opacity: slideAnim.interpolate({
+                                                inputRange: [0, 0.4, 1],
+                                                outputRange: [0, 0, 1],
+                                            }),
+                                            transform: [
+                                                {
+                                                    translateX: slideAnim.interpolate({
+                                                        inputRange: [0, 1],
+                                                        outputRange: [transition.direction * -SCREEN_WIDTH, 0],
+                                                    }),
+                                                },
+                                            ],
+                                        },
+                                    ]}
+                                >
+                                    <TouchableOpacity onPress={onItemPress ? () => onItemPress(transition.entering.id) : undefined} disabled={!onItemPress}>
+                                        <CenterContent item={transition.entering} />
+                                    </TouchableOpacity>
                             </Animated.View>
                         </>
                     ) : (
-                        <CenterContent item={currentItem} />
+                        <TouchableOpacity onPress={onItemPress ? () => onItemPress(currentItem.id) : undefined} disabled={!onItemPress}>
+                            <CenterContent item={currentItem} />
+                        </TouchableOpacity>
                     )}
                 </View>
 
@@ -269,6 +276,7 @@ const styles = StyleSheet.create({
         height: 180,
         justifyContent: 'center',
         alignItems: 'center',
+        marginHorizontal: "auto",
     },
     plantImage: {
         width: '90%',

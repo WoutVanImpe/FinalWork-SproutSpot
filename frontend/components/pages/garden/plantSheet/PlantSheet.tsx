@@ -81,11 +81,16 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 	useEffect(() => {
 		if (isVisible) {
 			setInternalVisible(true);
-			Animated.parallel([Animated.timing(slideAnim, { toValue: 1, duration: 300, useNativeDriver: true }), Animated.timing(opacityAnim, { toValue: 1, duration: 300, useNativeDriver: true })]).start();
 		} else if (internalVisible) {
 			Animated.parallel([Animated.timing(slideAnim, { toValue: 0, duration: 200, useNativeDriver: true }), Animated.timing(opacityAnim, { toValue: 0, duration: 200, useNativeDriver: true })]).start(() => setInternalVisible(false));
 		}
 	}, [isVisible]);
+
+	useEffect(() => {
+		if (internalVisible && isVisible) {
+			Animated.parallel([Animated.timing(slideAnim, { toValue: 1, duration: 300, useNativeDriver: true }), Animated.timing(opacityAnim, { toValue: 1, duration: 300, useNativeDriver: true })]).start();
+		}
+	}, [internalVisible]);
 
 	if (!plant && !internalVisible) return null;
 

@@ -14,8 +14,10 @@ import EditActionSheet from "../../components/pages/garden/editMode/EditActionSh
 import GardenGridItem, { GardenPlant } from "../../components/pages/garden/gardenGrid/GardenGridItem";
 import { useOverlay } from "../../context/OverlayContext";
 import StyledAlert, { AlertButton } from "../../components/style/StyledAlert";
+import { useLocalSearchParams, router } from "expo-router";
 
 const Garden = () => {
+	const params = useLocalSearchParams<{ selectedPlantId?: string }>();
 	const [plants, setPlants] = useState<GardenPlant[]>(initialPlants);
 	const [cols, setCols] = useState(5);
 	const [rows, setRows] = useState(6);
@@ -25,6 +27,15 @@ const Garden = () => {
 	const [isMoving, setIsMoving] = useState(false);
 	const [selectedPlant, setSelectedPlant] = useState<GardenPlant | null>(null);
 	const [alertConfig, setAlertConfig] = useState<{ title: string; message: string; buttons?: AlertButton[] } | null>(null);
+
+	useEffect(() => {
+		if (params.selectedPlantId) {
+			const plant = plants.find((p) => p.id === params.selectedPlantId);
+			if (plant) {
+				setSelectedPlant(plant);
+			}
+		}
+	}, [params.selectedPlantId]);
 
 	const [scale, setScale] = useState(1);
 	const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
@@ -377,7 +388,7 @@ const Garden = () => {
 
 				<Spacer space={BAR_HEIGHT + Styling.Spacing.xlg * 3} />
 			</View>
-			<PlantSheet plant={selectedPlant} isVisible={selectedPlant !== null} onClose={() => setSelectedPlant(null)} />
+			<PlantSheet plant={selectedPlant} isVisible={selectedPlant !== null} onClose={() => { setSelectedPlant(null); router.setParams({ selectedPlantId: undefined }); }} />
 			<StyledAlert visible={alertConfig !== null} title={alertConfig?.title ?? ""} message={alertConfig?.message ?? ""} buttons={alertConfig?.buttons} onDismiss={() => setAlertConfig(null)} />
 		</>
 	);
