@@ -3,7 +3,6 @@ import React from "react";
 import StyledText from "../../../style/StyledText";
 import { Styling } from "../../../../constants/Styling";
 import { BAR_MARGIN } from "../../../../constants/tabConfig";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SelectionInfo = ({
 	isMoving,

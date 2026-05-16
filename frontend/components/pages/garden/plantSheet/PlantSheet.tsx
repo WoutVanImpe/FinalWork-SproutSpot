@@ -1,5 +1,6 @@
 import { Animated, Dimensions, Modal, ScrollView, StyleSheet, TouchableOpacity, View, ViewStyle } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
+import { router } from "expo-router";
 import { Styling } from "../../../../constants/Styling";
 import Spacer from "../../../style/Spacer";
 import StyledIcon from "../../../style/StyledIcon";
@@ -15,7 +16,7 @@ const BAR_FILL_MIN_H = 6;
 const StatusBar = ({ level, optimalMin, optimalMax }: { level: number; optimalMin: number; optimalMax: number }) => {
 	return (
 		<View style={statusBarStyles.track}>
-			<View style={[statusBarStyles.fill, { width: `${level}%` }]} />
+			<View style={[statusBarStyles.fill, { width: `${level}%`, left: 1 }]} />
 			<View style={[statusBarStyles.optimalMark, { left: `${optimalMin}%` }]} />
 			<View style={[statusBarStyles.optimalMark, { left: `${optimalMax}%` }]} />
 		</View>
@@ -154,7 +155,7 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 							</StyledText>
 							<Spacer space={Styling.Spacing.sml} />
 
-							<TouchableOpacity style={styles.footerBtn}>
+							<TouchableOpacity style={styles.footerBtn} onPress={() => { onClose(); router.push({ pathname: "/(garden)/plant-detail", params: { plantData: JSON.stringify(plant) } }); }}>
 								<StyledText type="head4" style={styles.footerBtnText}>
 									Bekijk in detail
 								</StyledText>

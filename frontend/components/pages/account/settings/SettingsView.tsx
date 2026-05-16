@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	settingValue: {
-		color: Styling.Colors.lightGrey,
+		color: Styling.Colors.white,
 	},
 	editRow: {
 		flexDirection: "row",

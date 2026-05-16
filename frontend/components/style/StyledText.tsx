@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextStyle } from "react-native";
+import { StyleSheet, Text, TextStyle, StyleProp } from "react-native";
 import { Styling } from "../../constants/Styling";
 import React, { ReactNode } from "react";
 
@@ -13,7 +13,7 @@ const TextType = {
 
 type TextTypeKey = keyof typeof TextType;
 
-const StyledText = ({ type, fullCap = false, style, children, ...props }: { type?: TextTypeKey; fullCap?: boolean; style?: TextStyle; children?: ReactNode }) => {
+const StyledText = ({ type, fullCap = false, style, children, ...props }: { type?: TextTypeKey; fullCap?: boolean; style?: StyleProp<TextStyle>; children?: ReactNode }) => {
 	return (
 		<Text style={[styles.text, { fontSize: type ? TextType[type] : undefined }, { textTransform: fullCap ? "uppercase" : "none" }, style]} {...props}>
 			{children}

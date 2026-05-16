@@ -18,6 +18,7 @@ export interface GardenPlant {
 	x: number;
 	y: number;
 	nickname: string;
+	type: string;
 	stage: { current: number; max: number; label: string };
 	water: PlantStatusData;
 	light: PlantStatusData;
