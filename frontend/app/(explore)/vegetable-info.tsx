@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
 	sowingGrid: {
 		flexDirection: "row",
 		flexWrap: "wrap",
+    justifyContent: "space-between",
 		gap: Styling.Spacing.reg,
 	},
 	sowingItem: {
