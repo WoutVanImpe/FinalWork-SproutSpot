@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import cors from "cors";
 import { PORT } from "./config";
 
@@ -16,6 +17,8 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+app.use("/images", express.static(path.join(__dirname, "public")));
 
 app.use("/api/users", userRoutes);
 app.use("/api/gardens", gardenRoutes);

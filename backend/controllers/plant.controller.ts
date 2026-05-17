@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { PlantService } from "../services/plant.service";
+import { PlantRecord } from "../types/database";
 
 export class PlantController {
 	private service: PlantService;
@@ -8,17 +9,26 @@ export class PlantController {
 		this.service = new PlantService();
 	}
 
+	private buildImageUrl(req: Request, filename: string): string {
+		return `${req.protocol}://${req.get("host")}/images/plants/${filename}`;
+	}
+
+	private mapPlant(req: Request, plant: PlantRecord): PlantRecord & { image: string } {
+		return { ...plant, image: this.buildImageUrl(req, plant.image) };
+	}
+
 	/**
 	 * @description Retrieve all plants from the encyclopedia, ordered alphabetically.
 	 * @param {Request} req - Express request (unused).
 	 * @param {Response} res - Express response with full list of plants.
 	 * @returns {void}
 	 */
-	getAllPlants = async (_req: Request, res: Response) => {
+	getAllPlants = async (req: Request, res: Response) => {
 		try {
 			const plants = await this.service.getAllPlants();
+			const mapped = plants.map((p) => this.mapPlant(req, p));
 
-			res.status(200).json({ success: true, count: plants.length, data: plants });
+			res.status(200).json({ success: true, count: mapped.length, data: mapped });
 		} catch (error) {
 			console.error("[PlantController] Error:", error);
 			res.status(500).json({ error: "Internal Server Error", message: "Failed to retrieve plants" });
@@ -42,7 +52,7 @@ export class PlantController {
 
 			const plant = await this.service.getPlantById(id);
 
-			res.status(200).json({ success: true, data: plant });
+			res.status(200).json({ success: true, data: this.mapPlant(req, plant) });
 		} catch (error) {
 			if ((error as Error).message === "Plant not found") {
 				res.status(404).json({ error: "Not Found", message: (error as Error).message });
@@ -78,8 +88,9 @@ export class PlantController {
 			}
 
 			const plants = await this.service.searchPlants(query, filters);
+			const mapped = plants.map((p) => this.mapPlant(req, p));
 
-			res.status(200).json({ success: true, count: plants.length, data: plants });
+			res.status(200).json({ success: true, count: mapped.length, data: mapped });
 		} catch (error) {
 			console.error("[PlantController] Error:", error);
 			res.status(500).json({ error: "Internal Server Error", message: "Failed to search plants" });
