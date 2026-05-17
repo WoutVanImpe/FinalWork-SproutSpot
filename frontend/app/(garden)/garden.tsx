@@ -4,7 +4,9 @@ import { CELL, MAX_SCALE, MIN_SCALE, SCALE_STEP, clampOffset, gridDimensions } f
 import { Styling } from "../../constants/Styling";
 import { BAR_HEIGHT } from "../../constants/tabConfig";
 import { initialPlants } from "../../data/gardenPlants";
+import { VEGETABLE_DETAILS } from "../../data/vegetables";
 import Spacer from "../../components/style/Spacer";
+import StyledText from "../../components/style/StyledText";
 import PlantSheet from "../../components/pages/garden/plantSheet/PlantSheet";
 import EditTopBar from "../../components/pages/garden/editMode/EditTopBar";
 import LayoutControls from "../../components/pages/garden/editMode/LayoutControls";
@@ -16,12 +18,32 @@ import { useOverlay } from "../../context/OverlayContext";
 import StyledAlert, { AlertButton } from "../../components/style/StyledAlert";
 import { useLocalSearchParams, router } from "expo-router";
 
+function makeNewPlant(vegId: string, name: string, x: number, y: number): GardenPlant {
+  const veg = VEGETABLE_DETAILS[vegId];
+  return {
+    id: `plant_${Date.now()}`,
+    image: veg?.image ?? 0,
+    warning: false,
+    x,
+    y,
+    nickname: name || veg?.name || "Plant",
+    type: veg?.name ?? "",
+    stage: { current: 1, max: veg?.stages?.length ?? 1, label: veg?.stages?.[0]?.label ?? "Zaaien" },
+    water: { level: 100, label: veg?.water ?? "", optimalMin: 60, optimalMax: 80 },
+    light: { level: 80, label: veg?.light ?? "", optimalMin: 60, optimalMax: 90 },
+    temperature: { level: 70, label: `${veg?.temperature?.min ?? 0}°C - ${veg?.temperature?.max ?? 0}°C`, optimalMin: 50, optimalMax: 80 },
+    advice: "",
+    battery: 100,
+  };
+}
+
 const Garden = () => {
-	const params = useLocalSearchParams<{ selectedPlantId?: string }>();
+	const params = useLocalSearchParams<{ selectedPlantId?: string; placementMode?: string; vegId?: string; name?: string }>();
 	const [plants, setPlants] = useState<GardenPlant[]>(initialPlants);
 	const [cols, setCols] = useState(5);
 	const [rows, setRows] = useState(6);
 	const [isEditing, setIsEditing] = useState(false);
+	const [isPlacing, setIsPlacing] = useState(false);
 	const [hasChanges, setHasChanges] = useState(false);
 	const [selectedCell, setSelectedCell] = useState<{ x: number; y: number } | null>(null);
 	const [isMoving, setIsMoving] = useState(false);
@@ -35,7 +57,10 @@ const Garden = () => {
 				setSelectedPlant(plant);
 			}
 		}
-	}, [params.selectedPlantId]);
+		if (params.placementMode === "true" && params.vegId) {
+			setIsPlacing(true);
+		}
+	}, [params.selectedPlantId, params.placementMode, params.vegId]);
 
 	const [scale, setScale] = useState(1);
 	const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
@@ -318,6 +343,18 @@ const Garden = () => {
 						/>
 						<Spacer space={Styling.Spacing.sml} />
 					</>
+				) : isPlacing ? (
+					<>
+						<View style={styles.placementBar}>
+							<StyledText type="head3" style={styles.placementTitle}>
+								Kies een plek voor {decodeURIComponent(params.name || "")}
+							</StyledText>
+							<TouchableOpacity onPress={() => { setIsPlacing(false); router.setParams({ placementMode: undefined, vegId: undefined, name: undefined }); }}>
+								<StyledText type="paragh" style={{ color: Styling.Colors.green }}>Annuleren</StyledText>
+							</TouchableOpacity>
+						</View>
+						<Spacer space={Styling.Spacing.reg} />
+					</>
 				) : (
 					<>
 						<ViewTopBar onEdit={enterEditMode} onZoom={zoom} />
@@ -366,13 +403,21 @@ const Garden = () => {
 									<TouchableOpacity
 										key={key}
 										style={[styles.cell, { left: cx * CELL, top: cy * CELL }, selected && styles.cellSelected]}
-										onPress={() => {
-											if (isEditing) {
-												selectCell(cx, cy);
-											} else if (plant) {
-												setSelectedPlant(plant);
+									onPress={() => {
+										if (isEditing) {
+											selectCell(cx, cy);
+										} else if (isPlacing) {
+											if (!plant && params.vegId) {
+												const newPlant = makeNewPlant(params.vegId, decodeURIComponent(params.name || ""), cx, cy);
+												setPlants((prev) => [...prev, newPlant]);
+												setIsPlacing(false);
+												router.setParams({ placementMode: undefined, vegId: undefined, name: undefined });
+												setSelectedPlant(newPlant);
 											}
-										}}
+										} else if (plant) {
+											setSelectedPlant(plant);
+										}
+									}}
 										activeOpacity={0.7}
 									>
 										{plant && <GardenGridItem plant={plant} />}
@@ -434,5 +479,14 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		backgroundColor: "rgba(0, 202, 104, 0.15)",
 		borderRadius: 2,
+	},
+	placementBar: {
+		paddingHorizontal: Styling.Padding.reg,
+		alignItems: "center",
+		gap: Styling.Spacing.sml,
+	},
+	placementTitle: {
+		color: Styling.Colors.white,
+		textAlign: "center",
 	},
 });
