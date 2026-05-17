@@ -1,6 +1,6 @@
 import { StyleSheet, View, useWindowDimensions, Animated } from "react-native";
 import React, { useRef, useState, useEffect } from "react";
-import { Tabs, useSegments } from "expo-router";
+import { Tabs, useSegments, useRouter } from "expo-router";
 import { useFonts } from "expo-font";
 import CurvedBackground from "../components/shared/navbar/CurvedBackground";
 import TabBarButton from "../components/shared/navbar/TabBarButton";
@@ -9,6 +9,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import NavHeader from "../components/shared/header/NavHeader";
 import { OverlayProvider } from "../context/OverlayContext";
+import OnboardingCarousel from "../components/onboarding/OnboardingCarousel";
+import AuthScreen from "../components/auth/AuthScreen";
+import RegisterFlow from "../components/auth/RegisterFlow";
 
 const CustomTabBar = ({ state, navigation }: any) => {
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
@@ -103,8 +106,33 @@ const NavOverlay = () => {
 	});
 	const segments = useSegments();
 	const isAccountPage = segments.includes("account");
+	const [showOnboarding, setShowOnboarding] = useState(true);
+	const [showAuth, setShowAuth] = useState(false);
+	const [showRegisterFlow, setShowRegisterFlow] = useState(false);
+	const [pendingPlant, setPendingPlant] = useState<{ vegId: string; name: string } | null>(null);
+	const router = useRouter();
+
+	useEffect(() => {
+		if (pendingPlant) {
+			const { vegId, name } = pendingPlant;
+			router.push(`/(garden)/garden?placementMode=true&vegId=${vegId}&name=${encodeURIComponent(name)}`);
+			setPendingPlant(null);
+		}
+	}, [pendingPlant]);
 
 	if (!fontsLoaded) return null;
+
+	if (showOnboarding) {
+		return <OnboardingCarousel onComplete={() => { setShowOnboarding(false); setShowAuth(true); }} />;
+	}
+
+	if (showAuth) {
+		return <AuthScreen onComplete={(mode) => { setShowAuth(false); if (mode === "register") setShowRegisterFlow(true); }} />;
+	}
+
+	if (showRegisterFlow) {
+		return <RegisterFlow onComplete={(vegId, name) => { setShowRegisterFlow(false); setPendingPlant({ vegId, name }); }} />;
+	}
 
 	return (
 		<OverlayProvider>
