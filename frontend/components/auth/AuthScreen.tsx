@@ -81,13 +81,7 @@ const AuthScreen = ({ onComplete }: AuthScreenProps) => {
 
 	return (
 		<View style={[styles.container]}>
-			<ScrollView
-				ref={scrollRef}
-				contentContainerStyle={[styles.scrollContent, { paddingBottom: keyboardPadding }, { paddingTop: insets.top + 40 }]}
-				keyboardShouldPersistTaps="handled"
-				bounces={false}
-				showsVerticalScrollIndicator={false}
-			>
+			<ScrollView ref={scrollRef} contentContainerStyle={[styles.scrollContent, { paddingBottom: keyboardPadding }, { paddingTop: insets.top + 40 }]} keyboardShouldPersistTaps="handled" bounces={false} showsVerticalScrollIndicator={false}>
 				<View style={styles.header}>
 					<StyledText type="head1" style={{ color: Styling.Colors.green, textAlign: "center" }}>
 						SproutSpot
@@ -110,32 +104,43 @@ const AuthScreen = ({ onComplete }: AuthScreenProps) => {
 					</TouchableOpacity>
 				</View>
 
-				<View style={styles.form} onLayout={(e: LayoutChangeEvent) => { formY.current = e.nativeEvent.layout.y; }}>
+				<View
+					style={styles.form}
+					onLayout={(e: LayoutChangeEvent) => {
+						formY.current = e.nativeEvent.layout.y;
+					}}
+				>
 					{isRegister && (
-						<>
-							<View onLayout={(e: LayoutChangeEvent) => { inputYPositions.current["name"] = e.nativeEvent.layout.y; }}>
-								<TextInput
-									style={inputStyle("name")}
-									value={name}
-									onChangeText={(v) => {
-										setName(v);
-										setErrors((e) => ({ ...e, name: "" }));
-									}}
-									placeholder="Naam"
-									placeholderTextColor={Styling.Colors.white}
-									autoCapitalize="words"
-									onFocus={() => scrollToInput("name")}
-								/>
-								{errors.name && (
-									<StyledText type="smParagh" style={styles.error}>
-										{errors.name}
-									</StyledText>
-								)}
-							</View>
-						</>
+						<View
+							onLayout={(e: LayoutChangeEvent) => {
+								inputYPositions.current["name"] = e.nativeEvent.layout.y;
+							}}
+						>
+							<TextInput
+								style={inputStyle("name")}
+								value={name}
+								onChangeText={(v) => {
+									setName(v);
+									setErrors((e) => ({ ...e, name: "" }));
+								}}
+								placeholder="Naam"
+								placeholderTextColor={Styling.Colors.white}
+								autoCapitalize="words"
+								onFocus={() => scrollToInput("name")}
+							/>
+							{errors.name && (
+								<StyledText type="smParagh" style={styles.error}>
+									{errors.name}
+								</StyledText>
+							)}
+						</View>
 					)}
 
-					<View onLayout={(e: LayoutChangeEvent) => { inputYPositions.current["email"] = e.nativeEvent.layout.y; }}>
+					<View
+						onLayout={(e: LayoutChangeEvent) => {
+							inputYPositions.current["email"] = e.nativeEvent.layout.y;
+						}}
+					>
 						<TextInput
 							style={inputStyle("email")}
 							value={email}
@@ -156,7 +161,11 @@ const AuthScreen = ({ onComplete }: AuthScreenProps) => {
 						)}
 					</View>
 
-					<View onLayout={(e: LayoutChangeEvent) => { inputYPositions.current["password"] = e.nativeEvent.layout.y; }}>
+					<View
+						onLayout={(e: LayoutChangeEvent) => {
+							inputYPositions.current["password"] = e.nativeEvent.layout.y;
+						}}
+					>
 						<TextInput
 							style={inputStyle("password")}
 							value={password}
@@ -188,7 +197,11 @@ const AuthScreen = ({ onComplete }: AuthScreenProps) => {
 
 					{isRegister && (
 						<>
-							<View onLayout={(e: LayoutChangeEvent) => { inputYPositions.current["repeatPassword"] = e.nativeEvent.layout.y; }}>
+							<View
+								onLayout={(e: LayoutChangeEvent) => {
+									inputYPositions.current["repeatPassword"] = e.nativeEvent.layout.y;
+								}}
+							>
 								<TextInput
 									style={inputStyle("repeatPassword")}
 									value={repeatPassword}
