@@ -57,8 +57,10 @@ export class GardenRepository {
 			.andWhere("up.is_active", true)
 			.select(
 				"up.id",
+				"up.plant_id",
 				"up.x_pos",
 				"up.y_pos",
+				"up.nickname",
 				"p.name as plant_name",
 				"p.image as plant_image",
 				"up.current_stage_order",
