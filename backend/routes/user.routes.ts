@@ -14,5 +14,6 @@ router.use(authenticate);
 router.get("/profile", controller.getProfile);
 router.put("/profile", controller.updateProfile);
 router.put("/push-token", validateBody(["push_token"]), controller.updatePushToken);
+router.put("/password", validateBody(["current_password", "new_password"]), controller.changePassword);
 
 export default router;
