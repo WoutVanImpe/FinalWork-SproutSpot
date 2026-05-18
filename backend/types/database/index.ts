@@ -31,6 +31,11 @@ export interface PlantRecord {
 	temperature: string;
 	planting_type: "indoor" | "outdoor" | "both";
 	image: string;
+	sunlight: "full" | "partial" | "shade" | null;
+	care_level: "daily" | "weekly" | "minimal" | null;
+	temperature_min: number | null;
+	temperature_max: number | null;
+	total_days: number | null;
 	sowing_depth: number;
 	sowing_distance: number;
 	pot_min_depth: number;
@@ -75,6 +80,7 @@ export interface UserPlantRecord {
 	id: number;
 	user_id: number;
 	plant_id: number;
+	nickname: string | null;
 	sonde_id: string | null;
 	date_sown: Date;
 	current_stage_order: number;

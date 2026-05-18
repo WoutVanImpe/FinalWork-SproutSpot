@@ -18,7 +18,7 @@ export interface UpdateProfileDto {
 }
 
 export interface CreateUserPlantDto {
-	name: string;
+	nickname: string;
 	user_id: number;
 	plant_id: number;
 	garden_id?: number;
