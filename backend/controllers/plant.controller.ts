@@ -1,20 +1,12 @@
 import { Request, Response } from "express";
 import { PlantService } from "../services/plant.service";
-import { PlantRecord } from "../types/database";
+import { toPlantListItem, toPlantDetail, toStageInfo } from "../utils/plantMapper";
 
 export class PlantController {
 	private service: PlantService;
 
 	constructor() {
 		this.service = new PlantService();
-	}
-
-	private buildImageUrl(req: Request, filename: string): string {
-		return `${req.protocol}://${req.get("host")}/images/plants/${filename}`;
-	}
-
-	private mapPlant(req: Request, plant: PlantRecord): PlantRecord & { image: string } {
-		return { ...plant, image: this.buildImageUrl(req, plant.image) };
 	}
 
 	/**
@@ -26,7 +18,7 @@ export class PlantController {
 	getAllPlants = async (req: Request, res: Response) => {
 		try {
 			const plants = await this.service.getAllPlants();
-			const mapped = plants.map((p) => this.mapPlant(req, p));
+			const mapped = plants.map((p) => toPlantListItem(req, p));
 
 			res.status(200).json({ success: true, count: mapped.length, data: mapped });
 		} catch (error) {
@@ -36,7 +28,7 @@ export class PlantController {
 	};
 
 	/**
-	 * @description Retrieve a single plant from the encyclopedia by its ID.
+	 * @description Retrieve a single plant from the encyclopedia by its ID with full detail including stages.
 	 * @param {Request} req - Express request with plant ID as URL parameter.
 	 * @param {Response} res - Express response with plant data.
 	 * @returns {void}
@@ -51,8 +43,9 @@ export class PlantController {
 			}
 
 			const plant = await this.service.getPlantById(id);
+			const stages = await this.service.getPlantStages(id) as any[];
 
-			res.status(200).json({ success: true, data: this.mapPlant(req, plant) });
+			res.status(200).json({ success: true, data: toPlantDetail(req, plant, stages) });
 		} catch (error) {
 			if ((error as Error).message === "Plant not found") {
 				res.status(404).json({ error: "Not Found", message: (error as Error).message });
@@ -72,10 +65,10 @@ export class PlantController {
 	 */
 	searchPlants = async (req: Request, res: Response) => {
 		try {
-			const { q, light, difficulty, is_indoor, sowing_month } = req.query;
+			const { q, light, difficulty, is_indoor, sowing_month, sunlight, care_level } = req.query;
 
 			const query = typeof q === "string" ? q : undefined;
-			const filters: { light?: string; difficulty?: string; is_indoor?: boolean; sowingMonth?: number } = {};
+			const filters: { light?: string; difficulty?: string; is_indoor?: boolean; sowingMonth?: number; sunlight?: string; care_level?: string } = {};
 
 			if (typeof light === "string") filters.light = light;
 			if (typeof difficulty === "string") filters.difficulty = difficulty;
@@ -86,9 +79,11 @@ export class PlantController {
 					filters.sowingMonth = month;
 				}
 			}
+			if (typeof sunlight === "string") filters.sunlight = sunlight;
+			if (typeof care_level === "string") filters.care_level = care_level;
 
 			const plants = await this.service.searchPlants(query, filters);
-			const mapped = plants.map((p) => this.mapPlant(req, p));
+			const mapped = plants.map((p) => toPlantListItem(req, p));
 
 			res.status(200).json({ success: true, count: mapped.length, data: mapped });
 		} catch (error) {
@@ -115,8 +110,9 @@ export class PlantController {
 			const stageOrder = req.query.stage_order ? Number.parseInt(req.query.stage_order as string) : undefined;
 
 			const stages = await this.service.getPlantStages(id, stageOrder);
+			const mapped = Array.isArray(stages) ? stages.map(toStageInfo) : toStageInfo(stages);
 
-			res.status(200).json({ success: true, data: stages });
+			res.status(200).json({ success: true, data: mapped });
 		} catch (error) {
 			const msg = (error as Error).message;
 			if (msg.includes("not found")) {

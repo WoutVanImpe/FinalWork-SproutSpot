@@ -37,7 +37,7 @@ export class PlantService {
 	 * @param {object} [filters] - Optional filters object with light, difficulty, is_indoor, and sowingMonth properties.
 	 * @returns {Promise<PlantRecord[]>} Filtered list of matching plants.
 	 */
-	async searchPlants(nameQuery: string | undefined, filters?: { light?: string; difficulty?: string; is_indoor?: boolean; sowingMonth?: number }): Promise<PlantRecord[]> {
+	async searchPlants(nameQuery: string | undefined, filters?: { light?: string; difficulty?: string; is_indoor?: boolean; sowingMonth?: number; sunlight?: string; care_level?: string }): Promise<PlantRecord[]> {
 		return this.repository.search(nameQuery, filters);
 	}
 

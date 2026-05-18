@@ -25,7 +25,7 @@ export class PlantRepository {
 	 * @param {object} [filters] - Optional filters object with light, difficulty, is_indoor, and sowingMonth properties.
 	 * @returns {Promise<PlantRecord[]>} Filtered list of matching plants ordered alphabetically.
 	 */
-	async search(nameQuery: string | undefined, filters?: { light?: string; difficulty?: string; is_indoor?: boolean; sowingMonth?: number }): Promise<PlantRecord[]> {
+	async search(nameQuery: string | undefined, filters?: { light?: string; difficulty?: string; is_indoor?: boolean; sowingMonth?: number; sunlight?: string; care_level?: string }): Promise<PlantRecord[]> {
 		let baseQuery = db("plants");
 
 		if (nameQuery) {
@@ -52,6 +52,14 @@ export class PlantRepository {
 
 		if (filters?.sowingMonth) {
 			baseQuery = baseQuery.whereRaw("sowing_period @> ?::jsonb", [JSON.stringify([filters.sowingMonth])]);
+		}
+
+		if (filters?.sunlight) {
+			baseQuery = baseQuery.whereILike("sunlight", filters.sunlight);
+		}
+
+		if (filters?.care_level) {
+			baseQuery = baseQuery.whereILike("care_level", filters.care_level);
 		}
 
 		return baseQuery.orderBy("name", "asc");
