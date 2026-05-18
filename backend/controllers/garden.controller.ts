@@ -34,6 +34,30 @@ export class GardenController {
 	};
 
 	/**
+	 * @description Retrieve the user's garden dashboard with enriched plant data (current stage info) and summary stats.
+	 * @param {AuthenticatedRequest} req - Authenticated request containing user ID.
+	 * @param {Response} res - Express response with dashboard data.
+	 * @returns {void}
+	 */
+	getDashboard = async (req: AuthenticatedRequest, res: Response) => {
+		try {
+			const userId = req.user?.id;
+
+			if (!userId) {
+				res.status(401).json({ error: "Unauthorized", message: "Authentication required" });
+				return;
+			}
+
+			const result = await this.service.getUserDashboard(userId);
+
+			res.status(200).json({ success: true, data: result });
+		} catch (error) {
+			console.error("[GardenController] Error:", error);
+			res.status(500).json({ error: "Internal Server Error", message: "Failed to retrieve dashboard" });
+		}
+	};
+
+	/**
 	 * @description Update the garden's dimensions and/or plant positions. Validates dimension range (1-50) and checks for position collisions.
 	 * @param {AuthenticatedRequest} req - Authenticated request with { width, height, plant_positions } in body.
 	 * @param {Response} res - Express response with updated garden data.

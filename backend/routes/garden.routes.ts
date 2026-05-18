@@ -8,6 +8,7 @@ const controller = new GardenController();
 router.use(authenticate);
 
 router.get("/", controller.getUserGarden);
+router.get("/status", controller.getDashboard);
 router.put("/", controller.updateGarden);
 
 export default router;

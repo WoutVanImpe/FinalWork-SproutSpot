@@ -13,6 +13,7 @@ export class UserPlantRepository {
 			.insert({
 				user_id: input.user_id,
 				plant_id: input.plant_id,
+				nickname: input.nickname,
 				garden_id: input.garden_id || null,
 				x_pos: input.x_pos,
 				y_pos: input.y_pos,

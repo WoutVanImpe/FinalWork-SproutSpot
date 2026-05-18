@@ -65,6 +65,16 @@ export class UserPlantService {
 	}
 
 	/**
+	 * @description Create a new user plant record (add a plant to the user's garden).
+	 * @param {CreateUserPlantDto} input - The plant creation data including user_id, plant_id, nickname, position, and optional garden/probe.
+	 * @returns {Promise<UserPlantRecord>} The created user plant record.
+	 */
+	async createUserPlant(input: CreateUserPlantDto): Promise<UserPlantRecord> {
+		const createdPlant = await this.repository.create(input);
+		return createdPlant;
+	}
+
+	/**
 	 * @description Retrieve the current growth stage details for a user plant.
 	 * @param {number} userPlantId - The user plant's database ID.
 	 * @returns {Promise<PlantStageRecord>} The current stage record with care requirements.

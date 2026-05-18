@@ -11,6 +11,47 @@ export class UserPlantController {
 	}
 
 	/**
+	 * @description Create a new user plant in the user's garden. Requires plant_id, nickname, x_pos, and y_pos.
+	 * @param {AuthenticatedRequest} req - Authenticated request with { plant_id, nickname, x_pos, y_pos, garden_id?, sonde_id? } in body.
+	 * @param {Response} res - Express response with created user plant data.
+	 * @returns {void}
+	 */
+	createUserPlant = async (req: AuthenticatedRequest, res: Response) => {
+		try {
+			const userId = req.user?.id;
+
+			if (!userId) {
+				res.status(401).json({ error: "Unauthorized", message: "Authentication required" });
+				return;
+			}
+
+			const { plant_id, nickname, x_pos, y_pos, garden_id, sonde_id } = req.body;
+
+			if (!plant_id || !nickname || x_pos === undefined || y_pos === undefined) {
+				res.status(400).json({ error: "Validation Error", message: "plant_id, nickname, x_pos, and y_pos are required" });
+				return;
+			}
+
+			const input: CreateUserPlantDto = {
+				nickname,
+				user_id: userId,
+				plant_id,
+				x_pos,
+				y_pos,
+				garden_id: garden_id || undefined,
+				sonde_id: sonde_id || undefined,
+			};
+
+			const plant = await this.service.createUserPlant(input);
+
+			res.status(201).json({ success: true, message: "Plant added to garden", data: plant });
+		} catch (error) {
+			console.error("[UserPlantController] Error:", error);
+			res.status(500).json({ error: "Internal Server Error", message: "Failed to create plant" });
+		}
+	};
+
+	/**
 	 * @description Retrieve all user plants for the authenticated user, including inactive ones (harvested, died, removed).
 	 * @param {AuthenticatedRequest} req - Authenticated request containing user ID.
 	 * @param {Response} res - Express response with full plant history.

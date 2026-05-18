@@ -8,6 +8,7 @@ const controller = new UserPlantController();
 
 router.use(authenticate);
 
+router.post("/", validateBody(["plant_id", "nickname", "x_pos", "y_pos"]), controller.createUserPlant);
 router.get("/", controller.getAllUserPlants);
 router.get("/active", controller.getAllActiveUserPlants);
 router.post("/:id/stage", validateBody(["new_stage_order"]), controller.updateStage);
