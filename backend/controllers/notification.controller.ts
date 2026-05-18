@@ -2,6 +2,24 @@ import { Request, Response } from "express";
 import { NotificationService } from "../services/notification.service";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 
+const TYPE_MAP: Record<string, "problem" | "milestone"> = {
+	sensor_alert: "problem",
+	stage_validation: "milestone",
+	system_status: "milestone",
+};
+
+function mapNotification(n: any) {
+	return {
+		id: String(n.id),
+		type: TYPE_MAP[n.notification_type] ?? "problem",
+		title: n.title,
+		description: n.message,
+		image: n.plant_image ? { uri: n.plant_image } : null,
+		snoozed: n.notification_state === "snoozed",
+		created_at: n.created_at,
+	};
+}
+
 export class NotificationController {
 	private service: NotificationService;
 
@@ -26,8 +44,9 @@ export class NotificationController {
 
 			const onlyUnacknowledged = req.query.all !== "true";
 			const notifications = await this.service.getUserNotifications(userId, onlyUnacknowledged);
+			const mapped = notifications.map(mapNotification);
 
-			res.status(200).json({ success: true, count: notifications.length, data: notifications });
+			res.status(200).json({ success: true, count: mapped.length, data: mapped });
 		} catch (error) {
 			console.error("[NotificationController] Error:", error);
 			res.status(500).json({ error: "Internal Server Error", message: "Failed to retrieve notifications" });

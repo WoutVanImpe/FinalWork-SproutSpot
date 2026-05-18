@@ -8,17 +8,23 @@ export class NotificationRepository {
 	 * @param {boolean} onlyUnacknowledged - When true, excludes notifications with state "acknowledged".
 	 * @returns {Promise<PendingNotificationRecord[]>} List of notification records.
 	 */
-	async getNotificationsByUser(userId: number, onlyUnacknowledged: boolean): Promise<PendingNotificationRecord[]> {
-		let query = db("pending_notifications")
-			.where("user_id", userId)
-			.orderBy("created_at", "desc")
+	async getNotificationsByUser(userId: number, onlyUnacknowledged: boolean) {
+		let query = db("pending_notifications as pn")
+			.leftJoin("user_plants as up", "pn.user_plant_id", "up.id")
+			.leftJoin("plants as pl", "up.plant_id", "pl.id")
+			.where("pn.user_id", userId)
+			.orderBy("pn.created_at", "desc")
 			.limit(50);
 
 		if (onlyUnacknowledged) {
-			query = query.andWhereNot("notification_state", "acknowledged");
+			query = query.andWhereNot("pn.notification_state", "acknowledged");
 		}
 
-		return query;
+		return query.select(
+			"pn.*",
+			"pl.image as plant_image",
+			"pl.name as plant_name"
+		);
 	}
 
 	/**
