@@ -4,5 +4,6 @@ export const DATABASE_PORT = process.env.DATABASE_PORT;
 export const DATABASE_USER = process.env.DATABASE_USER;
 export const DATABASE_PASSWORD = process.env.DATABASE_PASSWORD;
 export const DATABASE_DB = process.env.DATABASE_DB;
+export const JWT_SECRET = process.env.JWT_SECRET || "sproutspot-dev-secret-key-change-in-production";
 export const DEEP_SLEEP_INTERVAL_MINUTES = 60;
 export const ANTI_SPAM_MEASUREMENT_THRESHOLD = 3;

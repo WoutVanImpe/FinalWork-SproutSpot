@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../config";
 
 export interface AuthenticatedRequest extends Request {
 	user?: {
@@ -20,14 +22,9 @@ export const authenticate = (req: AuthenticatedRequest, res: Response, next: Nex
 
 	const token = authHeader.split(" ")[1];
 
-	/* TODO: Implement JWT verification once jsonwebtoken is installed
-	 * For now, this is a placeholder that passes through for development
-	 */
 	try {
-		req.user = {
-			id: 1,
-			email: "dev@sproutspot.local",
-		};
+		const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
+		req.user = { id: decoded.id, email: decoded.email };
 		next();
 	} catch (error) {
 		res.status(401).json({
