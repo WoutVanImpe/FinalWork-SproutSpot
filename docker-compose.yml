@@ -30,6 +30,7 @@ services:
       context: ./backend
     command: sh -c "npm run knex:migrate && npm run knex:seed && npm start"
     environment:
+      BACKEND_BASE_URL: ${BACKEND_BASE_URL}
       DATABASE_HOST: database
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_USER: ${DATABASE_USER}

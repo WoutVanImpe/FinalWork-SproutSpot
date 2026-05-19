@@ -18,7 +18,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/images", express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(process.cwd(), "public")));
 
 app.use("/api/users", userRoutes);
 app.use("/api/gardens", gardenRoutes);
