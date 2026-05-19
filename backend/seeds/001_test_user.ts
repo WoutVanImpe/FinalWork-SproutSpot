@@ -2,11 +2,17 @@ import type { Knex } from "knex";
 import bcrypt from "bcrypt";
 
 export async function seed(knex: Knex): Promise<void> {
+	await knex("pending_notifications").del();
+	await knex("active_issues").del();
+	await knex("probe_entries").del();
+	await knex("user_plants").del();
+	await knex("probes").del();
 	await knex("users").del();
 
 	const hash = await bcrypt.hash("test1234", 10);
 
 	await knex("users").insert({
+		id: 1,
 		name: "Test User",
 		email: "test@sproutspot.app",
 		password_hash: hash,
