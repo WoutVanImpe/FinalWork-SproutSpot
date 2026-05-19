@@ -1,7 +1,7 @@
 export interface VegetableInfo {
 	id: string;
 	name: string;
-	image: number;
+	image: number | { uri: string };
 	warning?: boolean;
 	placement: "inside" | "outside" | "both";
 	sunlight: string;
@@ -11,7 +11,7 @@ export interface VegetableInfo {
 
 export interface VegetableDetail {
 	name: string;
-	image: number;
+	image: number | { uri: string };
 	light: string;
 	water: string;
 	difficulty: string;
