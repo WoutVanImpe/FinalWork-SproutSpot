@@ -1,6 +1,7 @@
 import { db } from "../db/connection";
 import { ProbeEntryRecord, PlantStageRecord } from "../types/database";
 import { toStageInfo } from "./plantMapper";
+import { buildImageUrl } from "../config";
 
 export interface PlantStatusData {
 	level: number;
@@ -23,6 +24,7 @@ export interface EnrichedGardenPlant {
 	temperature: PlantStatusData;
 	advice: string;
 	battery: number;
+	probe_name: string;
 }
 
 function batteryPercentage(voltage: number): number {
@@ -57,7 +59,6 @@ export async function enrichPlant(
 	stage: PlantStageRecord | null,
 	allStages: PlantStageRecord[],
 	latestTelemetry: ProbeEntryRecord | null,
-	baseImageUrl: string = "",
 ): Promise<EnrichedGardenPlant> {
 	const stageInfo = stage ? toStageInfo(stage) : { label: "Onbekend", durationDays: 0 };
 	const stageLabel = stageInfo.label;
@@ -91,8 +92,7 @@ export async function enrichPlant(
 		{ label: "temperature", data: tempStatus },
 	];
 
-	const filename = rawPlant.plant_image ?? "";
-	const imageUrl = filename ? `${baseImageUrl}/${filename}` : "";
+	const imageUrl = buildImageUrl(rawPlant.plant_image ?? "");
 
 	return {
 		id: String(rawPlant.id),
@@ -112,10 +112,11 @@ export async function enrichPlant(
 		temperature: tempStatus,
 		advice: computeAdvice(namedStatuses),
 		battery: batteryPercentage(rawPlant.battery_voltage ?? 0),
+		probe_name: rawPlant.probe_name ?? "",
 	};
 }
 
-export async function enrichPlants(rawPlants: any[], baseImageUrl: string = ""): Promise<EnrichedGardenPlant[]> {
+export async function enrichPlants(rawPlants: any[]): Promise<EnrichedGardenPlant[]> {
 	const plantPromises = rawPlants.map(async (rawPlant) => {
 		try {
 			const allStages = await db("plant_stages")
@@ -140,11 +141,9 @@ export async function enrichPlants(rawPlants: any[], baseImageUrl: string = ""):
 				currentStage,
 				allStages,
 				latestTelemetry,
-				baseImageUrl,
 			);
 		} catch {
-			const filename = rawPlant.plant_image ?? "";
-			const imageUrl = filename ? `${baseImageUrl}/${filename}` : "";
+			const imageUrl = buildImageUrl(rawPlant.plant_image ?? "");
 
 			return {
 				id: String(rawPlant.id),
@@ -160,6 +159,7 @@ export async function enrichPlants(rawPlants: any[], baseImageUrl: string = ""):
 				temperature: { level: 20, label: "", optimalMin: 10, optimalMax: 30 },
 				advice: "",
 				battery: batteryPercentage(rawPlant.battery_voltage ?? 0),
+				probe_name: rawPlant.probe_name ?? "",
 			};
 		}
 	});
