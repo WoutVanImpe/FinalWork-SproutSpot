@@ -22,7 +22,7 @@ export class GardenService {
 	 * @param {number} userId - The user's database ID.
 	 * @returns {Promise<{ garden: UserGardenRecord; plants: any[] }>} Garden record and list of active plants with probe health info.
 	 */
-	async getUserGarden(userId: number) {
+	async getUserGarden(userId: number, baseImageUrl: string = "") {
 		const result = await this.repository.getGardenWithActivePlants(userId);
 
 		if (!result) {
@@ -30,7 +30,7 @@ export class GardenService {
 			return { garden, plants: [] };
 		}
 
-		const enrichedPlants = await enrichPlants(result.plants);
+		const enrichedPlants = await enrichPlants(result.plants, baseImageUrl);
 
 		return { garden: result.garden, plants: enrichedPlants };
 	}
@@ -40,7 +40,7 @@ export class GardenService {
 	 * @param {number} userId - The user's database ID.
 	 * @returns {Promise<any>} Dashboard data with garden, enriched plants, and summary stats.
 	 */
-	async getUserDashboard(userId: number) {
+	async getUserDashboard(userId: number, baseImageUrl: string = "") {
 		const result = await this.repository.getGardenWithActivePlants(userId);
 
 		if (!result) {
@@ -52,7 +52,7 @@ export class GardenService {
 			};
 		}
 
-		const enrichedPlants = await enrichPlants(result.plants);
+		const enrichedPlants = await enrichPlants(result.plants, baseImageUrl);
 
 		return {
 			garden: result.garden,

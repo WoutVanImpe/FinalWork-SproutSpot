@@ -57,6 +57,7 @@ export async function enrichPlant(
 	stage: PlantStageRecord | null,
 	allStages: PlantStageRecord[],
 	latestTelemetry: ProbeEntryRecord | null,
+	baseImageUrl: string = "",
 ): Promise<EnrichedGardenPlant> {
 	const stageInfo = stage ? toStageInfo(stage) : { label: "Onbekend", durationDays: 0 };
 	const stageLabel = stageInfo.label;
@@ -90,9 +91,12 @@ export async function enrichPlant(
 		{ label: "temperature", data: tempStatus },
 	];
 
+	const filename = rawPlant.plant_image ?? "";
+	const imageUrl = filename ? `${baseImageUrl}/${filename}` : "";
+
 	return {
 		id: String(rawPlant.id),
-		image: rawPlant.plant_image ?? "",
+		image: imageUrl,
 		warning: computeWarning(statuses),
 		x: rawPlant.x_pos,
 		y: rawPlant.y_pos,
@@ -111,7 +115,7 @@ export async function enrichPlant(
 	};
 }
 
-export async function enrichPlants(rawPlants: any[]): Promise<EnrichedGardenPlant[]> {
+export async function enrichPlants(rawPlants: any[], baseImageUrl: string = ""): Promise<EnrichedGardenPlant[]> {
 	const plantPromises = rawPlants.map(async (rawPlant) => {
 		try {
 			const allStages = await db("plant_stages")
@@ -136,11 +140,15 @@ export async function enrichPlants(rawPlants: any[]): Promise<EnrichedGardenPlan
 				currentStage,
 				allStages,
 				latestTelemetry,
+				baseImageUrl,
 			);
 		} catch {
+			const filename = rawPlant.plant_image ?? "";
+			const imageUrl = filename ? `${baseImageUrl}/${filename}` : "";
+
 			return {
 				id: String(rawPlant.id),
-				image: rawPlant.plant_image ?? "",
+				image: imageUrl,
 				warning: false,
 				x: rawPlant.x_pos,
 				y: rawPlant.y_pos,

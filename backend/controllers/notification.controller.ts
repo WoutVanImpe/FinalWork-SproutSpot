@@ -8,16 +8,23 @@ const TYPE_MAP: Record<string, "problem" | "milestone"> = {
 	system_status: "milestone",
 };
 
-function mapNotification(n: any) {
+function mapNotification(n: any, baseImageUrl: string = "") {
+	const filename = n.plant_image ?? "";
+	const imageUri = filename ? `${baseImageUrl}/${filename}` : "";
 	return {
 		id: String(n.id),
 		type: TYPE_MAP[n.notification_type] ?? "problem",
 		title: n.title,
 		description: n.message,
-		image: n.plant_image ? { uri: n.plant_image } : null,
+		image: imageUri ? { uri: imageUri } : null,
 		snoozed: n.notification_state === "snoozed",
 		created_at: n.created_at,
 	};
+}
+
+function buildImagesBaseUrl(req: AuthenticatedRequest): string {
+	const host = req.get("host") ?? "localhost:5001";
+	return `${req.protocol}://${host}/images/plants`;
 }
 
 export class NotificationController {
@@ -44,7 +51,8 @@ export class NotificationController {
 
 			const onlyUnacknowledged = req.query.all !== "true";
 			const notifications = await this.service.getUserNotifications(userId, onlyUnacknowledged);
-			const mapped = notifications.map(mapNotification);
+			const baseImageUrl = buildImagesBaseUrl(req);
+			const mapped = notifications.map((n) => mapNotification(n, baseImageUrl));
 
 			res.status(200).json({ success: true, count: mapped.length, data: mapped });
 		} catch (error) {
