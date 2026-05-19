@@ -127,26 +127,24 @@ const NavOverlay = () => {
 		return <OnboardingCarousel onComplete={() => { setShowOnboarding(false); setShowAuth(true); }} />;
 	}
 
-	if (showAuth) {
-		return <AuthScreen onComplete={(mode) => { setShowAuth(false); if (mode === "register") { setShowRegisterFlow(true); } }} />;
-	}
-
-	if (showRegisterFlow) {
-		return <RegisterFlow onComplete={(vegId, name) => { setShowRegisterFlow(false); setPendingPlant({ vegId, name }); }} />;
-	}
-
 	return (
 		<AuthProvider>
-			<OverlayProvider>
-				<StatusBar style="light" />
-				{!isAccountPage && <NavHeader />}
-				<Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
-					<Tabs.Screen name="index" />
-					<Tabs.Screen name="(garden)/garden" />
-					<Tabs.Screen name="(explore)/explore" />
-					<Tabs.Screen name="(account)/account" options={{ href: null }} />
-				</Tabs>
-			</OverlayProvider>
+			{showAuth ? (
+				<AuthScreen onComplete={(mode) => { setShowAuth(false); if (mode === "register") { setShowRegisterFlow(true); } }} />
+			) : showRegisterFlow ? (
+				<RegisterFlow onComplete={(vegId, name) => { setShowRegisterFlow(false); setPendingPlant({ vegId, name }); }} />
+			) : (
+				<OverlayProvider>
+					<StatusBar style="light" />
+					{!isAccountPage && <NavHeader />}
+					<Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
+						<Tabs.Screen name="index" />
+						<Tabs.Screen name="(garden)/garden" />
+						<Tabs.Screen name="(explore)/explore" />
+						<Tabs.Screen name="(account)/account" options={{ href: null }} />
+					</Tabs>
+				</OverlayProvider>
+			)}
 		</AuthProvider>
 	);
 };
