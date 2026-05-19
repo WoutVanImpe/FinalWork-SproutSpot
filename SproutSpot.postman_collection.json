@@ -268,7 +268,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"plant_id\": 1,\n  \"nickname\": \"Minty\",\n  \"x_pos\": 0,\n  \"y_pos\": 0\n}"
+							"raw": "{\n  \"plant_id\": 1,\n  \"nickname\": \"Minty\",\n  \"garden_id\": 1,\n  \"x_pos\": 0,\n  \"y_pos\": 0\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/user-plants",
@@ -419,6 +419,25 @@
 							"raw": "{{baseUrl}}/api/probes/1/rename",
 							"host": ["{{baseUrl}}"],
 							"path": ["api", "probes", "1", "rename"]
+						}
+					}
+				},
+				{
+					"name": "Rename Probe by Code (app flow)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pairing_code\": \"TE123456\",\n  \"name\": \"Mijn Sonde\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/probes/rename-by-code",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "probes", "rename-by-code"]
 						}
 					}
 				},
