@@ -13,6 +13,7 @@ router.use(authenticate);
 router.get("/", controller.getUserProbes);
 router.get("/:id", controller.getUserProbes);
 router.put("/:id/rename", validateBody(["name"]), controller.renameProbe);
+router.post("/rename-by-code", validateBody(["pairing_code", "name"]), controller.renameProbeByCode);
 router.post("/:id/pair", validateBody(["user_plant_id"]), controller.pairProbe);
 router.post("/unpair/:userPlantId", controller.unpairProbe);
 

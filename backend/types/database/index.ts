@@ -63,6 +63,7 @@ export interface ProbeRecord {
 	name: string;
 	user_id: number | null;
 	state: "paired" | "available" | "offline";
+	pairing_code: string | null;
 	battery_voltage: number;
 	wifi_rssi: number;
 	last_seen: Date;

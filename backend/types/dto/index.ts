@@ -90,3 +90,8 @@ export interface SnoozeNotificationDto {
 export interface RenameProbeDto {
 	name: string;
 }
+
+export interface RenameProbeByCodeDto {
+	pairing_code: string;
+	name: string;
+}

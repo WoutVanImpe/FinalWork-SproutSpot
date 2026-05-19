@@ -48,6 +48,7 @@ export async function up(knex: Knex): Promise<void> {
 				table.string("name").notNullable();
 				table.integer("user_id").unsigned().references("id").inTable("users").onDelete("CASCADE");
 				table.enum("state", ["paired", "available", "offline"]).notNullable();
+				table.string("pairing_code").unique().nullable();
 				table.float("battery_voltage").notNullable();
 				table.float("wifi_rssi").notNullable();
 				table.timestamp("last_seen").defaultTo(knex.fn.now());

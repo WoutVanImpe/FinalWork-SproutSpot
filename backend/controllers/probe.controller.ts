@@ -44,6 +44,41 @@ export class ProbeController {
 	};
 
 	/**
+	 * @description Rename a probe by its pairing code. Finds the probe that was registered with this code and renames it. Returns the probe ID so the app can pair it later.
+	 * @param {AuthenticatedRequest} req - Authenticated request with { pairing_code, name } in body.
+	 * @param {Response} res - Express response with renamed probe data.
+	 * @returns {void}
+	 */
+	renameProbeByCode = async (req: AuthenticatedRequest, res: Response) => {
+		try {
+			const userId = req.user?.id;
+			const { pairing_code, name } = req.body;
+
+			if (!userId) {
+				res.status(401).json({ error: "Unauthorized", message: "Authentication required" });
+				return;
+			}
+
+			if (!pairing_code || !name) {
+				res.status(400).json({ error: "Validation Error", message: "pairing_code and name are required" });
+				return;
+			}
+
+			const probe = await this.service.renameByCode(pairing_code, name, userId);
+
+			res.status(200).json({ success: true, message: "Probe renamed", data: { id: probe.id } });
+		} catch (error) {
+			if ((error as Error).message === "Probe not found") {
+				res.status(404).json({ error: "Not Found", message: "No probe found with this pairing code" });
+				return;
+			}
+
+			console.error("[ProbeController] Error:", error);
+			res.status(500).json({ error: "Internal Server Error", message: "Failed to rename probe" });
+		}
+	};
+
+	/**
 	 * @description Pair a probe to a specific user plant by linking the probe's hardware_id to the plant's sonde_id.
 	 * @param {Request} req - Express request with probe ID as URL parameter and { user_plant_id } in body.
 	 * @param {Response} res - Express response with paired probe data.
