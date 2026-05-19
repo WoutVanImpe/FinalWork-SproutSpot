@@ -1,7 +1,9 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import TomatoImg from "../../assets/vegetables/tomato.png";
-import CabbageImg from "../../assets/vegetables/cabbage.png";
+import { useAuth } from "../../context/AuthContext";
+import { getProfile, updateProfile, changePassword as changePasswordApi } from "../../services/auth";
+import { getNotifications, acknowledgeNotification, resetNotification } from "../../services/notifications";
+import type { NotificationItem as ApiNotification } from "../../services/notifications";
 
 import AccountMain from "../../components/pages/account/main/AccountMain";
 import NotificationsView from "../../components/pages/account/notifications/NotificationsView";
@@ -12,7 +14,19 @@ import HistoryView from "../../components/pages/account/history/HistoryView";
 import type { HistoryEntry } from "../../components/pages/account/history/HistoryView";
 import SettingsView from "../../components/pages/account/settings/SettingsView";
 
+function apiNotifToView(n: ApiNotification): NotificationItem {
+	return {
+		id: n.id,
+		type: n.type,
+		title: n.title,
+		description: n.description,
+		image: n.image ?? (0 as unknown as number),
+		snoozed: n.snoozed,
+	};
+}
+
 const Account = () => {
+	const { logout: authLogout } = useAuth();
 	const [currentView, setCurrentView] = useState<string>("main");
 
 	useFocusEffect(
@@ -21,43 +35,66 @@ const Account = () => {
 		}, []),
 	);
 
-	const [notifications, setNotifications] = useState<NotificationItem[]>([
-		{ id: "n1", type: "problem", title: "Tomaat Toby", description: "De grond is te droog. Geef direct water totdat het water uit de drainagegaten loopt.", image: TomatoImg },
-		{ id: "n2", type: "milestone", title: "Tomaat Toby", description: "Nieuw groeistadium bereikt! Tijd om te valideren of de plant klaar is voor de volgende stap.", image: TomatoImg },
-		{ id: "n3", type: "problem", title: "Basilicum Bella", description: "Verplaats de plant naar een plek met meer direct zonlicht.", image: TomatoImg },
-	]);
-
+	const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+	const [name, setName] = useState("");
+	const [email, setEmail] = useState("");
+	const [pairingCode, setPairingCode] = useState("");
 	const [pushEnabled, setPushEnabled] = useState(true);
 	const [activeHours, setActiveHours] = useState<number[]>([8, 9, 10]);
+	const [historyEntries] = useState<HistoryEntry[]>([]);
 
-	const [name, setName] = useState("Anna");
+	useEffect(() => {
+		getNotifications(true)
+			.then((res) => { if (res.data) setNotifications(res.data.map(apiNotifToView)); })
+			.catch(console.error);
+		getProfile()
+			.then((res) => {
+				if (res.data) {
+					setName(res.data.name);
+					setEmail(res.data.email);
+					setPairingCode(res.data.pairing_code);
+				}
+			})
+			.catch(console.error);
+	}, []);
 
-	const [historyEntries] = useState<HistoryEntry[]>([
-		{ id: "h1", date: "14/05", time: "15:30", event: "Te droog: Tomaat Toby water gegeven", image: TomatoImg },
-		{ id: "h2", date: "14/05", time: "09:15", event: 'Groeistadium: Tomaat Toby naar "Groeispurt"', image: TomatoImg },
-		{ id: "h3", date: "13/05", time: "20:00", event: "Te donker: Basilicum Bella verplaatst", image: CabbageImg },
-		{ id: "h4", date: "13/05", time: "12:45", event: "Water bijgevuld: Munt Molly", image: CabbageImg },
-		{ id: "h5", date: "12/05", time: "18:30", event: "Batterij: Probe Tomaat op 15%", image: TomatoImg },
-		{ id: "h6", date: "11/05", time: "07:00", event: "Te warm: Tomaat Toby uit direct zonlicht gehaald", image: TomatoImg },
-		{ id: "h7", date: "10/05", time: "14:00", event: "Meststof toegevoegd: Paprika Pablo", image: CabbageImg },
-		{ id: "h8", date: "09/05", time: "08:30", event: "Verpot: Munt Molly naar grotere pot", image: CabbageImg },
-	]);
-
-	const handleLogout = () => {};
-
-	const handleDismiss = (id: string) => {
-		setNotifications((prev) => prev.filter((n) => n.id !== id));
+	const handleLogout = () => {
+		authLogout();
 	};
 
-	const handleSnooze = (id: string) => {
-		setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, snoozed: true } : n)));
+	const handleDismiss = async (id: string) => {
+		try {
+			await acknowledgeNotification(id);
+			setNotifications((prev) => prev.filter((n) => n.id !== id));
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
+	const handleSnooze = async (id: string) => {
+		try {
+			await resetNotification(id);
+			setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, snoozed: true } : n)));
+		} catch (err) {
+			console.error(err);
+		}
 	};
 
 	const handleConfirmPhaseUpdate = () => {
 		setCurrentView("main");
 	};
 
-	const handlePasswordChange = (currentPassword: string, newPassword: string) => {};
+	const handlePasswordChange = async (currentPassword: string, newPassword: string) => {
+		await changePasswordApi(currentPassword, newPassword);
+	};
+
+	const handleNameChange = async (newName: string) => {
+		await updateProfile({ name: newName });
+		setName(newName);
+	};
+
+	const handlePushChange = (val: boolean) => setPushEnabled(val);
+	const handleActiveHoursChange = (hours: number[]) => setActiveHours(hours);
 
 	switch (currentView) {
 		case "main":
@@ -75,14 +112,14 @@ const Account = () => {
 				<SettingsView
 					onBack={() => setCurrentView("main")}
 					name={name}
-					email="anna@email.be"
-					pairingCode="TE123456"
+					email={email}
+					pairingCode={pairingCode}
 					pushEnabled={pushEnabled}
 					activeHours={activeHours}
-					onNameChange={setName}
+					onNameChange={handleNameChange}
 					onPasswordChange={handlePasswordChange}
-					onPushChange={setPushEnabled}
-					onActiveHoursChange={setActiveHours}
+					onPushChange={handlePushChange}
+					onActiveHoursChange={handleActiveHoursChange}
 				/>
 			);
 		default:
