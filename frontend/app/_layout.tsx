@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import NavHeader from "../components/shared/header/NavHeader";
 import { OverlayProvider } from "../context/OverlayContext";
+import { AuthProvider } from "../context/AuthContext";
 import OnboardingCarousel from "../components/onboarding/OnboardingCarousel";
 import AuthScreen from "../components/auth/AuthScreen";
 import RegisterFlow from "../components/auth/RegisterFlow";
@@ -127,7 +128,7 @@ const NavOverlay = () => {
 	}
 
 	if (showAuth) {
-		return <AuthScreen onComplete={(mode) => { setShowAuth(false); if (mode === "register") setShowRegisterFlow(true); }} />;
+		return <AuthScreen onComplete={(mode) => { setShowAuth(false); if (mode === "register") { setShowRegisterFlow(true); } }} />;
 	}
 
 	if (showRegisterFlow) {
@@ -135,16 +136,18 @@ const NavOverlay = () => {
 	}
 
 	return (
-		<OverlayProvider>
-			<StatusBar style="light" />
-			{!isAccountPage && <NavHeader />}
-			<Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
-				<Tabs.Screen name="index" />
-				<Tabs.Screen name="(garden)/garden" />
-				<Tabs.Screen name="(explore)/explore" />
-				<Tabs.Screen name="(account)/account" options={{ href: null }} />
-			</Tabs>
-		</OverlayProvider>
+		<AuthProvider>
+			<OverlayProvider>
+				<StatusBar style="light" />
+				{!isAccountPage && <NavHeader />}
+				<Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
+					<Tabs.Screen name="index" />
+					<Tabs.Screen name="(garden)/garden" />
+					<Tabs.Screen name="(explore)/explore" />
+					<Tabs.Screen name="(account)/account" options={{ href: null }} />
+				</Tabs>
+			</OverlayProvider>
+		</AuthProvider>
 	);
 };
 
