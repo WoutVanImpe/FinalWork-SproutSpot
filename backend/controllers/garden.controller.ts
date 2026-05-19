@@ -9,11 +9,6 @@ export class GardenController {
 		this.service = new GardenService();
 	}
 
-	private buildImagesBaseUrl(req: AuthenticatedRequest): string {
-		const host = req.get("host") ?? "localhost:5001";
-		return `${req.protocol}://${host}/images/plants`;
-	}
-
 	/**
 	 * @description Retrieve the authenticated user's garden and all active plants within it. Auto-creates a garden if none exists.
 	 * @param {AuthenticatedRequest} req - Authenticated request containing user ID.
@@ -29,8 +24,7 @@ export class GardenController {
 				return;
 			}
 
-			const baseImageUrl = this.buildImagesBaseUrl(req);
-			const result = await this.service.getUserGarden(userId, baseImageUrl);
+			const result = await this.service.getUserGarden(userId);
 
 			res.status(200).json({ success: true, data: result });
 		} catch (error) {
@@ -54,8 +48,7 @@ export class GardenController {
 				return;
 			}
 
-			const baseImageUrl = this.buildImagesBaseUrl(req);
-			const result = await this.service.getUserDashboard(userId, baseImageUrl);
+			const result = await this.service.getUserDashboard(userId);
 
 			res.status(200).json({ success: true, data: result });
 		} catch (error) {
@@ -86,7 +79,13 @@ export class GardenController {
 				return;
 			}
 
-			const garden = await this.service.updateGarden(userId, { width, height, plant_positions });
+			const normalized = plant_positions?.map((p: any) => ({
+				id: Number(p.id),
+				x_pos: p.x_pos ?? p.x,
+				y_pos: p.y_pos ?? p.y,
+			}));
+
+			const garden = await this.service.updateGarden(userId, { width, height, plant_positions: normalized });
 
 			res.status(200).json({ success: true, message: "Garden updated", data: garden });
 		} catch (error) {

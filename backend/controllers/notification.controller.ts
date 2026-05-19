@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { NotificationService } from "../services/notification.service";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
+import { buildImageUrl } from "../config";
 
 const TYPE_MAP: Record<string, "problem" | "milestone"> = {
 	sensor_alert: "problem",
@@ -8,9 +9,8 @@ const TYPE_MAP: Record<string, "problem" | "milestone"> = {
 	system_status: "milestone",
 };
 
-function mapNotification(n: any, baseImageUrl: string = "") {
-	const filename = n.plant_image ?? "";
-	const imageUri = filename ? `${baseImageUrl}/${filename}` : "";
+function mapNotification(n: any) {
+	const imageUri = buildImageUrl(n.plant_image ?? "");
 	return {
 		id: String(n.id),
 		type: TYPE_MAP[n.notification_type] ?? "problem",
@@ -20,11 +20,6 @@ function mapNotification(n: any, baseImageUrl: string = "") {
 		snoozed: n.notification_state === "snoozed",
 		created_at: n.created_at,
 	};
-}
-
-function buildImagesBaseUrl(req: AuthenticatedRequest): string {
-	const host = req.get("host") ?? "localhost:5001";
-	return `${req.protocol}://${host}/images/plants`;
 }
 
 export class NotificationController {
@@ -51,8 +46,7 @@ export class NotificationController {
 
 			const onlyUnacknowledged = req.query.all !== "true";
 			const notifications = await this.service.getUserNotifications(userId, onlyUnacknowledged);
-			const baseImageUrl = buildImagesBaseUrl(req);
-			const mapped = notifications.map((n) => mapNotification(n, baseImageUrl));
+			const mapped = notifications.map(mapNotification);
 
 			res.status(200).json({ success: true, count: mapped.length, data: mapped });
 		} catch (error) {

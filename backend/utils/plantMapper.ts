@@ -1,4 +1,5 @@
 import { PlantRecord, PlantStageRecord } from "../types/database";
+import { buildImageUrl } from "../config";
 
 export interface PlantListItem {
 	id: string;
@@ -96,17 +97,11 @@ function formatDepth(val: number | null | undefined): string {
 	return `${val} cm`;
 }
 
-function buildImageUrl(req: { protocol?: string; get?: (name: string) => string | undefined }, filename: string): string {
-	if (filename.startsWith("http")) return filename;
-	const host = req?.get?.("host") ?? "localhost:3000";
-	return `${req?.protocol ?? "http"}://${host}/images/plants/${filename}`;
-}
-
-export function toPlantListItem(req: any, plant: PlantRecord): PlantListItem {
+export function toPlantListItem(plant: PlantRecord): PlantListItem {
 	return {
 		id: `veg_${plant.id}`,
 		name: plant.name,
-		image: buildImageUrl(req, plant.image),
+		image: buildImageUrl(plant.image),
 		placement: mapPlacement(plant.planting_type),
 		sunlight: plant.sunlight ?? "",
 		sowingPeriod: parseSowingPeriod(plant.sowing_period),
@@ -114,11 +109,11 @@ export function toPlantListItem(req: any, plant: PlantRecord): PlantListItem {
 	};
 }
 
-export function toPlantDetail(req: any, plant: PlantRecord, stages: PlantStageRecord[]): PlantDetail {
+export function toPlantDetail(plant: PlantRecord, stages: PlantStageRecord[]): PlantDetail {
 	return {
 		id: `veg_${plant.id}`,
 		name: plant.name,
-		image: buildImageUrl(req, plant.image),
+		image: buildImageUrl(plant.image),
 		light: translateLight(plant.light),
 		water: translateWater(plant.water),
 		difficulty: translateDifficulty(plant.difficulty),

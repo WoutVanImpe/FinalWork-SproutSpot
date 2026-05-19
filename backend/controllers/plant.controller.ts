@@ -18,7 +18,7 @@ export class PlantController {
 	getAllPlants = async (req: Request, res: Response) => {
 		try {
 			const plants = await this.service.getAllPlants();
-			const mapped = plants.map((p) => toPlantListItem(req, p));
+			const mapped = plants.map(toPlantListItem);
 
 			res.status(200).json({ success: true, count: mapped.length, data: mapped });
 		} catch (error) {
@@ -45,7 +45,7 @@ export class PlantController {
 			const plant = await this.service.getPlantById(id);
 			const stages = await this.service.getPlantStages(id) as any[];
 
-			res.status(200).json({ success: true, data: toPlantDetail(req, plant, stages) });
+			res.status(200).json({ success: true, data: toPlantDetail(plant, stages) });
 		} catch (error) {
 			if ((error as Error).message === "Plant not found") {
 				res.status(404).json({ error: "Not Found", message: (error as Error).message });
@@ -83,7 +83,7 @@ export class PlantController {
 			if (typeof care_level === "string") filters.care_level = care_level;
 
 			const plants = await this.service.searchPlants(query, filters);
-			const mapped = plants.map((p) => toPlantListItem(req, p));
+			const mapped = plants.map(toPlantListItem);
 
 			res.status(200).json({ success: true, count: mapped.length, data: mapped });
 		} catch (error) {
