@@ -21,6 +21,7 @@ export interface EnrichedPlant {
 	temperature: PlantStatusData;
 	advice: string;
 	battery: number;
+	probe_name: string;
 }
 
 export interface GardenData {
@@ -48,18 +49,24 @@ export function updateGarden(data: {
 	return api.put<GardenData>("/api/gardens", data as Record<string, unknown>);
 }
 
+export interface CreateUserPlantResult {
+	id: number;
+}
+
 export function createUserPlant(data: {
 	plant_id: string;
 	nickname: string;
 	x_pos: number;
 	y_pos: number;
+	garden_id?: number;
 }) {
 	const numericPlantId = data.plant_id.replace("veg_", "");
-	return api.post<void>("/api/user-plants", {
+	return api.post<CreateUserPlantResult>("/api/user-plants", {
 		plant_id: numericPlantId,
 		nickname: data.nickname,
 		x_pos: data.x_pos,
 		y_pos: data.y_pos,
+		garden_id: data.garden_id,
 	});
 }
 

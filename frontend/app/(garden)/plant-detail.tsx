@@ -99,7 +99,7 @@ const PlantDetail = () => {
         <Spacer space={Styling.Spacing.xlg} />
 
         <TechnicalOverview
-          probeName={`Sonde ${plant.nickname}`}
+          probeName={plant.probeName || `Sonde ${plant.nickname}`}
           battery={plant.battery}
           lastMeasurement="12/05/2026 14:30"
           lastMoisture={plant.water.level}

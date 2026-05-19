@@ -1,6 +1,6 @@
 import { StyleSheet, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
-import React, { useEffect, useState } from "react";
-import { useLocalSearchParams, router } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { useLocalSearchParams, router, useFocusEffect } from "expo-router";
 import { Styling } from "../../constants/Styling";
 import StyledText from "../../components/style/StyledText";
 import Spacer from "../../components/style/Spacer";
@@ -13,6 +13,8 @@ const PlantStep3 = () => {
   const [veg, setVeg] = useState<PlantDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
+
+  useFocusEffect(useCallback(() => { setName(""); }, []));
 
   useEffect(() => {
     if (!vegId) return;

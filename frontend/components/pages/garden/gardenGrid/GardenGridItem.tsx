@@ -25,6 +25,7 @@ export interface GardenPlant {
 	temperature: PlantStatusData;
 	advice: string;
 	battery: number;
+	probeName: string;
 }
 
 const GardenGridItem = ({ plant }: { plant: GardenPlant }) => {

@@ -4,6 +4,7 @@ import { CELL, MAX_SCALE, MIN_SCALE, SCALE_STEP, clampOffset, gridDimensions } f
 import { Styling } from "../../constants/Styling";
 import { BAR_HEIGHT } from "../../constants/tabConfig";
 import { getGarden, getDashboard, createUserPlant, updateGarden } from "../../services/garden";
+import { pairProbe } from "../../services/probes";
 import { getPlantById } from "../../services/plants";
 import type { EnrichedPlant } from "../../services/garden";
 import type { PlantDetail } from "../../services/plants";
@@ -35,6 +36,7 @@ function enrichedToGardenPlant(p: EnrichedPlant): GardenPlant {
 		temperature: p.temperature,
 		advice: p.advice,
 		battery: p.battery,
+		probeName: p.probe_name,
 	};
 }
 
@@ -53,9 +55,10 @@ async function fetchPlantDetail(vegId: string): Promise<PlantDetail | null> {
 }
 
 const Garden = () => {
-	const params = useLocalSearchParams<{ selectedPlantId?: string; placementMode?: string; vegId?: string; name?: string }>();
+	const params = useLocalSearchParams<{ selectedPlantId?: string; placementMode?: string; vegId?: string; name?: string; probeId?: string }>();
 	const [plants, setPlants] = useState<GardenPlant[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [gardenId, setGardenId] = useState<number | null>(null);
 	const [cols, setCols] = useState(5);
 	const [rows, setRows] = useState(6);
 	const [isEditing, setIsEditing] = useState(false);
@@ -71,6 +74,7 @@ const Garden = () => {
 			.then((res) => {
 				if (res.data) {
 					setPlants(res.data.plants.map(enrichedToGardenPlant));
+					setGardenId(res.data.garden.id);
 					setCols(res.data.garden.width);
 					setRows(res.data.garden.height);
 				}
@@ -89,7 +93,7 @@ const Garden = () => {
 		if (params.placementMode === "true" && params.vegId) {
 			setIsPlacing(true);
 		}
-	}, [params.selectedPlantId, params.placementMode, params.vegId]);
+	}, [params.selectedPlantId, params.placementMode, params.vegId, params.probeId]);
 
 	const [scale, setScale] = useState(1);
 	const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
@@ -457,7 +461,10 @@ const Garden = () => {
 												const veg = await fetchPlantDetail(params.vegId);
 												const numericId = params.vegId.replace("veg_", "");
 												try {
-													await createUserPlant({ plant_id: numericId, nickname: decodeURIComponent(params.name || veg?.name || ""), x_pos: cx, y_pos: cy });
+													const created = await createUserPlant({ plant_id: numericId, nickname: decodeURIComponent(params.name || veg?.name || ""), x_pos: cx, y_pos: cy, garden_id: gardenId ?? undefined });
+													if (params.probeId && created.data?.id) {
+														await pairProbe(Number(params.probeId), created.data.id).catch(console.error);
+													}
 													const res = await getGarden();
 													if (res.data) {
 														setPlants(res.data.plants.map(enrichedToGardenPlant));
@@ -466,7 +473,7 @@ const Garden = () => {
 													console.error(err);
 												}
 												setIsPlacing(false);
-												router.setParams({ placementMode: undefined, vegId: undefined, name: undefined });
+												router.setParams({ placementMode: undefined, vegId: undefined, name: undefined, probeId: undefined });
 											}
 										} else if (plant) {
 											setSelectedPlant(plant);
