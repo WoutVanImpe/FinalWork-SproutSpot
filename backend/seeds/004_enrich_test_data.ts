@@ -98,4 +98,11 @@ export async function seed(knex: Knex): Promise<void> {
 			notification_state: "sent",
 		},
 	]);
+
+	await knex.raw("SELECT setval('user_plants_id_seq', (SELECT COALESCE(MAX(id),0) FROM user_plants))");
+	await knex.raw("SELECT setval('probes_id_seq', (SELECT COALESCE(MAX(id),0) FROM probes))");
+	await knex.raw("SELECT setval('probe_entries_id_seq', (SELECT COALESCE(MAX(id),0) FROM probe_entries))");
+	await knex.raw("SELECT setval('active_issues_id_seq', (SELECT COALESCE(MAX(id),0) FROM active_issues))");
+	await knex.raw("SELECT setval('pending_notifications_id_seq', (SELECT COALESCE(MAX(id),0) FROM pending_notifications))");
+	await knex.raw("SELECT setval('user_gardens_id_seq', (SELECT COALESCE(MAX(id),0) FROM user_gardens))");
 }
