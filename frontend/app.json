@@ -27,6 +27,9 @@
 		"web": {
 			"favicon": "./assets/icon.png"
 		},
-		"plugins": ["expo-router"]
+		"plugins": ["expo-router"],
+		"extra": {
+			"apiBaseUrl": "http://192.168.1.94:5001"
+		}
 	}
 }
