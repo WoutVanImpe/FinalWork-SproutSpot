@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { router } from "expo-router";
-import { VEGETABLES, VEGETABLE_DETAILS } from "../../data/vegetables";
+import { getAllPlants } from "../../services/plants";
+import type { PlantListItem } from "../../services/plants";
 import QuestionScreen from "../../components/pages/explore/plantFinder/QuestionScreen";
 import ResultsView from "../../components/pages/explore/plantFinder/ResultsView";
 
@@ -61,6 +62,13 @@ const QUESTIONS: Question[] = [
 const PlantFinder = () => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<(string | null)[]>([null, null, null, null]);
+  const [allPlants, setAllPlants] = useState<PlantListItem[]>([]);
+
+  useEffect(() => {
+    getAllPlants()
+      .then((res) => { if (res.data) setAllPlants(res.data); })
+      .catch(console.error);
+  }, []);
 
   const setAnswer = (value: string) => {
     const next = [...answers];
@@ -81,15 +89,21 @@ const PlantFinder = () => {
     const [placement, sunlight, month, careLevel] = answers as string[];
     const monthNum = parseInt(month, 10);
 
-    const results = VEGETABLES.filter((v) => {
-      const d = VEGETABLE_DETAILS[v.id];
-      if (!d) return false;
-      if (placement !== "either" && d.placement !== "both" && d.placement !== placement) return false;
-      if (sunlight !== d.sunlight) return false;
-      if (monthNum < d.sowingPeriod.startMonth || monthNum > d.sowingPeriod.endMonth) return false;
-      if (careLevel !== "either" && d.careLevel !== careLevel) return false;
+    const results = allPlants.filter((v) => {
+      if (placement !== "either" && v.placement !== "both" && v.placement !== placement) return false;
+      if (sunlight !== v.sunlight) return false;
+      if (monthNum < v.sowingPeriod.startMonth || monthNum > v.sowingPeriod.endMonth) return false;
+      if (careLevel !== "either" && v.careLevel !== careLevel) return false;
       return true;
-    });
+    }).map((v) => ({
+      id: v.id,
+      name: v.name,
+      image: { uri: v.image },
+      placement: v.placement,
+      sunlight: v.sunlight,
+      sowingPeriod: v.sowingPeriod,
+      careLevel: v.careLevel,
+    }));
 
     return <ResultsView results={results} onRestart={() => { setStep(0); setAnswers([null, null, null, null]); }} />;
   }

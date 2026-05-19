@@ -1,5 +1,5 @@
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
-import React from "react";
+import { Image, StyleSheet, TouchableOpacity, View, ActivityIndicator } from "react-native";
+import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, router } from "expo-router";
 import { Styling } from "../../constants/Styling";
 import StyledView from "../../components/style/StyledView";
@@ -8,7 +8,9 @@ import StyledIcon from "../../components/style/StyledIcon";
 import StyledButton from "../../components/style/StyledButton";
 import Spacer from "../../components/style/Spacer";
 import BackIcon from "../../assets/icons/undo.svg";
-import { VEGETABLE_DETAILS, formatSowingPeriod, formatTemperature } from "../../data/vegetables";
+import { getPlantById } from "../../services/plants";
+import type { PlantDetail } from "../../services/plants";
+import { formatSowingPeriod, formatTemperature } from "../../data/vegetables";
 import WaveBackground from "../../components/shared/WaveBackground";
 
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
@@ -36,7 +38,24 @@ const detailStyles = StyleSheet.create({
 
 const VegetableInfo = () => {
 	const { id } = useLocalSearchParams<{ id: string }>();
-	const veg = id ? VEGETABLE_DETAILS[id] : null;
+	const [veg, setVeg] = useState<PlantDetail | null>(null);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		if (!id) return;
+		getPlantById(id)
+			.then((res) => { if (res.data) setVeg(res.data); })
+			.catch(console.error)
+			.finally(() => setLoading(false));
+	}, [id]);
+
+	if (loading) {
+		return (
+			<StyledView>
+				<ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 100 }} />
+			</StyledView>
+		);
+	}
 
 	if (!veg) return null;
 
@@ -58,7 +77,7 @@ const VegetableInfo = () => {
 				<WaveBackground waveHeight={310} leftOffset={-770} widthMultiplier={6} style={{marginTop: 15}} />
 				<View style={styles.infoRowContent}>
 					<View style={styles.imageContainer}>
-						<Image source={veg.image} style={styles.image} resizeMode="contain" />
+						<Image source={{ uri: veg.image }} style={styles.image} resizeMode="contain" />
 					</View>
 					<View style={styles.generalInfo}>
 						<DetailRow label="Licht" value={veg.light} />

@@ -1,16 +1,27 @@
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import React from "react";
+import { StyleSheet, TouchableOpacity, View, ActivityIndicator } from "react-native";
+import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, router } from "expo-router";
 import { Styling } from "../../constants/Styling";
 import StyledText from "../../components/style/StyledText";
 import Spacer from "../../components/style/Spacer";
-import { VEGETABLE_DETAILS } from "../../data/vegetables";
+import { getPlantById } from "../../services/plants";
+import type { PlantDetail } from "../../services/plants";
 import FlowLayout from "../../components/pages/explore/plantFlow/FlowLayout";
 
 const PlantStep4 = () => {
   const { vegId, name } = useLocalSearchParams<{ vegId: string; name: string }>();
-  const veg = vegId ? VEGETABLE_DETAILS[vegId] : null;
+  const [veg, setVeg] = useState<PlantDetail | null>(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    if (!vegId) return;
+    getPlantById(vegId)
+      .then((res) => { if (res.data) setVeg(res.data); })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [vegId]);
+
+  if (loading) return <FlowLayout title="Koppel je sonde" onBack={() => router.push(`/(explore)/plant-step3?vegId=${vegId}`)}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></FlowLayout>;
   if (!veg) return null;
 
   const displayName = decodeURIComponent(name || "");

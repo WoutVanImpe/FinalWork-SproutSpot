@@ -5,24 +5,21 @@ import * as Clipboard from "expo-clipboard";
 import { Styling } from "../../constants/Styling";
 import StyledText from "../../components/style/StyledText";
 import Spacer from "../../components/style/Spacer";
-import { VEGETABLE_DETAILS } from "../../data/vegetables";
+import { useAuth } from "../../context/AuthContext";
 import FlowLayout from "../../components/pages/explore/plantFlow/FlowLayout";
-
-const PAIRING_CODE = "SP12AB3456";
 
 const PlantStep5 = () => {
   const { vegId, name } = useLocalSearchParams<{ vegId: string; name: string }>();
-  const veg = vegId ? VEGETABLE_DETAILS[vegId] : null;
+  const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [probeName, setProbeName] = useState("");
   const [copied, setCopied] = useState(false);
 
-  if (!veg) return null;
-
+  const pairingCode = user?.pairing_code ?? "TE123456";
   const displayName = decodeURIComponent(name || "mijn plant");
 
   const handleCopyCode = async () => {
-    await Clipboard.setStringAsync(PAIRING_CODE);
+    await Clipboard.setStringAsync(pairingCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -74,7 +71,7 @@ const PlantStep5 = () => {
               <StyledText type="smParagh" style={styles.codeLabel}>
                 {copied ? "Gekopieerd!" : "Klik hier om je koppelcode te kopiëren"}
               </StyledText>
-              <StyledText type="head3" style={styles.codeValue}>{PAIRING_CODE}</StyledText>
+              <StyledText type="head3" style={styles.codeValue}>{pairingCode}</StyledText>
             </TouchableOpacity>
             <Spacer space={Styling.Spacing.reg} />
             <TouchableOpacity style={styles.nextBtn} onPress={() => setStep(2)} activeOpacity={0.7}>
