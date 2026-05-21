@@ -1,6 +1,11 @@
 import { db } from "../db/connection";
-import { ProbeEntryRecord } from "../types/database";
+import { ActiveIssueRecord, PendingNotificationRecord, ProbeEntryRecord, StageThresholdsRecord, UserPlantRecord } from "../types/database";
 import { TelemetryEntryDto, TelemetryPayloadDto } from "../types/dto";
+
+export interface LinkedPlantResult {
+	userPlant: UserPlantRecord;
+	thresholds: StageThresholdsRecord;
+}
 
 export class TelemetryRepository {
 	/**
@@ -88,5 +93,109 @@ export class TelemetryRepository {
 			.orderBy("pe.created_at", "desc")
 			.limit(limit)
 			.select("pe.*");
+	}
+
+	async findActivePlantByProbe(hardwareId: string): Promise<LinkedPlantResult | undefined> {
+		const row = await db("user_plants as up")
+			.join("plant_stages as ps", function () {
+				this.on("up.plant_id", "=", "ps.plant_id")
+					.andOn("up.current_stage_order", "=", "ps.stage_order");
+			})
+			.where("up.sonde_id", hardwareId)
+			.where("up.is_active", true)
+			.first(
+				"up.*",
+				"ps.thresholds"
+			);
+
+		if (!row) return undefined;
+
+		const thresholds: StageThresholdsRecord =
+			typeof row.thresholds === "string"
+				? JSON.parse(row.thresholds)
+				: row.thresholds;
+
+		const { thresholds: _t, ...userPlant } = row;
+
+		return { userPlant: userPlant as UserPlantRecord, thresholds };
+	}
+
+	async getRecentEntriesBefore(hardwareId: string, beforeTimestamp: Date, limit: number): Promise<ProbeEntryRecord[]> {
+		return db("probe_entries")
+			.where("sonde_id", hardwareId)
+			.where("created_at", "<", beforeTimestamp)
+			.orderBy("created_at", "desc")
+			.limit(limit);
+	}
+
+	async findOpenIssuesByUserPlant(userPlantId: number): Promise<ActiveIssueRecord[]> {
+		return db("active_issues")
+			.where("user_plant_id", userPlantId)
+			.whereNull("resolved_at");
+	}
+
+	async createIssue(userPlantId: number, issueType: string): Promise<ActiveIssueRecord> {
+		const [issue] = await db("active_issues")
+			.insert({
+				user_plant_id: userPlantId,
+				issue_type: issueType,
+				occurrence_count: 1,
+				start_time: db.fn.now(),
+				last_seen: db.fn.now(),
+			})
+			.returning("*");
+
+		return issue;
+	}
+
+	async incrementIssueOccurrence(issueId: number): Promise<ActiveIssueRecord> {
+		const [issue] = await db("active_issues")
+			.where("id", issueId)
+			.increment("occurrence_count", 1)
+			.update({ last_seen: db.fn.now() })
+			.returning("*");
+
+		return issue;
+	}
+
+	async resolveIssue(issueId: number): Promise<ActiveIssueRecord | undefined> {
+		const [issue] = await db("active_issues")
+			.where("id", issueId)
+			.update({ resolved_at: db.fn.now() })
+			.returning("*");
+
+		return issue;
+	}
+
+	async findUserNotificationWindow(userId: number): Promise<{ notification_window_start: string; notification_window_end: string } | undefined> {
+		return db("users")
+			.where("id", userId)
+			.first("notification_window_start", "notification_window_end");
+	}
+
+	async createNotification(params: {
+		userId: number;
+		userPlantId: number;
+		issueId: number;
+		title: string;
+		message: string;
+		notificationType: "sensor_alert";
+		state: "sent" | "snoozed";
+		snoozedUntil?: Date | null;
+	}): Promise<PendingNotificationRecord> {
+		const [notification] = await db("pending_notifications")
+			.insert({
+				user_id: params.userId,
+				user_plant_id: params.userPlantId,
+				issue_id: params.issueId,
+				title: params.title,
+				message: params.message,
+				notification_type: params.notificationType,
+				notification_state: params.state,
+				snoozed_until: params.snoozedUntil ?? null,
+			})
+			.returning("*");
+
+		return notification;
 	}
 }
