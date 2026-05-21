@@ -13,6 +13,7 @@ import { AuthProvider } from "../context/AuthContext";
 import OnboardingCarousel from "../components/onboarding/OnboardingCarousel";
 import AuthScreen from "../components/auth/AuthScreen";
 import RegisterFlow from "../components/auth/RegisterFlow";
+import LoadingScreen from "../components/shared/LoadingScreen";
 import { useAuth } from "../context/AuthContext";
 
 const CustomTabBar = ({ state, navigation }: any) => {
@@ -114,6 +115,7 @@ const AppContent = () => {
 	const [pendingPlant, setPendingPlant] = useState<{ vegId: string; name: string } | null>(null);
 	const router = useRouter();
 	const { loading, user } = useAuth();
+	const isLoading = !fontsLoaded || loading;
 
 	useEffect(() => {
 		if (pendingPlant) {
@@ -123,41 +125,31 @@ const AppContent = () => {
 		}
 	}, [pendingPlant]);
 
-	if (!fontsLoaded) return null;
-
-	// Token restore in progress — wait
-	if (loading) return null;
-
-	// Already authenticated — go straight to app
-	if (user) {
-		return (
-			<OverlayProvider>
-				<StatusBar style="light" />
-				{!isAccountPage && <NavHeader />}
-				<Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
-					<Tabs.Screen name="index" />
-					<Tabs.Screen name="(garden)/garden" />
-					<Tabs.Screen name="(explore)/explore" />
-					<Tabs.Screen name="(account)/account" options={{ href: null }} />
-				</Tabs>
-			</OverlayProvider>
-		);
-	}
-
-	// Not authenticated — show onboarding → auth → register flow
-	if (showOnboarding) {
-		return <OnboardingCarousel onComplete={() => { setShowOnboarding(false); setShowAuth(true); }} />;
-	}
-
-	if (showAuth) {
-		return <AuthScreen onComplete={(mode) => { setShowAuth(false); if (mode === "register") { setShowRegisterFlow(true); } }} />;
-	}
-
-	if (showRegisterFlow) {
-		return <RegisterFlow onComplete={(vegId, name) => { setShowRegisterFlow(false); setPendingPlant({ vegId, name }); }} />;
-	}
-
-	return null;
+	return (
+		<View style={{ flex: 1 }}>
+			{user ? (
+				<OverlayProvider>
+					<StatusBar style="light" />
+					{!isAccountPage && <NavHeader />}
+					<Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
+						<Tabs.Screen name="index" />
+						<Tabs.Screen name="(garden)/garden" />
+						<Tabs.Screen name="(explore)/explore" />
+						<Tabs.Screen name="(account)/account" options={{ href: null }} />
+					</Tabs>
+				</OverlayProvider>
+			) : showOnboarding ? (
+				<OnboardingCarousel onComplete={() => { setShowOnboarding(false); setShowAuth(true); }} />
+			) : showAuth ? (
+				<AuthScreen onComplete={(mode) => { setShowAuth(false); if (mode === "register") { setShowRegisterFlow(true); } }} />
+			) : showRegisterFlow ? (
+				<RegisterFlow onComplete={(vegId, name) => { setShowRegisterFlow(false); setPendingPlant({ vegId, name }); }} />
+			) : (
+				<View style={{ flex: 1, backgroundColor: "#3E4348" }} />
+			)}
+			<LoadingScreen visible={isLoading} />
+		</View>
+	);
 };
 
 const NavOverlay = () => (
