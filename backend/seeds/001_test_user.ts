@@ -17,7 +17,7 @@ export async function seed(knex: Knex): Promise<void> {
 		email: "test@sproutspot.app",
 		password_hash: hash,
 		pairing_code: "TE123456",
-		notification_window_start: "08:00:00",
-		notification_window_end: "22:00:00",
+		notification_window_start: "00:00:00",
+		notification_window_end: "23:00:00",
 	});
 }
