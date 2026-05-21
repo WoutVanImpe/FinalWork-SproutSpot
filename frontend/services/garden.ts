@@ -82,6 +82,18 @@ export function advanceStage(userPlantId: number, new_stage_order: number) {
 	return api.post<void>(`/api/user-plants/${userPlantId}/stage`, { new_stage_order });
 }
 
+export interface ReadingRecord {
+	id: number;
+	sonde_id: string | null;
+	temp_c: number | null;
+	humidity_pct: number | null;
+	light_lux: number | null;
+	soil_moist_pct: number | null;
+	battery_voltage: number;
+	wifi_rssi: number;
+	created_at: string;
+}
+
 export function getReadings(userPlantId: number) {
-	return api.get<unknown[]>(`/api/user-plants/${userPlantId}/readings`);
+	return api.get<ReadingRecord[]>(`/api/user-plants/${userPlantId}/readings`);
 }
