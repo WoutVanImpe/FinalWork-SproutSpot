@@ -25,6 +25,33 @@ function apiNotifToView(n: ApiNotification): NotificationItem {
 	};
 }
 
+function parseTimeRangeToHours(start: string, end: string): number[] {
+	const startHour = parseInt(start.split(":")[0], 10);
+	const endHour = parseInt(end.split(":")[0], 10);
+	const hours: number[] = [];
+	for (let h = startHour; h <= endHour; h++) {
+		hours.push(h);
+	}
+	return hours;
+}
+
+function hoursToTimeRange(hours: number[]): { start: string; end: string } {
+	const sorted = [...hours].sort((a, b) => a - b);
+	let s = sorted[0];
+	let e = sorted[0];
+	for (let i = 1; i < sorted.length; i++) {
+		if (sorted[i] === e + 1) {
+			e = sorted[i];
+		} else {
+			break;
+		}
+	}
+	return {
+		start: String(s).padStart(2, "0") + ":00",
+		end: String(e).padStart(2, "0") + ":00",
+	};
+}
+
 const Account = () => {
 	const { logout: authLogout } = useAuth();
 	const [currentView, setCurrentView] = useState<string>("main");
@@ -53,6 +80,10 @@ const Account = () => {
 					setName(res.data.name);
 					setEmail(res.data.email);
 					setPairingCode(res.data.pairing_code);
+					setPushEnabled(res.data.push_enabled);
+					if (res.data.notification_window_start && res.data.notification_window_end) {
+						setActiveHours(parseTimeRangeToHours(res.data.notification_window_start, res.data.notification_window_end));
+					}
 				}
 			})
 			.catch(console.error);
@@ -93,8 +124,16 @@ const Account = () => {
 		setName(newName);
 	};
 
-	const handlePushChange = (val: boolean) => setPushEnabled(val);
-	const handleActiveHoursChange = (hours: number[]) => setActiveHours(hours);
+	const handlePushChange = async (val: boolean) => {
+		await updateProfile({ push_enabled: val });
+		setPushEnabled(val);
+	};
+
+	const handleActiveHoursChange = async (hours: number[]) => {
+		const range = hoursToTimeRange(hours);
+		await updateProfile({ notification_window_start: range.start, notification_window_end: range.end });
+		setActiveHours(hours);
+	};
 
 	switch (currentView) {
 		case "main":
