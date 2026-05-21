@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import { UserService } from "../services/user.service";
 import { CreateUserDto, UpdateProfileDto } from "../types/dto";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
+import { JWT_SECRET } from "../config";
 
 export class UserController {
 	private readonly service: UserService;
@@ -10,10 +12,14 @@ export class UserController {
 		this.service = new UserService();
 	}
 
+	private generateToken(user: { id: number; email: string }): string {
+		return jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "30d" });
+	}
+
 	/**
-	 * @description Create a new user account with name, email, and password. Returns an auto-generated pairing_code for hardware registration.
+	 * @description Create a new user account with name, email, and password. Returns an auto-generated pairing_code and JWT token.
 	 * @param {Request} req - Express request with { name, email, password } in body.
-	 * @param {Response} res - Express response with created user data (including pairing_code) or error.
+	 * @param {Response} res - Express response with created user data (including token and pairing_code) or error.
 	 * @returns {void}
 	 */
 	signup = async (req: Request, res: Response) => {
@@ -27,11 +33,12 @@ export class UserController {
 
 			const input: CreateUserDto = { name, email, password };
 			const user = await this.service.signup(input);
+			const token = this.generateToken(user);
 
 			res.status(201).json({
 				success: true,
 				message: "Account created successfully",
-				data: { id: user.id, name: user.name, email: user.email, pairing_code: user.pairing_code, created_at: user.created_at },
+				data: { id: user.id, name: user.name, email: user.email, pairing_code: user.pairing_code, token, created_at: user.created_at },
 			});
 		} catch (error) {
 			if ((error as Error).message === "Email already registered") {
@@ -45,9 +52,9 @@ export class UserController {
 	};
 
 	/**
-	 * @description Authenticate a user with email and password.
+	 * @description Authenticate a user with email and password. Returns a JWT token.
 	 * @param {Request} req - Express request with { email, password } in body.
-	 * @param {Response} res - Express response with authenticated user data or error.
+	 * @param {Response} res - Express response with authenticated user data and token or error.
 	 * @returns {void}
 	 */
 	login = async (req: Request, res: Response) => {
@@ -60,11 +67,12 @@ export class UserController {
 			}
 
 			const user = await this.service.login(email, password);
+			const token = this.generateToken(user);
 
 			res.status(200).json({
 				success: true,
 				message: "Login successful",
-				data: { id: user.id, name: user.name, email: user.email },
+				data: { id: user.id, name: user.name, email: user.email, token },
 			});
 		} catch (error) {
 			if ((error as Error).message === "Invalid email or password") {
@@ -102,6 +110,8 @@ export class UserController {
 					email: user.email,
 					profile_picture: user.profile_picture,
 					push_token: user.push_token,
+					push_enabled: user.push_enabled,
+					pairing_code: user.pairing_code,
 					notification_window_start: user.notification_window_start,
 					notification_window_end: user.notification_window_end,
 					created_at: user.created_at,
@@ -133,12 +143,13 @@ export class UserController {
 				return;
 			}
 
-			const { name, profile_picture, push_token, notification_window_start, notification_window_end } = req.body;
+			const { name, profile_picture, push_token, push_enabled, notification_window_start, notification_window_end } = req.body;
 
 			const input: UpdateProfileDto = {
 				name,
 				profile_picture,
 				push_token,
+				push_enabled,
 				notification_window_start,
 				notification_window_end,
 			};
@@ -153,6 +164,7 @@ export class UserController {
 					name: user.name,
 					email: user.email,
 					profile_picture: user.profile_picture,
+					push_enabled: user.push_enabled,
 					notification_window_start: user.notification_window_start,
 					notification_window_end: user.notification_window_end,
 				},
@@ -191,6 +203,42 @@ export class UserController {
 		} catch (error) {
 			console.error("[UserController] Error:", error);
 			res.status(500).json({ error: "Internal Server Error", message: "Failed to update push token" });
+		}
+	};
+
+	/**
+	 * @description Change the authenticated user's password. Requires current password for verification.
+	 * @param {AuthenticatedRequest} req - Authenticated request with { current_password, new_password } in body.
+	 * @param {Response} res - Express response with success confirmation.
+	 * @returns {void}
+	 */
+	changePassword = async (req: AuthenticatedRequest, res: Response) => {
+		try {
+			const userId = req.user?.id;
+
+			if (!userId) {
+				res.status(401).json({ error: "Unauthorized", message: "User authentication required" });
+				return;
+			}
+
+			const { current_password, new_password } = req.body;
+
+			if (!current_password || !new_password) {
+				res.status(400).json({ error: "Validation Error", message: "current_password and new_password are required" });
+				return;
+			}
+
+			await this.service.updatePassword(userId, current_password, new_password);
+
+			res.status(200).json({ success: true, message: "Password updated successfully" });
+		} catch (error) {
+			if ((error as Error).message === "Current password is incorrect") {
+				res.status(400).json({ error: "Bad Request", message: (error as Error).message });
+				return;
+			}
+
+			console.error("[UserController] Error:", error);
+			res.status(500).json({ error: "Internal Server Error", message: "Failed to update password" });
 		}
 	};
 }

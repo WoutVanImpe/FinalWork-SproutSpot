@@ -27,6 +27,11 @@ export async function up(knex: Knex): Promise<void> {
 				table.string("temperature").notNullable();
 				table.enum("planting_type", ["indoor", "outdoor", "both"]).notNullable();
 				table.string("image").notNullable();
+				table.enum("sunlight", ["full", "partial", "shade"]).nullable();
+				table.enum("care_level", ["daily", "weekly", "minimal"]).nullable();
+				table.float("temperature_min").nullable();
+				table.float("temperature_max").nullable();
+				table.integer("total_days").nullable();
 				table.float("sowing_depth").notNullable();
 				table.float("sowing_distance").notNullable();
 				table.float("pot_min_depth").notNullable();
@@ -43,6 +48,7 @@ export async function up(knex: Knex): Promise<void> {
 				table.string("name").notNullable();
 				table.integer("user_id").unsigned().references("id").inTable("users").onDelete("CASCADE");
 				table.enum("state", ["paired", "available", "offline"]).notNullable();
+				table.string("pairing_code").unique().nullable();
 				table.float("battery_voltage").notNullable();
 				table.float("wifi_rssi").notNullable();
 				table.timestamp("last_seen").defaultTo(knex.fn.now());
@@ -52,8 +58,8 @@ export async function up(knex: Knex): Promise<void> {
 			.createTable("user_gardens", (table) => {
 				table.increments("id").primary();
 				table.integer("user_id").unsigned().references("id").inTable("users").onDelete("CASCADE");
-				table.integer("width").defaultTo(5);
-				table.integer("height").defaultTo(8);
+				table.integer("width").defaultTo(3);
+				table.integer("height").defaultTo(3);
 				table.timestamp("created_at").defaultTo(knex.fn.now());
 			})
 
@@ -75,6 +81,7 @@ export async function up(knex: Knex): Promise<void> {
 				table.increments("id").primary();
 				table.integer("user_id").unsigned().references("id").inTable("users");
 				table.integer("plant_id").unsigned().references("id").inTable("plants");
+				table.string("nickname").nullable();
 				table.string("sonde_id").references("hardware_id").inTable("probes");
 				table.timestamp("date_sown").defaultTo(knex.fn.now());
 				table.integer("current_stage_order").defaultTo(1);
@@ -133,10 +140,11 @@ export async function down(knex: Knex): Promise<void> {
 	return knex.schema
 		.dropTableIfExists("pending_notifications")
 		.dropTableIfExists("active_issues")
-		.dropTableIfExists("sensor_logs")
+		.dropTableIfExists("probe_entries")
 		.dropTableIfExists("user_plants")
 		.dropTableIfExists("plant_stages")
+		.dropTableIfExists("probes")
 		.dropTableIfExists("plants")
-		.dropTableIfExists("users")
-		.dropTableIfExists("user_gardens");
+		.dropTableIfExists("user_gardens")
+		.dropTableIfExists("users");
 }

@@ -1,34 +1,55 @@
-import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
-import React, { useState } from "react";
-import { useLocalSearchParams, router } from "expo-router";
+import { StyleSheet, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
+import React, { useCallback, useRef, useState } from "react";
+import { useLocalSearchParams, router, useFocusEffect } from "expo-router";
 import * as Clipboard from "expo-clipboard";
 import { Styling } from "../../constants/Styling";
 import StyledText from "../../components/style/StyledText";
 import Spacer from "../../components/style/Spacer";
-import { VEGETABLE_DETAILS } from "../../data/vegetables";
+import { useAuth } from "../../context/AuthContext";
+import { renameProbeByCode } from "../../services/probes";
 import FlowLayout from "../../components/pages/explore/plantFlow/FlowLayout";
-
-const PAIRING_CODE = "SP12AB3456";
 
 const PlantStep5 = () => {
   const { vegId, name } = useLocalSearchParams<{ vegId: string; name: string }>();
-  const veg = vegId ? VEGETABLE_DETAILS[vegId] : null;
+  const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [probeName, setProbeName] = useState("");
+  const [probeId, setProbeId] = useState<number | null>(null);
+  const [renaming, setRenaming] = useState(false);
+  const [renameError, setRenameError] = useState("");
   const [copied, setCopied] = useState(false);
 
-  if (!veg) return null;
-
+  const pairingCodeRef = useRef(user?.pairing_code ?? "TE123456");
   const displayName = decodeURIComponent(name || "mijn plant");
 
+  useFocusEffect(useCallback(() => { setStep(0); setProbeName(""); setProbeId(null); setRenameError(""); }, []));
+
   const handleCopyCode = async () => {
-    await Clipboard.setStringAsync(PAIRING_CODE);
+    await Clipboard.setStringAsync(pairingCodeRef.current);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleRename = async () => {
+    if (!probeName.trim()) return;
+    setRenaming(true);
+    setRenameError("");
+    try {
+      const res = await renameProbeByCode(pairingCodeRef.current, probeName.trim());
+      if (res.data?.id) {
+        setProbeId(res.data.id);
+        setStep(4);
+      }
+    } catch {
+      setRenameError("Nog geen sonde gevonden. Heb je de koppelcode al ingevuld op sproutspot.local?");
+    } finally {
+      setRenaming(false);
+    }
+  };
+
   const navigateToGarden = () => {
-    router.push(`/(garden)/garden?placementMode=true&vegId=${vegId}&name=${encodeURIComponent(displayName)}`);
+    const params = `placementMode=true&vegId=${vegId}&name=${encodeURIComponent(displayName)}${probeId ? `&probeId=${probeId}` : ""}`;
+    router.push(`/(garden)/garden?${params}`);
   };
 
   const renderStep = () => {
@@ -74,7 +95,7 @@ const PlantStep5 = () => {
               <StyledText type="smParagh" style={styles.codeLabel}>
                 {copied ? "Gekopieerd!" : "Klik hier om je koppelcode te kopiëren"}
               </StyledText>
-              <StyledText type="head3" style={styles.codeValue}>{PAIRING_CODE}</StyledText>
+              <StyledText type="head3" style={styles.codeValue}>{pairingCodeRef.current}</StyledText>
             </TouchableOpacity>
             <Spacer space={Styling.Spacing.reg} />
             <TouchableOpacity style={styles.nextBtn} onPress={() => setStep(2)} activeOpacity={0.7}>
@@ -115,7 +136,31 @@ const PlantStep5 = () => {
               placeholderTextColor={Styling.Colors.lightGrey}
               maxLength={30}
             />
+            {renameError ? (
+              <>
+                <Spacer space={Styling.Spacing.sml} />
+                <StyledText type="smParagh" style={styles.errorText}>{renameError}</StyledText>
+              </>
+            ) : null}
             <Spacer space={Styling.Spacing.reg} />
+            <TouchableOpacity
+              style={[styles.nextBtn, (!probeName.trim() || renaming) && styles.disabledBtn]}
+              onPress={handleRename}
+              activeOpacity={0.7}
+              disabled={!probeName.trim() || renaming}
+            >
+              {renaming ? (
+                <ActivityIndicator color={Styling.Colors.white} size="small" />
+              ) : (
+                <StyledText type="head4" style={{ color: Styling.Colors.white }}>Geef naam</StyledText>
+              )}
+            </TouchableOpacity>
+          </View>
+        );
+
+      case 4:
+        return (
+          <View style={styles.content}>
             <StyledText type="head3" style={styles.stepTitle}>Stap 5: Sonde planten</StyledText>
             <Spacer space={Styling.Spacing.sml} />
             <View style={styles.guideStep}>
@@ -127,7 +172,7 @@ const PlantStep5 = () => {
               <StyledText type="paragh" style={styles.guideText}>Plaats de sonde 5 cm naast de zaaiplek. Zorg dat de sonde 4 cm diep steekt.</StyledText>
             </View>
             <Spacer space={Styling.Spacing.xlg} />
-            <TouchableOpacity style={[styles.finalBtn, !probeName.trim() && styles.disabledBtn]} onPress={navigateToGarden} activeOpacity={0.7} disabled={!probeName.trim()}>
+            <TouchableOpacity style={styles.finalBtn} onPress={navigateToGarden} activeOpacity={0.7}>
               <StyledText type="head4" style={{ color: Styling.Colors.white }}>Naar de tuin!</StyledText>
             </TouchableOpacity>
           </View>
@@ -218,6 +263,10 @@ const styles = StyleSheet.create({
   },
   disabledBtn: {
     opacity: 0.4,
+  },
+  errorText: {
+    color: Styling.Colors.red,
+    textAlign: "center",
   },
 });
 

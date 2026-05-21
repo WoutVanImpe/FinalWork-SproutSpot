@@ -33,7 +33,7 @@ export class ProbeService {
 			throw new Error("Probe with this hardware ID already exists");
 		}
 
-		const probe = await this.repository.create(hardwareId, user.id);
+		const probe = await this.repository.create(hardwareId, user.id, pairingCode);
 
 		const newPairingCode = await this.generateUniquePairingCode();
 		await this.userRepository.updatePairingCode(user.id, newPairingCode);
@@ -78,6 +78,16 @@ export class ProbeService {
 	 * @param {number} userPlantId - The user plant's database ID to link to.
 	 * @returns {Promise<ProbeRecord>} The probe record.
 	 */
+	async renameByCode(pairingCode: string, name: string, userId: number): Promise<ProbeRecord> {
+		const probe = await this.repository.findByPairingCode(pairingCode);
+
+		if (!probe || probe.user_id !== userId) {
+			throw new Error("Probe not found");
+		}
+
+		return this.repository.rename(probe.id, name);
+	}
+
 	async pairProbe(probeId: number, userPlantId: number): Promise<ProbeRecord> {
 		const probe = await this.repository.findById(probeId);
 
@@ -86,6 +96,7 @@ export class ProbeService {
 		}
 
 		await this.repository.linkToUserPlant(probe.hardware_id, userPlantId);
+		await this.repository.updateState(probeId, "paired");
 
 		return probe;
 	}

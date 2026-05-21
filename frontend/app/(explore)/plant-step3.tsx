@@ -1,17 +1,30 @@
-import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
-import React, { useState } from "react";
-import { useLocalSearchParams, router } from "expo-router";
+import { StyleSheet, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { useLocalSearchParams, router, useFocusEffect } from "expo-router";
 import { Styling } from "../../constants/Styling";
 import StyledText from "../../components/style/StyledText";
 import Spacer from "../../components/style/Spacer";
-import { VEGETABLE_DETAILS } from "../../data/vegetables";
+import { getPlantById } from "../../services/plants";
+import type { PlantDetail } from "../../services/plants";
 import FlowLayout from "../../components/pages/explore/plantFlow/FlowLayout";
 
 const PlantStep3 = () => {
   const { vegId } = useLocalSearchParams<{ vegId: string }>();
-  const veg = vegId ? VEGETABLE_DETAILS[vegId] : null;
+  const [veg, setVeg] = useState<PlantDetail | null>(null);
+  const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
 
+  useFocusEffect(useCallback(() => { setName(""); }, []));
+
+  useEffect(() => {
+    if (!vegId) return;
+    getPlantById(vegId)
+      .then((res) => { if (res.data) setVeg(res.data); })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [vegId]);
+
+  if (loading) return <FlowLayout title="Geef je plant een naam" onBack={() => router.push(`/(explore)/plant-step2?vegId=${vegId}`)}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></FlowLayout>;
   if (!veg) return null;
 
   const canContinue = name.trim().length > 0;

@@ -1,9 +1,10 @@
-import { Keyboard, ScrollView, StyleSheet, TextInput, TouchableOpacity, View, LayoutChangeEvent } from "react-native";
+import { Keyboard, ScrollView, StyleSheet, TextInput, TouchableOpacity, View, LayoutChangeEvent, ActivityIndicator } from "react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Styling } from "../../constants/Styling";
 import StyledText from "../style/StyledText";
 import StyledButton from "../style/StyledButton";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from "../../context/AuthContext";
 
 interface AuthScreenProps {
 	onComplete: (mode: "login" | "register") => void;
@@ -20,12 +21,14 @@ const PASSWORD_RULES = [
 const AuthScreen = ({ onComplete }: AuthScreenProps) => {
 	const insets = useSafeAreaInsets();
 	const scrollRef = useRef<ScrollView>(null);
+	const { login, signup, loading } = useAuth();
 	const [isRegister, setIsRegister] = useState(true);
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [repeatPassword, setRepeatPassword] = useState("");
 	const [errors, setErrors] = useState<Record<string, string>>({});
+	const [apiError, setApiError] = useState("");
 	const [keyboardPadding, setKeyboardPadding] = useState(0);
 	const inputYPositions = useRef<Record<string, number>>({});
 	const formY = useRef(0);
@@ -68,13 +71,25 @@ const AuthScreen = ({ onComplete }: AuthScreenProps) => {
 		return Object.keys(newErrors).length === 0;
 	};
 
-	const handleSubmit = () => {
-		if (validate()) onComplete(isRegister ? "register" : "login");
+	const handleSubmit = async () => {
+		if (!validate()) return;
+		setApiError("");
+		try {
+			if (isRegister) {
+				await signup(name.trim(), email.trim(), password);
+			} else {
+				await login(email.trim(), password);
+			}
+			onComplete(isRegister ? "register" : "login");
+		} catch (err) {
+			setApiError((err as Error).message);
+		}
 	};
 
 	const toggleMode = () => {
 		setIsRegister(!isRegister);
 		setErrors({});
+		setApiError("");
 	};
 
 	const inputStyle = (field: string) => [styles.input, errors[field] && { borderColor: Styling.Colors.red }];
@@ -224,9 +239,22 @@ const AuthScreen = ({ onComplete }: AuthScreenProps) => {
 					)}
 				</View>
 
+				{apiError ? (
+					<StyledText type="smParagh" style={styles.apiError}>
+						{apiError}
+					</StyledText>
+				) : null}
 				<View style={styles.submitWrapper}>
-					<TouchableOpacity onPress={handleSubmit} activeOpacity={0.8}>
-						<StyledButton>{isRegister ? "Account aanmaken" : "Inloggen"}</StyledButton>
+					<TouchableOpacity onPress={handleSubmit} activeOpacity={0.8} disabled={loading}>
+						<StyledButton>
+							{loading ? (
+								<ActivityIndicator color={Styling.Colors.white} />
+							) : isRegister ? (
+								"Account aanmaken"
+							) : (
+								"Inloggen"
+							)}
+						</StyledButton>
 					</TouchableOpacity>
 				</View>
 			</ScrollView>
@@ -289,6 +317,11 @@ const styles = StyleSheet.create({
 	},
 	ruleRow: {
 		paddingLeft: 4,
+	},
+	apiError: {
+		color: Styling.Colors.red,
+		textAlign: "center",
+		marginTop: 16,
 	},
 	submitWrapper: {
 		marginTop: 32,

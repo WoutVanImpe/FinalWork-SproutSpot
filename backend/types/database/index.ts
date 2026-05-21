@@ -16,6 +16,7 @@ export interface UserRecord {
 	email: string;
 	password_hash: string;
 	push_token: string | null;
+	push_enabled: boolean;
 	notification_window_start: string | null;
 	notification_window_end: string | null;
 	pairing_code: string;
@@ -31,6 +32,11 @@ export interface PlantRecord {
 	temperature: string;
 	planting_type: "indoor" | "outdoor" | "both";
 	image: string;
+	sunlight: "full" | "partial" | "shade" | null;
+	care_level: "daily" | "weekly" | "minimal" | null;
+	temperature_min: number | null;
+	temperature_max: number | null;
+	total_days: number | null;
 	sowing_depth: number;
 	sowing_distance: number;
 	pot_min_depth: number;
@@ -58,6 +64,7 @@ export interface ProbeRecord {
 	name: string;
 	user_id: number | null;
 	state: "paired" | "available" | "offline";
+	pairing_code: string | null;
 	battery_voltage: number;
 	wifi_rssi: number;
 	last_seen: Date;
@@ -75,6 +82,7 @@ export interface UserPlantRecord {
 	id: number;
 	user_id: number;
 	plant_id: number;
+	nickname: string | null;
 	sonde_id: string | null;
 	date_sown: Date;
 	current_stage_order: number;

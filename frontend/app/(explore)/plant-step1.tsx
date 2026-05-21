@@ -1,23 +1,34 @@
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
-import React from "react";
+import { Image, StyleSheet, TouchableOpacity, View, ActivityIndicator } from "react-native";
+import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, router } from "expo-router";
 import { Styling } from "../../constants/Styling";
 import StyledText from "../../components/style/StyledText";
 import Spacer from "../../components/style/Spacer";
-import { VEGETABLE_DETAILS } from "../../data/vegetables";
+import { getPlantById } from "../../services/plants";
+import type { PlantDetail } from "../../services/plants";
 import FlowLayout from "../../components/pages/explore/plantFlow/FlowLayout";
 
 const PlantStep1 = () => {
   const { vegId } = useLocalSearchParams<{ vegId: string }>();
-  const veg = vegId ? VEGETABLE_DETAILS[vegId] : null;
+  const [veg, setVeg] = useState<PlantDetail | null>(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    if (!vegId) return;
+    getPlantById(vegId)
+      .then((res) => { if (res.data) setVeg(res.data); })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [vegId]);
+
+  if (loading) return <FlowLayout title="Klaar om te planten?" onBack={() => router.navigate("/(explore)/explore")}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></FlowLayout>;
   if (!veg) return null;
 
   return (
     <FlowLayout title="Klaar om te planten?" onBack={() => router.navigate("/(explore)/explore")}>
       <View style={styles.content}>
         <View style={styles.topRow}>
-          <Image source={veg.image} style={styles.image} resizeMode="contain" />
+          <Image source={{ uri: veg.image }} style={styles.image} resizeMode="contain" />
           <View style={styles.itemsCol}>
             <StyledText type="head3" style={styles.itemsTitle}>Je hebt nodig:</StyledText>
             <Spacer space={Styling.Spacing.xsm} />

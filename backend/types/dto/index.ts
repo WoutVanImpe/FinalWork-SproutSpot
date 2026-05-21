@@ -13,12 +13,13 @@ export interface UpdateProfileDto {
 	name?: string;
 	profile_picture?: string;
 	push_token?: string;
+	push_enabled?: boolean;
 	notification_window_start?: string;
 	notification_window_end?: string;
 }
 
 export interface CreateUserPlantDto {
-	name: string;
+	nickname: string;
 	user_id: number;
 	plant_id: number;
 	garden_id?: number;
@@ -88,5 +89,10 @@ export interface SnoozeNotificationDto {
 }
 
 export interface RenameProbeDto {
+	name: string;
+}
+
+export interface RenameProbeByCodeDto {
+	pairing_code: string;
 	name: string;
 }

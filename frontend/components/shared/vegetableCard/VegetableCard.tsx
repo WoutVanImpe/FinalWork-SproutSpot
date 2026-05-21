@@ -1,5 +1,5 @@
 import { StyleSheet, TouchableOpacity, View, Image } from "react-native";
-import React from "react";
+import React, { memo } from "react";
 import StyledText from "../../style/StyledText";
 import WarningIcon from "../../../assets/icons/warning.svg";
 import { Styling } from "../../../constants/Styling";
@@ -13,7 +13,7 @@ export interface VegetableCardProps {
 	onPress?: () => void;
 }
 
-const VegetableCard = ({ vegetable }: { vegetable: VegetableCardProps }) => {
+const VegetableCard = memo(({ vegetable }: { vegetable: VegetableCardProps }) => {
 	const content = (
 		<View style={styles.card}>
 			{vegetable.warning && (
@@ -21,7 +21,7 @@ const VegetableCard = ({ vegetable }: { vegetable: VegetableCardProps }) => {
 					<StyledIcon Icon={WarningIcon} size="reg" fill={Styling.Colors.white} />
 				</View>
 			)}
-			<Image source={vegetable.image} style={styles.image} resizeMode="contain" />
+			<Image source={vegetable.image} style={styles.image} resizeMode="contain" fadeDuration={0} />
 			<StyledText type="paragh" style={styles.name}>{vegetable.name}</StyledText>
 		</View>
 	);
@@ -30,7 +30,7 @@ const VegetableCard = ({ vegetable }: { vegetable: VegetableCardProps }) => {
 		return <TouchableOpacity onPress={vegetable.onPress} activeOpacity={0.7}>{content}</TouchableOpacity>;
 	}
 	return content;
-};
+});
 
 export default VegetableCard;
 

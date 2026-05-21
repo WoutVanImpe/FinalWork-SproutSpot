@@ -1,12 +1,16 @@
+import bcrypt from "bcrypt";
 import { UserRepository } from "../repositories/user.repository";
+import { GardenRepository } from "../repositories/garden.repository";
 import { UserRecord } from "../types/database";
 import { CreateUserDto, UpdateProfileDto } from "../types/dto";
 
 export class UserService {
 	private repository: UserRepository;
+	private gardenRepository: GardenRepository;
 
 	constructor() {
 		this.repository = new UserRepository();
+		this.gardenRepository = new GardenRepository();
 	}
 
 	/**
@@ -41,7 +45,7 @@ export class UserService {
 	}
 
 	/**
-	 * @description Register a new user after verifying the email is not already taken. Auto-generates a unique hardware pairing code.
+	 * @description Register a new user after verifying the email is not already taken. Auto-generates a unique hardware pairing code. Hashes the password with bcrypt.
 	 * @param {CreateUserDto} input - User registration data containing name, email, and password.
 	 * @returns {Promise<UserRecord>} The created user record with a pairing_code for probe registration.
 	 */
@@ -52,15 +56,20 @@ export class UserService {
 			throw new Error("Email already registered");
 		}
 
+		const hashedPassword = await bcrypt.hash(input.password, 10);
 		const pairingCode = await this.generateUniquePairingCode();
 
-		return this.repository.create(input, pairingCode);
+		const user = await this.repository.create({ ...input, password: hashedPassword }, pairingCode);
+
+		await this.gardenRepository.getOrCreate(user.id);
+
+		return user;
 	}
 
 	/**
-	 * @description Authenticate a user by verifying email and password match.
+	 * @description Authenticate a user by verifying email and password with bcrypt.
 	 * @param {string} email - User's email address.
-	 * @param {string} password - User's plaintext password (bcrypt hashing pending).
+	 * @param {string} password - User's plaintext password.
 	 * @returns {Promise<UserRecord>} The authenticated user record.
 	 */
 	async login(email: string, password: string): Promise<UserRecord> {
@@ -70,7 +79,9 @@ export class UserService {
 			throw new Error("Invalid email or password");
 		}
 
-		if (user.password_hash !== password) {
+		const passwordValid = await bcrypt.compare(password, user.password_hash);
+
+		if (!passwordValid) {
 			throw new Error("Invalid email or password");
 		}
 
@@ -142,11 +153,15 @@ export class UserService {
 			throw new Error("User not found");
 		}
 
-		if (user.password_hash !== currentPassword) {
+		const passwordValid = await bcrypt.compare(currentPassword, user.password_hash);
+
+		if (!passwordValid) {
 			throw new Error("Current password is incorrect");
 		}
 
-		return this.repository.updatePassword(userId, newPassword);
+		const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+		return this.repository.updatePassword(userId, hashedPassword);
 	}
 
 	/**

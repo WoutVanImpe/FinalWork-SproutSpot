@@ -1,5 +1,5 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocalSearchParams, router } from "expo-router";
 import { Styling } from "../../constants/Styling";
 import StyledView from "../../components/style/StyledView";
@@ -12,6 +12,8 @@ import RequirementsSection from "../../components/pages/garden/plantDetail/Requi
 import TechnicalOverview from "../../components/pages/garden/plantDetail/TechnicalOverview";
 import GraphModal from "../../components/pages/garden/plantDetail/GraphModal";
 import { GardenPlant } from "../../components/pages/garden/gardenGrid/GardenGridItem";
+import { getReadings } from "../../services/garden";
+import type { ReadingRecord } from "../../services/garden";
 
 const TOMATO_STAGES = [
   { label: "Zaaien", dayStart: 0, dayEnd: 7 },
@@ -52,6 +54,18 @@ const PlantDetail = () => {
   const { plantData } = useLocalSearchParams<{ plantData: string }>();
   const plant: GardenPlant | null = plantData ? JSON.parse(plantData) : null;
   const [graphVisible, setGraphVisible] = useState(false);
+  const [readings, setReadings] = useState<ReadingRecord[]>([]);
+
+  useEffect(() => {
+    if (plant && graphVisible) {
+      const plantId = parseInt(plant.id.replace("up_", ""), 10);
+      if (!isNaN(plantId)) {
+        getReadings(plantId)
+          .then((res) => { if (res.data) setReadings(res.data); })
+          .catch(console.error);
+      }
+    }
+  }, [graphVisible, plant]);
 
   if (!plant) return null;
 
@@ -99,7 +113,7 @@ const PlantDetail = () => {
         <Spacer space={Styling.Spacing.xlg} />
 
         <TechnicalOverview
-          probeName={`Sonde ${plant.nickname}`}
+          probeName={plant.probeName || `Sonde ${plant.nickname}`}
           battery={plant.battery}
           lastMeasurement="12/05/2026 14:30"
           lastMoisture={plant.water.level}
@@ -115,7 +129,16 @@ const PlantDetail = () => {
         </TouchableOpacity>
         <Spacer space={175} />
       </StyledView>
-      <GraphModal visible={graphVisible} onDismiss={() => setGraphVisible(false)} />
+      <GraphModal
+        visible={graphVisible}
+        onDismiss={() => setGraphVisible(false)}
+        readings={readings}
+        optimalRanges={{
+          water: { optimalMin: plant.water.optimalMin, optimalMax: plant.water.optimalMax },
+          light: { optimalMin: plant.light.optimalMin, optimalMax: plant.light.optimalMax },
+          temperature: { optimalMin: plant.temperature.optimalMin, optimalMax: plant.temperature.optimalMax },
+        }}
+      />
     </>
   );
 };

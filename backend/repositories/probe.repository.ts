@@ -8,13 +8,14 @@ export class ProbeRepository {
 	 * @param {number} userId - The user to assign this probe to (resolved via pairing code).
 	 * @returns {Promise<ProbeRecord>} The created probe record.
 	 */
-	async create(hardwareId: string, userId: number): Promise<ProbeRecord> {
+	async create(hardwareId: string, userId: number, pairingCode?: string): Promise<ProbeRecord> {
 		const [probe] = await db("probes")
 			.insert({
 				hardware_id: hardwareId,
 				name: "Unnamed Probe",
 				user_id: userId,
 				state: "available",
+				pairing_code: pairingCode ?? null,
 				battery_voltage: 0,
 				wifi_rssi: 0,
 			})
@@ -30,6 +31,10 @@ export class ProbeRepository {
 	 */
 	async findByHardwareId(hardwareId: string): Promise<ProbeRecord | undefined> {
 		return db("probes").where("hardware_id", hardwareId).first();
+	}
+
+	async findByPairingCode(pairingCode: string): Promise<ProbeRecord | undefined> {
+		return db("probes").where("pairing_code", pairingCode).first();
 	}
 
 	/**
@@ -113,6 +118,15 @@ export class ProbeRepository {
 	 * @param {string} name - The new name for the probe.
 	 * @returns {Promise<ProbeRecord>} The updated probe record.
 	 */
+	async updateState(probeId: number, state: "paired" | "available" | "offline"): Promise<ProbeRecord> {
+		const [probe] = await db("probes")
+			.where("id", probeId)
+			.update({ state })
+			.returning("*");
+
+		return probe;
+	}
+
 	async rename(probeId: number, name: string): Promise<ProbeRecord> {
 		const [probe] = await db("probes")
 			.where("id", probeId)

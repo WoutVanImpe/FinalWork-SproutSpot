@@ -1,0 +1,576 @@
+{
+	"info": {
+		"name": "SproutSpot API",
+		"description": "Complete API collection for SproutSpot backend. Test user: test@sproutspot.app / test1234. Pairing code: TE123456",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5001"
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Signup",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"newuser@sproutspot.app\",\n  \"password\": \"test1234\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/signup",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "signup"]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@sproutspot.app\",\n  \"password\": \"test1234\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "login"]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.token) {",
+									"    pm.collectionVariables.set(\"token\", jsonData.data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Name\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"current_password\": \"test1234\",\n  \"new_password\": \"newpass123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/password",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "password"]
+						}
+					}
+				},
+				{
+					"name": "Update Push Token",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"push_token\": \"expo-push-token-here\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/push-token",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "push-token"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Plants (Encyclopedia)",
+			"item": [
+				{
+					"name": "Get All Plants",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/plants",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "plants"]
+						}
+					}
+				},
+				{
+					"name": "Search Plants",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/plants/search?q=tomaat&sunlight=full&care_level=daily",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "plants", "search"],
+							"query": [
+								{ "key": "q", "value": "tomaat" },
+								{ "key": "light", "value": "", "disabled": true },
+								{ "key": "difficulty", "value": "", "disabled": true },
+								{ "key": "is_indoor", "value": "", "disabled": true },
+								{ "key": "sowing_month", "value": "", "disabled": true },
+								{ "key": "sunlight", "value": "full", "disabled": true },
+								{ "key": "care_level", "value": "daily", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Plant by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/plants/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "plants", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Plant Stages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/plants/1/stages",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "plants", "1", "stages"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Garden",
+			"item": [
+				{
+					"name": "Get Garden (with plants)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/gardens",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gardens"]
+						}
+					}
+				},
+				{
+					"name": "Get Dashboard (home page)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/gardens/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gardens", "status"]
+						}
+					}
+				},
+				{
+					"name": "Update Garden",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"width\": 5,\n  \"height\": 6,\n  \"positions\": [\n    { \"user_plant_id\": 1, \"x\": 0, \"y\": 0 },\n    { \"user_plant_id\": 2, \"x\": 2, \"y\": 1 },\n    { \"user_plant_id\": 3, \"x\": 4, \"y\": 2 }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/gardens",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gardens"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "User Plants",
+			"item": [
+				{
+					"name": "Create User Plant (placement)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plant_id\": 1,\n  \"nickname\": \"Minty\",\n  \"garden_id\": 1,\n  \"x_pos\": 0,\n  \"y_pos\": 0\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/user-plants",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "user-plants"]
+						}
+					}
+				},
+				{
+					"name": "Get All User Plants (history)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/user-plants",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "user-plants"]
+						}
+					}
+				},
+				{
+					"name": "Get Active User Plants",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/user-plants/active",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "user-plants", "active"]
+						}
+					}
+				},
+				{
+					"name": "Get Current Stage",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/user-plants/1/stage",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "user-plants", "1", "stage"]
+						}
+					}
+				},
+				{
+					"name": "Advance Stage",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"new_stage_order\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/user-plants/1/stage",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "user-plants", "1", "stage"]
+						}
+					}
+				},
+				{
+					"name": "Get Probe Readings (last 24)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/user-plants/1/readings",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "user-plants", "1", "readings"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Probes",
+			"item": [
+				{
+					"name": "Register Probe (no auth)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hardware_id\": \"80:F1:B2:64:32:99\",\n  \"pairing_code\": \"TE123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/probes/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "probes", "register"]
+						}
+					}
+				},
+				{
+					"name": "List My Probes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/probes",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "probes"]
+						}
+					}
+				},
+				{
+					"name": "Get Probe by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/probes/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "probes", "1"]
+						}
+					}
+				},
+				{
+					"name": "Rename Probe",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"My Garden Probe\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/probes/1/rename",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "probes", "1", "rename"]
+						}
+					}
+				},
+				{
+					"name": "Rename Probe by Code (app flow)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pairing_code\": \"TE123456\",\n  \"name\": \"Mijn Sonde\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/probes/rename-by-code",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "probes", "rename-by-code"]
+						}
+					}
+				},
+				{
+					"name": "Pair Probe to Plant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_plant_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/probes/1/pair",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "probes", "1", "pair"]
+						}
+					}
+				},
+				{
+					"name": "Unpair Probe from Plant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/probes/unpair/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "probes", "unpair", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Telemetry",
+			"item": [
+				{
+					"name": "Upload Telemetry (batch)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hardware_id\": \"80:F1:B2:64:32:99\",\n  \"entries\": [\n    {\n      \"temp_c\": 22.5,\n      \"humidity_pct\": 55,\n      \"light_lux\": 25000,\n      \"soil_raw\": 300,\n      \"battery_voltage\": 4.0,\n      \"wifi_rssi\": -65,\n      \"time_t\": 1715097600\n    },\n    {\n      \"temp_c\": 22.8,\n      \"humidity_pct\": 54,\n      \"light_lux\": 24000,\n      \"soil_raw\": 310,\n      \"battery_voltage\": 4.0,\n      \"wifi_rssi\": -67,\n      \"time_t\": 1715097900\n    },\n    {\n      \"temp_c\": 22.1,\n      \"humidity_pct\": 56,\n      \"light_lux\": 23000,\n      \"soil_raw\": 295,\n      \"battery_voltage\": 3.9,\n      \"wifi_rssi\": -66,\n      \"time_t\": 1715098200\n    },\n    {\n      \"temp_c\": 23.0,\n      \"humidity_pct\": 53,\n      \"light_lux\": 26000,\n      \"soil_raw\": 305,\n      \"battery_voltage\": 4.0,\n      \"wifi_rssi\": -64,\n      \"time_t\": 1715098500\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/telemetry/upload",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "telemetry", "upload"]
+						}
+					}
+				},
+				{
+					"name": "Get Recent Telemetry",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/telemetry/recent/80:F1:B2:64:32:99",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "telemetry", "recent", "80:F1:B2:64:32:99"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "Get Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "notifications"]
+						}
+					}
+				},
+				{
+					"name": "Acknowledge Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications/1/acknowledge",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "notifications", "1", "acknowledge"]
+						}
+					}
+				},
+				{
+					"name": "Resolve Issue",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications/issues/1/resolve",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "notifications", "issues", "1", "resolve"]
+						}
+					}
+				},
+				{
+					"name": "Reset Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications/1/reset",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "notifications", "1", "reset"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

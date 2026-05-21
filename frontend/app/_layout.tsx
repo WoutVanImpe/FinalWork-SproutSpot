@@ -9,9 +9,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import NavHeader from "../components/shared/header/NavHeader";
 import { OverlayProvider } from "../context/OverlayContext";
+import { AuthProvider } from "../context/AuthContext";
 import OnboardingCarousel from "../components/onboarding/OnboardingCarousel";
 import AuthScreen from "../components/auth/AuthScreen";
 import RegisterFlow from "../components/auth/RegisterFlow";
+import LoadingScreen from "../components/shared/LoadingScreen";
+import { useAuth } from "../context/AuthContext";
 
 const CustomTabBar = ({ state, navigation }: any) => {
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
@@ -99,7 +102,7 @@ const CustomTabBar = ({ state, navigation }: any) => {
 	);
 };
 
-const NavOverlay = () => {
+const AppContent = () => {
 	const [fontsLoaded] = useFonts({
 		"SpaceGrotesk-Regular": require("../assets/fonts/SpaceGrotesk-Regular.ttf"),
 		"SpaceGrotesk-Bold": require("../assets/fonts/SpaceGrotesk-Bold.ttf"),
@@ -111,6 +114,8 @@ const NavOverlay = () => {
 	const [showRegisterFlow, setShowRegisterFlow] = useState(false);
 	const [pendingPlant, setPendingPlant] = useState<{ vegId: string; name: string } | null>(null);
 	const router = useRouter();
+	const { loading, user } = useAuth();
+	const isLoading = !fontsLoaded || loading;
 
 	useEffect(() => {
 		if (pendingPlant) {
@@ -120,33 +125,38 @@ const NavOverlay = () => {
 		}
 	}, [pendingPlant]);
 
-	if (!fontsLoaded) return null;
-
-	if (showOnboarding) {
-		return <OnboardingCarousel onComplete={() => { setShowOnboarding(false); setShowAuth(true); }} />;
-	}
-
-	if (showAuth) {
-		return <AuthScreen onComplete={(mode) => { setShowAuth(false); if (mode === "register") setShowRegisterFlow(true); }} />;
-	}
-
-	if (showRegisterFlow) {
-		return <RegisterFlow onComplete={(vegId, name) => { setShowRegisterFlow(false); setPendingPlant({ vegId, name }); }} />;
-	}
-
 	return (
-		<OverlayProvider>
-			<StatusBar style="light" />
-			{!isAccountPage && <NavHeader />}
-			<Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
-				<Tabs.Screen name="index" />
-				<Tabs.Screen name="(garden)/garden" />
-				<Tabs.Screen name="(explore)/explore" />
-				<Tabs.Screen name="(account)/account" options={{ href: null }} />
-			</Tabs>
-		</OverlayProvider>
+		<View style={{ flex: 1 }}>
+			{user ? (
+				<OverlayProvider>
+					<StatusBar style="light" />
+					{!isAccountPage && <NavHeader />}
+					<Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
+						<Tabs.Screen name="index" />
+						<Tabs.Screen name="(garden)/garden" />
+						<Tabs.Screen name="(explore)/explore" />
+						<Tabs.Screen name="(account)/account" options={{ href: null }} />
+					</Tabs>
+				</OverlayProvider>
+			) : showOnboarding ? (
+				<OnboardingCarousel onComplete={() => { setShowOnboarding(false); setShowAuth(true); }} />
+			) : showAuth ? (
+				<AuthScreen onComplete={(mode) => { setShowAuth(false); if (mode === "register") { setShowRegisterFlow(true); } }} />
+			) : showRegisterFlow ? (
+				<RegisterFlow onComplete={(vegId, name) => { setShowRegisterFlow(false); setPendingPlant({ vegId, name }); }} />
+			) : (
+				<View style={{ flex: 1, backgroundColor: "#3E4348" }} />
+			)}
+			<LoadingScreen visible={isLoading} />
+		</View>
 	);
 };
+
+const NavOverlay = () => (
+	<AuthProvider>
+		<AppContent />
+	</AuthProvider>
+);
 
 export default NavOverlay;
 

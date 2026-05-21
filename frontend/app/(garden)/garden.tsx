@@ -1,10 +1,13 @@
-import { PanResponder, StyleSheet, TouchableOpacity, View } from "react-native";
+import { PanResponder, StyleSheet, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { CELL, MAX_SCALE, MIN_SCALE, SCALE_STEP, clampOffset, gridDimensions } from "../../constants/garden";
 import { Styling } from "../../constants/Styling";
 import { BAR_HEIGHT } from "../../constants/tabConfig";
-import { initialPlants } from "../../data/gardenPlants";
-import { VEGETABLE_DETAILS } from "../../data/vegetables";
+import { getGarden, getDashboard, createUserPlant, updateGarden } from "../../services/garden";
+import { pairProbe } from "../../services/probes";
+import { getPlantById } from "../../services/plants";
+import type { EnrichedPlant } from "../../services/garden";
+import type { PlantDetail } from "../../services/plants";
 import Spacer from "../../components/style/Spacer";
 import StyledText from "../../components/style/StyledText";
 import PlantSheet from "../../components/pages/garden/plantSheet/PlantSheet";
@@ -18,28 +21,44 @@ import { useOverlay } from "../../context/OverlayContext";
 import StyledAlert, { AlertButton } from "../../components/style/StyledAlert";
 import { useLocalSearchParams, router } from "expo-router";
 
-function makeNewPlant(vegId: string, name: string, x: number, y: number): GardenPlant {
-  const veg = VEGETABLE_DETAILS[vegId];
-  return {
-    id: `plant_${Date.now()}`,
-    image: veg?.image ?? 0,
-    warning: false,
-    x,
-    y,
-    nickname: name || veg?.name || "Plant",
-    type: veg?.name ?? "",
-    stage: { current: 1, max: veg?.stages?.length ?? 1, label: veg?.stages?.[0]?.label ?? "Zaaien" },
-    water: { level: 100, label: veg?.water ?? "", optimalMin: 60, optimalMax: 80 },
-    light: { level: 80, label: veg?.light ?? "", optimalMin: 60, optimalMax: 90 },
-    temperature: { level: 70, label: `${veg?.temperature?.min ?? 0}°C - ${veg?.temperature?.max ?? 0}°C`, optimalMin: 50, optimalMax: 80 },
-    advice: "",
-    battery: 100,
-  };
+function enrichedToGardenPlant(p: EnrichedPlant): GardenPlant {
+	return {
+		id: p.id,
+		image: p.image ? { uri: p.image } : (0 as unknown as number),
+		warning: p.warning,
+		x: p.x,
+		y: p.y,
+		nickname: p.nickname,
+		type: p.type,
+		stage: p.stage,
+		water: p.water,
+		light: p.light,
+		temperature: p.temperature,
+		advice: p.advice,
+		battery: p.battery,
+		probeName: p.probe_name,
+	};
+}
+
+let vegCache: Record<string, PlantDetail> = {};
+
+async function fetchPlantDetail(vegId: string): Promise<PlantDetail | null> {
+	if (vegCache[vegId]) return vegCache[vegId];
+	try {
+		const res = await getPlantById(vegId);
+		if (res.data) {
+			vegCache[vegId] = res.data;
+			return res.data;
+		}
+	} catch { /* ignore */ }
+	return null;
 }
 
 const Garden = () => {
-	const params = useLocalSearchParams<{ selectedPlantId?: string; placementMode?: string; vegId?: string; name?: string }>();
-	const [plants, setPlants] = useState<GardenPlant[]>(initialPlants);
+	const params = useLocalSearchParams<{ selectedPlantId?: string; placementMode?: string; vegId?: string; name?: string; probeId?: string }>();
+	const [plants, setPlants] = useState<GardenPlant[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [gardenId, setGardenId] = useState<number | null>(null);
 	const [cols, setCols] = useState(5);
 	const [rows, setRows] = useState(6);
 	const [isEditing, setIsEditing] = useState(false);
@@ -51,6 +70,20 @@ const Garden = () => {
 	const [alertConfig, setAlertConfig] = useState<{ title: string; message: string; buttons?: AlertButton[] } | null>(null);
 
 	useEffect(() => {
+		getGarden()
+			.then((res) => {
+				if (res.data) {
+					setPlants(res.data.plants.map(enrichedToGardenPlant));
+					setGardenId(res.data.garden.id);
+					setCols(res.data.garden.width);
+					setRows(res.data.garden.height);
+				}
+			})
+			.catch(console.error)
+			.finally(() => setLoading(false));
+	}, []);
+
+	useEffect(() => {
 		if (params.selectedPlantId) {
 			const plant = plants.find((p) => p.id === params.selectedPlantId);
 			if (plant) {
@@ -60,7 +93,7 @@ const Garden = () => {
 		if (params.placementMode === "true" && params.vegId) {
 			setIsPlacing(true);
 		}
-	}, [params.selectedPlantId, params.placementMode, params.vegId]);
+	}, [params.selectedPlantId, params.placementMode, params.vegId, params.probeId]);
 
 	const [scale, setScale] = useState(1);
 	const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
@@ -178,7 +211,16 @@ const Garden = () => {
 				buttons: [
 					{
 						text: "Opslaan",
-						onPress: () => {
+						onPress: async () => {
+							try {
+								await updateGarden({
+									width: cols,
+									height: rows,
+									plant_positions: plants.map((p) => ({ id: p.id.replace("veg_", ""), x: p.x, y: p.y })),
+								});
+							} catch (err) {
+								console.error(err);
+							}
 							setIsEditing(false);
 							setSelectedCell(null);
 							setIsMoving(false);
@@ -322,6 +364,14 @@ const Garden = () => {
 		}
 	}, [isEditing, selectedCell, isMoving, selectedEditPlant]);
 
+	if (loading) {
+		return (
+			<View style={[styles.page, { justifyContent: "center", alignItems: "center" }]}>
+				<ActivityIndicator color={Styling.Colors.green} size="large" />
+			</View>
+		);
+	}
+
 	return (
 		<>
 			<View style={styles.page}>
@@ -403,16 +453,27 @@ const Garden = () => {
 									<TouchableOpacity
 										key={key}
 										style={[styles.cell, { left: cx * CELL, top: cy * CELL }, selected && styles.cellSelected]}
-									onPress={() => {
+									onPress={async () => {
 										if (isEditing) {
 											selectCell(cx, cy);
 										} else if (isPlacing) {
 											if (!plant && params.vegId) {
-												const newPlant = makeNewPlant(params.vegId, decodeURIComponent(params.name || ""), cx, cy);
-												setPlants((prev) => [...prev, newPlant]);
+												const veg = await fetchPlantDetail(params.vegId);
+												const numericId = params.vegId.replace("veg_", "");
+												try {
+													const created = await createUserPlant({ plant_id: numericId, nickname: decodeURIComponent(params.name || veg?.name || ""), x_pos: cx, y_pos: cy, garden_id: gardenId ?? undefined });
+													if (params.probeId && created.data?.id) {
+														await pairProbe(Number(params.probeId), created.data.id).catch(console.error);
+													}
+													const res = await getGarden();
+													if (res.data) {
+														setPlants(res.data.plants.map(enrichedToGardenPlant));
+													}
+												} catch (err) {
+													console.error(err);
+												}
 												setIsPlacing(false);
-												router.setParams({ placementMode: undefined, vegId: undefined, name: undefined });
-												setSelectedPlant(newPlant);
+												router.setParams({ placementMode: undefined, vegId: undefined, name: undefined, probeId: undefined });
 											}
 										} else if (plant) {
 											setSelectedPlant(plant);

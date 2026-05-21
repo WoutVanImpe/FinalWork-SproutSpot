@@ -11,7 +11,7 @@ export interface NotificationItem {
 	type: "problem" | "milestone";
 	title: string;
 	description: string;
-	image: number;
+	image: number | { uri: string } | null;
 	snoozed?: boolean;
 }
 
@@ -36,9 +36,9 @@ const NotificationsView = ({ notifications, onBack, onDismiss, onSnooze, onValid
 				notifications
 					.filter((n) => !n.snoozed)
 					.map((item) => (
-						<View key={item.id} style={styles.notificationCard}>
+							<View key={item.id} style={styles.notificationCard}>
 							<View style={styles.notificationRow}>
-								<Image source={item.image} style={styles.plantThumb} resizeMode="contain" />
+								{item.image ? <Image source={item.image} style={styles.plantThumb} resizeMode="contain" /> : <View style={[styles.plantThumb, { backgroundColor: Styling.Colors.lightGrey }]} />}
 								<View style={styles.notificationInfo}>
 									<StyledText type="head3" style={styles.cardTitle}>
 										{item.title}

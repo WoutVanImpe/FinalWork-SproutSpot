@@ -1,6 +1,8 @@
 import { db } from "../db/connection";
 import { GardenRepository } from "../repositories/garden.repository";
+import { UserPlantRepository } from "../repositories/userPlant.repository";
 import { UserGardenRecord } from "../types/database";
+import { enrichPlants } from "../utils/plantEnricher";
 
 interface GardenUpdateInput {
 	width?: number;
@@ -28,7 +30,37 @@ export class GardenService {
 			return { garden, plants: [] };
 		}
 
-		return result;
+		const enrichedPlants = await enrichPlants(result.plants);
+		return { garden: result.garden, plants: enrichedPlants };
+	}
+
+	/**
+	 * @description Retrieve a rich dashboard view including garden, active plants, and each plant's current stage details.
+	 * @param {number} userId - The user's database ID.
+	 * @returns {Promise<any>} Dashboard data with garden, enriched plants, and summary stats.
+	 */
+	async getUserDashboard(userId: number) {
+		const result = await this.repository.getGardenWithActivePlants(userId);
+
+		if (!result) {
+			const garden = await this.repository.getOrCreate(userId);
+			return {
+				garden,
+				plants: [],
+				stats: { total_plants: 0, active_plants: 0 },
+			};
+		}
+
+		const enrichedPlants = await enrichPlants(result.plants);
+
+		return {
+			garden: result.garden,
+			plants: enrichedPlants,
+			stats: {
+				total_plants: enrichedPlants.length,
+				active_plants: enrichedPlants.filter((p: any) => p.warning !== undefined).length,
+			},
+		};
 	}
 
 	/**

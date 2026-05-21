@@ -1,11 +1,12 @@
 import { Modal, StyleSheet, TouchableOpacity, View, Dimensions } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Svg, { Circle, Line, Path, Rect, Text as SvgText } from "react-native-svg";
 import { Styling } from "../../../../constants/Styling";
 import StyledText from "../../../style/StyledText";
 import StyledIcon from "../../../style/StyledIcon";
 import CloseIcon from "../../../../assets/icons/close.svg";
 import Spacer from "../../../style/Spacer";
+import type { ReadingRecord } from "../../../../services/garden";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CHART_PADDING = 40;
@@ -32,126 +33,50 @@ interface MetricConfig {
 interface GraphModalProps {
 	visible: boolean;
 	onDismiss: () => void;
+	readings: ReadingRecord[];
+	optimalRanges: {
+		water: { optimalMin: number; optimalMax: number };
+		light: { optimalMin: number; optimalMax: number };
+		temperature: { optimalMin: number; optimalMax: number };
+	};
 }
-
-const METRICS: MetricConfig[] = [
-  {
-    key: "moist",
-    label: "Vocht",
-    unit: "%",
-    optimalMin: 30,
-    optimalMax: 70,
-    yMax: 100,
-    color: "#4A90D9",
-    data: [
-      { value: 48, label: "00:00" },
-      { value: 47, label: "01:00" },
-      { value: 46, label: "02:00" },
-      { value: 46, label: "03:00" },
-      { value: 45, label: "04:00" },
-      { value: 45, label: "05:00" },
-      { value: 42, label: "06:00" },
-      { value: 40, label: "07:00" },
-      { value: 38, label: "08:00" },
-      { value: 35, label: "09:00" },
-      { value: 33, label: "10:00" },
-      { value: 30, label: "11:00" },
-      { value: 28, label: "12:00" },
-      { value: 27, label: "13:00" },
-      { value: 32, label: "14:00" },
-      { value: 36, label: "15:00" },
-      { value: 40, label: "16:00" },
-      { value: 44, label: "17:00" },
-      { value: 46, label: "18:00" },
-      { value: 47, label: "19:00" },
-      { value: 48, label: "20:00" },
-      { value: 48, label: "21:00" },
-      { value: 49, label: "22:00" },
-      { value: 49, label: "23:00" },
-    ],
-  },
-  {
-    key: "temp",
-    label: "Temperatuur",
-    unit: "°C",
-    optimalMin: 18,
-    optimalMax: 25,
-    yMax: 40,
-    color: "#C44028",
-    data: [
-      { value: 14, label: "00:00" },
-      { value: 13, label: "01:00" },
-      { value: 12, label: "02:00" },
-      { value: 12, label: "03:00" },
-      { value: 11, label: "04:00" },
-      { value: 12, label: "05:00" },
-      { value: 14, label: "06:00" },
-      { value: 17, label: "07:00" },
-      { value: 19, label: "08:00" },
-      { value: 22, label: "09:00" },
-      { value: 24, label: "10:00" },
-      { value: 26, label: "11:00" },
-      { value: 28, label: "12:00" },
-      { value: 29, label: "13:00" },
-      { value: 27, label: "14:00" },
-      { value: 25, label: "15:00" },
-      { value: 23, label: "16:00" },
-      { value: 20, label: "17:00" },
-      { value: 18, label: "18:00" },
-      { value: 17, label: "19:00" },
-      { value: 16, label: "20:00" },
-      { value: 15, label: "21:00" },
-      { value: 15, label: "22:00" },
-      { value: 14, label: "23:00" },
-    ],
-  },
-  {
-    key: "light",
-    label: "Licht",
-    unit: "lux",
-    optimalMin: 5000,
-    optimalMax: 30000,
-    yMax: 50000,
-    color: "#F5A623",
-    data: [
-      { value: 0, label: "00:00" },
-      { value: 0, label: "01:00" },
-      { value: 0, label: "02:00" },
-      { value: 0, label: "03:00" },
-      { value: 0, label: "04:00" },
-      { value: 200, label: "05:00" },
-      { value: 2000, label: "06:00" },
-      { value: 5000, label: "07:00" },
-      { value: 12000, label: "08:00" },
-      { value: 20000, label: "09:00" },
-      { value: 28000, label: "10:00" },
-      { value: 35000, label: "11:00" },
-      { value: 38000, label: "12:00" },
-      { value: 34000, label: "13:00" },
-      { value: 25000, label: "14:00" },
-      { value: 15000, label: "15:00" },
-      { value: 8000, label: "16:00" },
-      { value: 3000, label: "17:00" },
-      { value: 200, label: "18:00" },
-      { value: 0, label: "19:00" },
-      { value: 0, label: "20:00" },
-      { value: 0, label: "21:00" },
-      { value: 0, label: "22:00" },
-      { value: 0, label: "23:00" },
-    ],
-  },
-];
 
 const toX = (i: number, total: number) => GRAPH_PAD.left + (i / (total - 1)) * CHART_W;
 const toY = (value: number, yMax: number) => GRAPH_PAD.top + CHART_H - (value / yMax) * (CHART_H - GRAPH_PAD.top - GRAPH_PAD.bottom);
 
-const GraphModal = ({ visible, onDismiss }: GraphModalProps) => {
+function formatLabel(iso: string): string {
+	const d = new Date(iso);
+	return String(d.getHours()).padStart(2, "0") + ":00";
+}
+
+function getDataLabel(iso: string, index: number, total: number): string {
+	if (total <= 5) return formatLabel(iso);
+	const step = Math.max(1, Math.floor((total - 1) / 4));
+	if (index % step === 0 || index === total - 1) return formatLabel(iso);
+	return "";
+}
+
+function buildMetrics(readings: ReadingRecord[], optimalRanges: GraphModalProps["optimalRanges"]): MetricConfig[] {
+	const sorted = [...readings].reverse();
+	const dataMap = sorted.map((r) => ({ label: r.created_at, mo: r.soil_moist_pct ?? 0, te: r.temp_c ?? 0, li: r.light_lux ?? 0 }));
+	const maxTemp = Math.max(...dataMap.map((d) => d.te), 40);
+	const maxLight = Math.max(...dataMap.map((d) => d.li), 50000);
+	return [
+		{ key: "moist", label: "Vocht", unit: "%", optimalMin: optimalRanges.water.optimalMin, optimalMax: optimalRanges.water.optimalMax, yMax: 100, color: "#4A90D9", data: dataMap.map((d) => ({ value: d.mo, label: d.label })) },
+		{ key: "temp", label: "Temperatuur", unit: "°C", optimalMin: optimalRanges.temperature.optimalMin, optimalMax: optimalRanges.temperature.optimalMax, yMax: maxTemp, color: "#C44028", data: dataMap.map((d) => ({ value: d.te, label: d.label })) },
+		{ key: "light", label: "Licht", unit: "lux", optimalMin: optimalRanges.light.optimalMin, optimalMax: optimalRanges.light.optimalMax, yMax: maxLight, color: "#F5A623", data: dataMap.map((d) => ({ value: d.li, label: d.label })) },
+	];
+}
+
+const GraphModal = ({ visible, onDismiss, readings, optimalRanges }: GraphModalProps) => {
 	const [selectedMetric, setSelectedMetric] = useState(0);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 
-	const metric = METRICS[selectedMetric];
-	const yMax = metric.yMax;
-	const points = metric.data;
+	const METRICS = useMemo(() => buildMetrics(readings, optimalRanges), [readings, optimalRanges]);
+
+	const metric = METRICS[selectedMetric] || METRICS[0];
+	const yMax = metric?.yMax ?? 100;
+	const points = metric?.data ?? [];
 
 	const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"}${toX(i, points.length)},${toY(p.value, yMax)}`).join(" ");
 
@@ -230,7 +155,7 @@ const GraphModal = ({ visible, onDismiss }: GraphModalProps) => {
 								.filter((_, i) => i % Math.max(1, Math.floor(points.length / 4)) === 0 || i === points.length - 1)
 								.map((p, i) => (
 									<SvgText key={i} x={toX(points.indexOf(p), points.length)} y={CHART_H + GRAPH_PAD.top + GRAPH_PAD.bottom - 5} fill={Styling.Colors.lightGrey} fontSize={9} textAnchor="middle">
-										{p.label}
+										{getDataLabel(p.label, points.indexOf(p), points.length)}
 									</SvgText>
 								))}
 						</Svg>

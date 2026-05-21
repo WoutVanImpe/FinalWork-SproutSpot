@@ -13,12 +13,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Clipboard from "expo-clipboard";
 import StyledView from "../style/StyledView";
 import { BAR_MARGIN } from "../../constants/tabConfig";
+import { useAuth } from "../../context/AuthContext";
 
 interface RegisterFlowProps {
 	onComplete: (vegId: string, name: string) => void;
 }
-
-const PAIRING_CODE = "SP12AB3456";
 
 type Step =
 	| "intro"
@@ -75,6 +74,7 @@ const QUESTIONS = [
 
 const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 	const insets = useSafeAreaInsets();
+	const { user } = useAuth();
 	const [step, setStep] = useState<Step>("intro");
 	const [answers, setAnswers] = useState<(string | null)[]>([null, null, null, null]);
 	const [selectedVeg, setSelectedVeg] = useState<VegetableInfo | null>(null);
@@ -82,6 +82,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 	const [probeName, setProbeName] = useState("");
 	const [copied, setCopied] = useState(false);
 	const [finderStep, setFinderStep] = useState(0);
+	const pairingCode = user?.pairing_code ?? "TE123456";
 
 	const goBack = () => {
 		if (step === "finder") {
@@ -132,7 +133,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 	};
 
 	const handleCopyCode = async () => {
-		await Clipboard.setStringAsync(PAIRING_CODE);
+		await Clipboard.setStringAsync(pairingCode);
 		setCopied(true);
 		setTimeout(() => setCopied(false), 2000);
 	};
@@ -384,7 +385,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 										<StyledText type="smParagh" style={{ color: Styling.Colors.lightGrey, marginBottom: 4 }}>
 											{copied ? "Gekopieerd!" : "Klik hier om je koppelcode te kopiëren"}
 										</StyledText>
-										<StyledText type="head3" style={{ color: Styling.Colors.green, letterSpacing: 2 }}>{PAIRING_CODE}</StyledText>
+										<StyledText type="head3" style={{ color: Styling.Colors.green, letterSpacing: 2 }}>{pairingCode}</StyledText>
 									</TouchableOpacity>
 									<Spacer space={Styling.Spacing.reg} />
 									<TouchableOpacity style={styles.greenBtn} onPress={() => setStep({ type: "step5", sub: 2 })} activeOpacity={0.7}>
