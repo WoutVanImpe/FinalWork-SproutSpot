@@ -22,6 +22,7 @@ export interface UserProfile {
 	email: string;
 	profile_picture: string | null;
 	push_token: string | null;
+	push_enabled: boolean;
 	pairing_code: string;
 	notification_window_start: string;
 	notification_window_end: string;
@@ -43,6 +44,7 @@ export function getProfile() {
 export function updateProfile(data: {
 	name?: string;
 	push_token?: string;
+	push_enabled?: boolean;
 	notification_window_start?: string;
 	notification_window_end?: string;
 }) {

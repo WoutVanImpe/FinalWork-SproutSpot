@@ -110,6 +110,7 @@ export class UserController {
 					email: user.email,
 					profile_picture: user.profile_picture,
 					push_token: user.push_token,
+					push_enabled: user.push_enabled,
 					pairing_code: user.pairing_code,
 					notification_window_start: user.notification_window_start,
 					notification_window_end: user.notification_window_end,
@@ -142,12 +143,13 @@ export class UserController {
 				return;
 			}
 
-			const { name, profile_picture, push_token, notification_window_start, notification_window_end } = req.body;
+			const { name, profile_picture, push_token, push_enabled, notification_window_start, notification_window_end } = req.body;
 
 			const input: UpdateProfileDto = {
 				name,
 				profile_picture,
 				push_token,
+				push_enabled,
 				notification_window_start,
 				notification_window_end,
 			};
@@ -162,6 +164,7 @@ export class UserController {
 					name: user.name,
 					email: user.email,
 					profile_picture: user.profile_picture,
+					push_enabled: user.push_enabled,
 					notification_window_start: user.notification_window_start,
 					notification_window_end: user.notification_window_end,
 				},

@@ -16,6 +16,7 @@ export interface UserRecord {
 	email: string;
 	password_hash: string;
 	push_token: string | null;
+	push_enabled: boolean;
 	notification_window_start: string | null;
 	notification_window_end: string | null;
 	pairing_code: string;

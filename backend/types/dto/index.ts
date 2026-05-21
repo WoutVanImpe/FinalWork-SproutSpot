@@ -13,6 +13,7 @@ export interface UpdateProfileDto {
 	name?: string;
 	profile_picture?: string;
 	push_token?: string;
+	push_enabled?: boolean;
 	notification_window_start?: string;
 	notification_window_end?: string;
 }
