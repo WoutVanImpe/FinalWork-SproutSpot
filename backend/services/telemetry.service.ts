@@ -133,18 +133,42 @@ export class TelemetryService {
 			plantNickname,
 		);
 
-		// Temperature — persistent guard (3 consecutive)
-		await this.checkAndActOnMetric(
-			"temperature",
-			latest.temp_c,
-			{ min: thresholds.temp_min, max: thresholds.temp_max },
-			"persistent",
-			allSamples,
-			userPlantId,
-			["TEMP_TOO_LOW", "TEMP_TOO_HIGH"],
-			userId,
-			plantNickname,
-		);
+		// Temperature — TEMP_TOO_HIGH persistent guard (3 consecutive, prevents overheating)
+		// TEMP_TOO_LOW is handled by daily average check in scheduler
+		if (latest.temp_c > thresholds.temp_max) {
+			const required = 3;
+			let consecutive = 0;
+
+			for (let i = allSamples.length - 1; i >= 0; i--) {
+				const val = allSamples[i]!.temp_c;
+				if (val > thresholds.temp_max) {
+					consecutive++;
+					if (consecutive >= required) break;
+				} else {
+					break;
+				}
+			}
+
+			if (consecutive >= required) {
+				console.log(`[Telemetry] TEMP_TOO_HIGH — value=${latest.temp_c}, limit=${thresholds.temp_max} (persistent trigger, ${consecutive} consecutive)`);
+				const { issue, isNew } = await this.upsertIssue(userPlantId, "TEMP_TOO_HIGH");
+				if (isNew) {
+					await this.dispatchNotificationForIssue(issue, userId, userPlantId, plantNickname);
+				}
+			} else {
+				console.log(`[Telemetry] TEMP_TOO_HIGH filtered by anti-spam — only ${consecutive} consecutive out-of-range readings (need ${required})`);
+			}
+		}
+
+		// Critical frost guardrail — any single reading below 2°C triggers instant TEMP_TOO_LOW
+		const frostReading = batchEntries.find((e) => e.temp_c < 2);
+		if (frostReading) {
+			console.log(`[Telemetry] TEMP_TOO_LOW (FROST) — value=${frostReading.temp_c}°C < 2°C (critical instant trigger)`);
+			const { issue, isNew } = await this.upsertIssue(userPlantId, "TEMP_TOO_LOW");
+			if (isNew) {
+				await this.dispatchNotificationForIssue(issue, userId, userPlantId, plantNickname);
+			}
+		}
 
 		// Light — high-light protection only (3 consecutive, prevents sunburn)
 		// LIGHT_TOO_LOW is handled by daily cumulative DLI check in scheduler
@@ -263,6 +287,35 @@ export class TelemetryService {
 				}
 
 				console.log(`[Telemetry] LIGHT_TOO_LOW — daily sun hours: ${s.cumulativeHours.toFixed(1)}h < ${s.requiredHours}h (end-of-day trigger)`);
+			}
+		}
+	}
+
+	async checkDailyTemperatureIntegral(): Promise<void> {
+		const END_OF_DAY_HOUR = 22;
+
+		const summaries = await this.repository.getDailyTemperatureSummary();
+
+		for (const s of summaries) {
+			if (s.dailyAvgTemp >= s.tempMin) {
+				const openIssues = await this.repository.findOpenIssuesByUserPlant(s.userPlantId);
+				const existing = openIssues.find((i) => i.issue_type === "TEMP_TOO_LOW");
+				if (existing) {
+					console.log(`[Telemetry] Auto-resolving TEMP_TOO_LOW (issue #${existing.id}) — daily avg ${s.dailyAvgTemp.toFixed(1)}°C >= ${s.tempMin}°C`);
+					await this.repository.resolveIssue(existing.id);
+				}
+			} else if (new Date().getHours() >= END_OF_DAY_HOUR) {
+				const openIssues = await this.repository.findOpenIssuesByUserPlant(s.userPlantId);
+				const existing = openIssues.find((i) => i.issue_type === "TEMP_TOO_LOW");
+
+				if (existing) {
+					await this.repository.incrementIssueOccurrence(existing.id);
+				} else {
+					const issue = await this.repository.createIssue(s.userPlantId, "TEMP_TOO_LOW");
+					await this.dispatchNotificationForIssue(issue, s.userId, s.userPlantId, s.nickname);
+				}
+
+				console.log(`[Telemetry] TEMP_TOO_LOW — daily avg ${s.dailyAvgTemp.toFixed(1)}°C < ${s.tempMin}°C (end-of-day trigger)`);
 			}
 		}
 	}
@@ -444,9 +497,6 @@ export class TelemetryService {
 					break;
 				case "SOIL_TOO_WET":
 					if (latest.soil_moist_pct <= thresholds.soil_max) resolved = true;
-					break;
-				case "TEMP_TOO_LOW":
-					if (latest.temp_c >= thresholds.temp_min) resolved = true;
 					break;
 				case "TEMP_TOO_HIGH":
 					if (latest.temp_c <= thresholds.temp_max) resolved = true;

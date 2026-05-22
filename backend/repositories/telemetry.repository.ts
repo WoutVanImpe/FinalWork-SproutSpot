@@ -11,6 +11,14 @@ export interface DailyLightSummary {
 	cumulativeHours: number;
 }
 
+export interface DailyTemperatureSummary {
+	userPlantId: number;
+	userId: number;
+	nickname: string | null;
+	tempMin: number;
+	dailyAvgTemp: number;
+}
+
 export interface LinkedPlantResult {
 	userPlant: UserPlantRecord;
 	thresholds: StageThresholdsRecord;
@@ -238,6 +246,36 @@ export class TelemetryRepository {
 			lightMin: r.light_min,
 			requiredHours: Number(r.required_hours),
 			cumulativeHours: Number(r.cumulative_hours ?? 0),
+		}));
+	}
+
+	async getDailyTemperatureSummary(): Promise<DailyTemperatureSummary[]> {
+		const rows = await db("user_plants as up")
+			.join("plant_stages as ps", function () {
+				this.on("up.plant_id", "=", "ps.plant_id")
+					.andOn("up.current_stage_order", "=", "ps.stage_order");
+			})
+			.leftJoin("probe_entries as pe", function () {
+				this.on("pe.sonde_id", "=", "up.sonde_id")
+					.andOn("pe.created_at", ">=", db.raw("CURRENT_DATE"));
+			})
+			.where("up.is_active", true)
+			.whereNotNull("up.sonde_id")
+			.groupBy("up.id", "up.user_id", "up.nickname", "ps.thresholds")
+			.select(
+				"up.id",
+				"up.user_id",
+				"up.nickname",
+				db.raw("(ps.thresholds->>'temp_min')::int as temp_min"),
+				db.raw("AVG(pe.temp_c) as daily_avg_temp"),
+			);
+
+		return rows.map((r: any) => ({
+			userPlantId: r.id,
+			userId: r.user_id,
+			nickname: r.nickname,
+			tempMin: r.temp_min,
+			dailyAvgTemp: Number(r.daily_avg_temp ?? 0),
 		}));
 	}
 }
