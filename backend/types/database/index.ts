@@ -7,6 +7,7 @@ export interface StageThresholdsRecord {
 	humidity_max: number;
 	light_min: number;
 	light_max: number;
+	required_daily_sun_hours: number;
 }
 
 export interface UserRecord {

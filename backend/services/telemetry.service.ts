@@ -146,18 +146,32 @@ export class TelemetryService {
 			plantNickname,
 		);
 
-		// Light — persistent guard (3 consecutive)
-		await this.checkAndActOnMetric(
-			"light",
-			latest.light_lux,
-			{ min: thresholds.light_min, max: thresholds.light_max },
-			"persistent",
-			allSamples,
-			userPlantId,
-			["LIGHT_TOO_LOW", "LIGHT_TOO_HIGH"],
-			userId,
-			plantNickname,
-		);
+		// Light — high-light protection only (3 consecutive, prevents sunburn)
+		// LIGHT_TOO_LOW is handled by daily cumulative DLI check in scheduler
+		if (latest.light_lux > thresholds.light_max) {
+			const required = 3;
+			let consecutive = 0;
+
+			for (let i = allSamples.length - 1; i >= 0; i--) {
+				const val = allSamples[i]!.light_lux;
+				if (val > thresholds.light_max) {
+					consecutive++;
+					if (consecutive >= required) break;
+				} else {
+					break;
+				}
+			}
+
+			if (consecutive >= required) {
+				console.log(`[Telemetry] LIGHT_TOO_HIGH — value=${latest.light_lux}, limit=${thresholds.light_max} (persistent trigger, ${consecutive} consecutive)`);
+				const { issue, isNew } = await this.upsertIssue(userPlantId, "LIGHT_TOO_HIGH");
+				if (isNew) {
+					await this.dispatchNotificationForIssue(issue, userId, userPlantId, plantNickname);
+				}
+			} else {
+				console.log(`[Telemetry] LIGHT_TOO_HIGH filtered by anti-spam — only ${consecutive} consecutive out-of-range readings (need ${required})`);
+			}
+		}
 
 		// Auto-resolve
 		await this.autoResolveIssues(allSamples, userPlantId, thresholds);
@@ -221,6 +235,35 @@ export class TelemetryService {
 			await this.probeRepository.updateState(probe.id, "offline");
 
 			console.log(`[Telemetry] PROBE_STALE — ${probe.hardware_id} last seen > ${STALE_THRESHOLD_MINUTES} min ago (battery ${probe.battery_voltage}V)`);
+		}
+	}
+
+	async checkDailyLightIntegral(): Promise<void> {
+		const END_OF_DAY_HOUR = 22;
+
+		const summaries = await this.repository.getDailyLightSummary();
+
+		for (const s of summaries) {
+			if (s.cumulativeHours >= s.requiredHours) {
+				const openIssues = await this.repository.findOpenIssuesByUserPlant(s.userPlantId);
+				const existing = openIssues.find((i) => i.issue_type === "LIGHT_TOO_LOW");
+				if (existing) {
+					console.log(`[Telemetry] Auto-resolving LIGHT_TOO_LOW (issue #${existing.id}) — daily sun hours met: ${s.cumulativeHours.toFixed(1)}h >= ${s.requiredHours}h`);
+					await this.repository.resolveIssue(existing.id);
+				}
+			} else if (new Date().getHours() >= END_OF_DAY_HOUR) {
+				const openIssues = await this.repository.findOpenIssuesByUserPlant(s.userPlantId);
+				const existing = openIssues.find((i) => i.issue_type === "LIGHT_TOO_LOW");
+
+				if (existing) {
+					await this.repository.incrementIssueOccurrence(existing.id);
+				} else {
+					const issue = await this.repository.createIssue(s.userPlantId, "LIGHT_TOO_LOW");
+					await this.dispatchNotificationForIssue(issue, s.userId, s.userPlantId, s.nickname);
+				}
+
+				console.log(`[Telemetry] LIGHT_TOO_LOW — daily sun hours: ${s.cumulativeHours.toFixed(1)}h < ${s.requiredHours}h (end-of-day trigger)`);
+			}
 		}
 	}
 
@@ -407,9 +450,6 @@ export class TelemetryService {
 					break;
 				case "TEMP_TOO_HIGH":
 					if (latest.temp_c <= thresholds.temp_max) resolved = true;
-					break;
-				case "LIGHT_TOO_LOW":
-					if (latest.light_lux >= thresholds.light_min) resolved = true;
 					break;
 				case "LIGHT_TOO_HIGH":
 					if (latest.light_lux <= thresholds.light_max) resolved = true;

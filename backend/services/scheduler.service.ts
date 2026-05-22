@@ -9,12 +9,14 @@ export function startScheduler(): void {
 
 	const telemetryService = new TelemetryService();
 
-	console.log(`[Scheduler] Starting stale probe check every ${CHECK_INTERVAL_MS / 60000} minutes`);
+	console.log(`[Scheduler] Starting checks every ${CHECK_INTERVAL_MS / 60000} minutes`);
 
 	telemetryService.checkStaleProbes();
+	telemetryService.checkDailyLightIntegral();
 
 	intervalHandle = setInterval(() => {
 		telemetryService.checkStaleProbes();
+		telemetryService.checkDailyLightIntegral();
 	}, CHECK_INTERVAL_MS);
 }
 

@@ -2,6 +2,15 @@ import { db } from "../db/connection";
 import { ActiveIssueRecord, PendingNotificationRecord, ProbeEntryRecord, StageThresholdsRecord, UserPlantRecord } from "../types/database";
 import { TelemetryEntryDto, TelemetryPayloadDto } from "../types/dto";
 
+export interface DailyLightSummary {
+	userPlantId: number;
+	userId: number;
+	nickname: string | null;
+	lightMin: number;
+	requiredHours: number;
+	cumulativeHours: number;
+}
+
 export interface LinkedPlantResult {
 	userPlant: UserPlantRecord;
 	thresholds: StageThresholdsRecord;
@@ -197,5 +206,38 @@ export class TelemetryRepository {
 			.returning("*");
 
 		return notification;
+	}
+
+	async getDailyLightSummary(): Promise<DailyLightSummary[]> {
+		const rows = await db("user_plants as up")
+			.join("plant_stages as ps", function () {
+				this.on("up.plant_id", "=", "ps.plant_id")
+					.andOn("up.current_stage_order", "=", "ps.stage_order");
+			})
+			.leftJoin("probe_entries as pe", function () {
+				this.on("pe.sonde_id", "=", "up.sonde_id")
+					.andOn("pe.created_at", ">=", db.raw("CURRENT_DATE"))
+					.andOn("pe.light_lux", ">=", db.raw("(ps.thresholds->>'light_min')::int"));
+			})
+			.where("up.is_active", true)
+			.whereNotNull("up.sonde_id")
+			.groupBy("up.id", "up.user_id", "up.nickname", "ps.thresholds")
+			.select(
+				"up.id",
+				"up.user_id",
+				"up.nickname",
+				db.raw("(ps.thresholds->>'light_min')::int as light_min"),
+				db.raw("COALESCE((ps.thresholds->>'required_daily_sun_hours')::numeric, 6) as required_hours"),
+				db.raw("COUNT(pe.id) * 0.25 as cumulative_hours"),
+			);
+
+		return rows.map((r: any) => ({
+			userPlantId: r.id,
+			userId: r.user_id,
+			nickname: r.nickname,
+			lightMin: r.light_min,
+			requiredHours: Number(r.required_hours),
+			cumulativeHours: Number(r.cumulative_hours ?? 0),
+		}));
 	}
 }
