@@ -3,8 +3,6 @@ export interface StageThresholdsRecord {
 	soil_max: number;
 	temp_min: number;
 	temp_max: number;
-	humidity_min: number;
-	humidity_max: number;
 	light_min: number;
 	light_max: number;
 	required_daily_sun_hours: number;
@@ -101,7 +99,6 @@ export interface ProbeEntryRecord {
 	id: number;
 	sonde_id: string | null;
 	temp_c: number | null;
-	humidity_pct: number | null;
 	light_lux: number | null;
 	soil_moist_pct: number | null;
 	battery_voltage: number;

@@ -11,6 +11,7 @@ export async function up(knex: Knex): Promise<void> {
 				table.string("email").unique().notNullable();
 				table.string("password_hash").notNullable();
 				table.string("push_token");
+				table.boolean("push_enabled").defaultTo(true).notNullable();
 				table.time("notification_window_start").defaultTo("08:00:00");
 				table.time("notification_window_end").defaultTo("22:00:00");
 				table.string("pairing_code").unique().notNullable();
@@ -100,7 +101,6 @@ export async function up(knex: Knex): Promise<void> {
 				table.increments("id").primary();
 				table.string("sonde_id").references("hardware_id").inTable("probes");
 				table.float("temp_c");
-				table.float("humidity_pct");
 				table.float("light_lux");
 				table.float("soil_moist_pct");
 				table.float("battery_voltage").notNullable();
