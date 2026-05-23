@@ -280,7 +280,11 @@ export class TelemetryService {
 				const existing = openIssues.find((i) => i.issue_type === "LIGHT_TOO_LOW");
 
 				if (existing) {
-					await this.repository.incrementIssueOccurrence(existing.id);
+					const today = new Date().toISOString().slice(0, 10);
+					const lastSeen = existing.last_seen.toISOString().slice(0, 10);
+					if (lastSeen !== today) {
+						await this.repository.incrementIssueOccurrence(existing.id);
+					}
 				} else {
 					const issue = await this.repository.createIssue(s.userPlantId, "LIGHT_TOO_LOW");
 					await this.dispatchNotificationForIssue(issue, s.userId, s.userPlantId, s.nickname);
@@ -309,7 +313,11 @@ export class TelemetryService {
 				const existing = openIssues.find((i) => i.issue_type === "TEMP_TOO_LOW");
 
 				if (existing) {
-					await this.repository.incrementIssueOccurrence(existing.id);
+					const today = new Date().toISOString().slice(0, 10);
+					const lastSeen = existing.last_seen.toISOString().slice(0, 10);
+					if (lastSeen !== today) {
+						await this.repository.incrementIssueOccurrence(existing.id);
+					}
 				} else {
 					const issue = await this.repository.createIssue(s.userPlantId, "TEMP_TOO_LOW");
 					await this.dispatchNotificationForIssue(issue, s.userId, s.userPlantId, s.nickname);
