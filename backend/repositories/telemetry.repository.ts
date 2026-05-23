@@ -1,4 +1,5 @@
 import { db } from "../db/connection";
+import { DLI_HOURS_PER_ENTRY } from "../config";
 import { ActiveIssueRecord, PendingNotificationRecord, ProbeEntryRecord, StageThresholdsRecord, UserPlantRecord } from "../types/database";
 import { TelemetryEntryDto, TelemetryPayloadDto } from "../types/dto";
 
@@ -35,7 +36,6 @@ export class TelemetryRepository {
 		const rows = entries.map((e) => ({
 			sonde_id: hardwareId,
 			temp_c: e.temp_c,
-			humidity_pct: e.humidity_pct,
 			light_lux: e.light_lux,
 			soil_moist_pct: e.soil_raw,
 			battery_voltage: e.battery_voltage,
@@ -48,7 +48,7 @@ export class TelemetryRepository {
 
 	/**
 	 * @description Create a new probe entry record with mapped telemetry data (soil moisture already converted to percentage).
-	 * @param {TelemetryPayloadDto} payload - Telemetry data with hardware_id, temperature, humidity, light, mapped soil moisture, battery, and WiFi.
+	 * @param {TelemetryPayloadDto} payload - Telemetry data with hardware_id, temperature, light, mapped soil moisture, battery, and WiFi.
 	 * @returns {Promise<ProbeEntryRecord>} The created probe entry record.
 	 */
 	async createEntry(payload: TelemetryPayloadDto): Promise<ProbeEntryRecord> {
@@ -56,7 +56,6 @@ export class TelemetryRepository {
 			.insert({
 				sonde_id: payload.hardware_id,
 				temp_c: payload.temp_c,
-				humidity_pct: payload.humidity_pct,
 				light_lux: payload.light_lux,
 				soil_moist_pct: payload.soil_raw,
 				battery_voltage: payload.battery_voltage,
@@ -225,27 +224,28 @@ export class TelemetryRepository {
 			.leftJoin("probe_entries as pe", function () {
 				this.on("pe.sonde_id", "=", "up.sonde_id")
 					.andOn("pe.created_at", ">=", db.raw("CURRENT_DATE"))
-					.andOn("pe.light_lux", ">=", db.raw("(ps.thresholds->>'light_min')::int"));
+					.andOn("pe.light_lux", ">=", db.raw("(ps.thresholds->>'light_min')::numeric"));
 			})
 			.where("up.is_active", true)
 			.whereNotNull("up.sonde_id")
+			.where("up.created_at", "<", db.raw("CURRENT_DATE"))
 			.groupBy("up.id", "up.user_id", "up.nickname", "ps.thresholds")
 			.select(
 				"up.id",
 				"up.user_id",
 				"up.nickname",
-				db.raw("(ps.thresholds->>'light_min')::int as light_min"),
+				db.raw("(ps.thresholds->>'light_min')::numeric as light_min"),
 				db.raw("COALESCE((ps.thresholds->>'required_daily_sun_hours')::numeric, 6) as required_hours"),
-				db.raw("COUNT(pe.id) * 0.25 as cumulative_hours"),
+				db.raw("COUNT(pe.id) as entry_count"),
 			);
 
 		return rows.map((r: any) => ({
 			userPlantId: r.id,
 			userId: r.user_id,
 			nickname: r.nickname,
-			lightMin: r.light_min,
+			lightMin: Number(r.light_min),
 			requiredHours: Number(r.required_hours),
-			cumulativeHours: Number(r.cumulative_hours ?? 0),
+			cumulativeHours: Number(r.entry_count ?? 0) * DLI_HOURS_PER_ENTRY,
 		}));
 	}
 
@@ -261,12 +261,13 @@ export class TelemetryRepository {
 			})
 			.where("up.is_active", true)
 			.whereNotNull("up.sonde_id")
+			.where("up.created_at", "<", db.raw("CURRENT_DATE"))
 			.groupBy("up.id", "up.user_id", "up.nickname", "ps.thresholds")
 			.select(
 				"up.id",
 				"up.user_id",
 				"up.nickname",
-				db.raw("(ps.thresholds->>'temp_min')::int as temp_min"),
+				db.raw("(ps.thresholds->>'temp_min')::numeric as temp_min"),
 				db.raw("AVG(pe.temp_c) as daily_avg_temp"),
 			);
 
@@ -274,8 +275,9 @@ export class TelemetryRepository {
 			userPlantId: r.id,
 			userId: r.user_id,
 			nickname: r.nickname,
-			tempMin: r.temp_min,
+			tempMin: Number(r.temp_min),
 			dailyAvgTemp: Number(r.daily_avg_temp ?? 0),
 		}));
 	}
+
 }
