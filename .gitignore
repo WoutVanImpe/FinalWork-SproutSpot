@@ -29,5 +29,3 @@ opencode
 sonde
 #NodeModules
 node_modules
-#Firebase admin SDK
-sproutspot-*.json
