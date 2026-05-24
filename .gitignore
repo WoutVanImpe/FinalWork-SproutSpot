@@ -29,3 +29,5 @@ opencode
 sonde
 #NodeModules
 node_modules
+#Database data
+data/
