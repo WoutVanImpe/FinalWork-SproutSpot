@@ -10,7 +10,6 @@ const knexConfig = {
 			password: process.env.DATABASE_PASSWORD || "postgres",
 			database: process.env.DATABASE_DB || "sproutspot",
 			ssl: { rejectUnauthorized: false },
-			family: 4,
 		},
 		migrations: {
 			directory: path.join(__dirname, "migrations"),
