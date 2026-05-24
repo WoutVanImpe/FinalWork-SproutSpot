@@ -17,6 +17,7 @@
 			"supportsTablet": true
 		},
 		"android": {
+			"package": "com.sproutspot.app",
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/icon.png",
 				"backgroundColor": "#ffffff"
@@ -29,7 +30,7 @@
 		},
 		"plugins": ["expo-router"],
 		"extra": {
-			"apiBaseUrl": "http://192.168.0.123:5001",
+			"apiBaseUrl": "http://178.104.50.231:5001",
 			"router": {},
 			"eas": {
 				"projectId": "2825dad0-affb-4704-b8d3-373135ca60e3"
