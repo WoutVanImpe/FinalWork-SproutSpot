@@ -1,0 +1,40 @@
+{
+	"expo": {
+		"scheme": "sproutspot",
+		"name": "sproutspot",
+		"slug": "sproutspot",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./assets/icon.png",
+		"userInterfaceStyle": "light",
+		"newArchEnabled": true,
+		"splash": {
+			"image": "./assets/icon.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#ffffff"
+		},
+		"ios": {
+			"supportsTablet": true
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/icon.png",
+				"backgroundColor": "#ffffff"
+			},
+			"edgeToEdgeEnabled": true,
+			"predictiveBackGestureEnabled": false
+		},
+		"web": {
+			"favicon": "./assets/icon.png"
+		},
+		"plugins": ["expo-router"],
+		"extra": {
+			"apiBaseUrl": "http://192.168.0.123:5001",
+			"router": {},
+			"eas": {
+				"projectId": "2825dad0-affb-4704-b8d3-373135ca60e3"
+			}
+		},
+		"owner": "woutvi"
+	}
+}

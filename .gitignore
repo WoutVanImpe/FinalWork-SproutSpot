@@ -21,3 +21,11 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+#Envirment variables
+.env
+#Opencode
+opencode
+#Probe
+sonde
+#NodeModules
+node_modules

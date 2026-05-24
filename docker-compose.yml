@@ -1,0 +1,15 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    command: sh -c "npm run knex:migrate && npm run knex:seed && npm start"
+    environment:
+      BACKEND_BASE_URL: ${BACKEND_BASE_URL}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_DB: ${DATABASE_DB}
+      API_PORT: ${API_PORT}
+    ports:
+      - "${API_PORT}:${API_PORT}"
