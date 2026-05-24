@@ -87,8 +87,8 @@ function mapPlacement(val: string | null | undefined): "inside" | "outside" | "b
 
 function parseSowingPeriod(months: string[] | null | undefined): { startMonth: number; endMonth: number } {
 	if (!months || months.length < 2) return { startMonth: 1, endMonth: 12 };
-	const start = MONTH_MAP[months[0]?.toLowerCase()] ?? 1;
-	const end = MONTH_MAP[months[months.length - 1]?.toLowerCase()] ?? 12;
+	const start = MONTH_MAP[months[0]?.toLowerCase() ?? ""] ?? 1;
+	const end = MONTH_MAP[months[months.length - 1]?.toLowerCase() ?? ""] ?? 12;
 	return { startMonth: start, endMonth: end };
 }
 

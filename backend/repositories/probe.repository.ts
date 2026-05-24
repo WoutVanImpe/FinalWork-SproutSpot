@@ -1,5 +1,10 @@
 import { db } from "../db/connection";
-import { ProbeRecord } from "../types/database";
+import { ProbeRecord, UserPlantRecord } from "../types/database";
+
+export interface StaleProbeResult {
+	probe: ProbeRecord;
+	userPlant: UserPlantRecord;
+}
 
 export class ProbeRepository {
 	/**
@@ -35,6 +40,63 @@ export class ProbeRepository {
 
 	async findByPairingCode(pairingCode: string): Promise<ProbeRecord | undefined> {
 		return db("probes").where("pairing_code", pairingCode).first();
+	}
+
+	async findStaleProbes(thresholdMinutes: number): Promise<StaleProbeResult[]> {
+		const threshold = db.raw(`NOW() - INTERVAL '1 minute' * ?`, [thresholdMinutes]);
+		const rows = await db("probes as p")
+			.join("user_plants as up", "up.sonde_id", "p.hardware_id")
+			.where("p.state", "paired")
+			.where("p.last_seen", "<", threshold)
+			.where("up.is_active", true)
+			.select(
+				"p.*",
+				"up.id as up_id",
+				"up.user_id as up_user_id",
+				"up.plant_id as up_plant_id",
+				"up.garden_id as up_garden_id",
+				"up.nickname as up_nickname",
+				"up.sonde_id as up_sonde_id",
+				"up.current_stage_order as up_stage_order",
+				"up.is_active as up_is_active",
+				"up.x_pos as up_x_pos",
+				"up.y_pos as up_y_pos",
+				"up.date_sown as up_date_sown",
+				"up.last_stage_update as up_last_stage_update",
+				"up.created_at as up_created_at",
+				"up.deactivation_reason as up_deactivation_reason",
+				"up.deactivated_at as up_deactivated_at",
+			);
+
+		return rows.map((row: any) => {
+			const {
+				up_id, up_user_id, up_plant_id, up_garden_id,
+				up_nickname, up_sonde_id, up_stage_order, up_is_active,
+				up_x_pos, up_y_pos, up_date_sown, up_last_stage_update,
+				up_created_at, up_deactivation_reason, up_deactivated_at,
+				...probeFields
+			} = row;
+			return {
+				probe: probeFields as ProbeRecord,
+				userPlant: {
+					id: up_id,
+					user_id: up_user_id,
+					plant_id: up_plant_id,
+					garden_id: up_garden_id,
+					nickname: up_nickname,
+					sonde_id: up_sonde_id,
+					current_stage_order: up_stage_order,
+					is_active: up_is_active,
+					x_pos: up_x_pos,
+					y_pos: up_y_pos,
+					date_sown: up_date_sown,
+					last_stage_update: up_last_stage_update,
+					created_at: up_created_at,
+					deactivation_reason: up_deactivation_reason,
+					deactivated_at: up_deactivated_at,
+				} as UserPlantRecord,
+			};
+		});
 	}
 
 	/**

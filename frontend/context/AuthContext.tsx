@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import { setToken as setApiToken, clearToken as clearApiToken } from "../services/api";
-import { loginUser, signupUser, getProfile, type UserProfile } from "../services/auth";
+import { loginUser, signupUser, getProfile, updateProfile, type UserProfile } from "../services/auth";
+import { registerForPushNotificationsAsync } from "../utils/notifications";
 
 const TOKEN_KEY = "auth_token";
 
@@ -30,7 +31,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 					setTokenState(saved);
 					setApiToken(saved);
 					const res = await getProfile();
-					if (res.data) setUser(res.data);
+					if (res.data) {
+						setUser(res.data);
+						syncPushToken(res.data.push_token);
+					}
 				}
 			} catch {
 				await SecureStore.deleteItemAsync(TOKEN_KEY).catch(() => {});
@@ -49,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				setApiToken(res.data.token);
 				await SecureStore.setItemAsync(TOKEN_KEY, res.data.token);
 				setUser({ id: res.data.id, name: res.data.name, email: res.data.email, profile_picture: null, push_token: null, push_enabled: true, pairing_code: "", notification_window_start: "", notification_window_end: "", created_at: "" });
+				syncPushToken(null);
 			}
 		} finally {
 			setLoading(false);
@@ -64,6 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				setApiToken(res.data.token);
 				await SecureStore.setItemAsync(TOKEN_KEY, res.data.token);
 				setUser({ id: res.data.id, name: res.data.name, email: res.data.email, profile_picture: null, push_token: null, push_enabled: true, pairing_code: res.data.pairing_code, notification_window_start: "", notification_window_end: "", created_at: res.data.created_at });
+				syncPushToken(null);
 			}
 		} finally {
 			setLoading(false);
@@ -76,6 +82,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		setUser(null);
 		SecureStore.deleteItemAsync(TOKEN_KEY).catch(() => {});
 	}, []);
+
+	const syncPushToken = async (currentToken: string | null) => {
+		try {
+			const expoPushToken = await registerForPushNotificationsAsync();
+			if (expoPushToken && expoPushToken !== currentToken) {
+				await updateProfile({ push_token: expoPushToken });
+			}
+		} catch {
+			// ignore — non-critical
+		}
+	};
 
 	const refreshProfile = useCallback(async () => {
 		try {

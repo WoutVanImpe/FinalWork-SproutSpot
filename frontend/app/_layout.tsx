@@ -2,6 +2,8 @@ import { StyleSheet, View, useWindowDimensions, Animated } from "react-native";
 import React, { useRef, useState, useEffect } from "react";
 import { Tabs, useSegments, useRouter } from "expo-router";
 import { useFonts } from "expo-font";
+import * as Notifications from "expo-notifications";
+
 import CurvedBackground from "../components/shared/navbar/CurvedBackground";
 import TabBarButton from "../components/shared/navbar/TabBarButton";
 import { BAR_MARGIN, TAB_WIDTH, TAB_GAP, BAR_HEIGHT, routeIcons, routeOrder } from "../constants/tabConfig";
@@ -15,6 +17,14 @@ import AuthScreen from "../components/auth/AuthScreen";
 import RegisterFlow from "../components/auth/RegisterFlow";
 import LoadingScreen from "../components/shared/LoadingScreen";
 import { useAuth } from "../context/AuthContext";
+
+Notifications.setNotificationHandler({
+	handleNotification: async () => ({
+		shouldShowAlert: true,
+		shouldPlaySound: true,
+		shouldSetBadge: false,
+	}),
+});
 
 const CustomTabBar = ({ state, navigation }: any) => {
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
@@ -124,6 +134,18 @@ const AppContent = () => {
 			setPendingPlant(null);
 		}
 	}, [pendingPlant]);
+
+	useEffect(() => {
+		const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+			const data = response.notification.request.content.data;
+			if (data?.screen) {
+				router.push(data.screen);
+			} else {
+				router.push("/(account)/account");
+			}
+		});
+		return () => sub.remove();
+	}, []);
 
 	return (
 		<View style={{ flex: 1 }}>

@@ -9,7 +9,7 @@
 		"userInterfaceStyle": "light",
 		"newArchEnabled": true,
 		"splash": {
-			"image": "./assets/icon.png",                     
+			"image": "./assets/icon.png",
 			"resizeMode": "contain",
 			"backgroundColor": "#ffffff"
 		},
@@ -28,6 +28,13 @@
 			"favicon": "./assets/icon.png"
 		},
 		"plugins": ["expo-router"],
-		"extra": {}
+		"extra": {
+			"apiBaseUrl": "http://192.168.0.123:5001",
+			"router": {},
+			"eas": {
+				"projectId": "2825dad0-affb-4704-b8d3-373135ca60e3"
+			}
+		},
+		"owner": "woutvi"
 	}
 }

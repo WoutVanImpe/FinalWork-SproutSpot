@@ -61,7 +61,6 @@ export async function seed(knex: Knex): Promise<void> {
 		entries.push({
 			sonde_id: "AA:BB:CC:DD:EE:01",
 			temp_c: 20 + Math.sin(i * 0.3) * 3,
-			humidity_pct: 55 + Math.sin(i * 0.2) * 10,
 			light_lux: Math.max(0, 30000 + Math.sin(i * 0.5) * 15000),
 			soil_moist_pct: 60 + Math.sin(i * 0.4) * 15,
 			battery_voltage: 3.8,
