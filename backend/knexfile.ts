@@ -9,7 +9,6 @@ const knexConfig = {
 			user: process.env.DATABASE_USER || "postgres",
 			password: process.env.DATABASE_PASSWORD || "postgres",
 			database: process.env.DATABASE_DB || "sproutspot",
-			ssl: { rejectUnauthorized: false },
 		},
 		migrations: {
 			directory: path.join(__dirname, "migrations"),
