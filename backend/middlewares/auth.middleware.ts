@@ -22,8 +22,16 @@ export const authenticate = (req: AuthenticatedRequest, res: Response, next: Nex
 
 	const token = authHeader.split(" ")[1];
 
+	if (!token) {
+		res.status(401).json({
+			error: "Unauthorized",
+			message: "No valid authentication token provided",
+		});
+		return;
+	}
+
 	try {
-		const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
+		const decoded = jwt.verify(token, JWT_SECRET) as unknown as { id: number; email: string };
 		req.user = { id: decoded.id, email: decoded.email };
 		next();
 	} catch (error) {
