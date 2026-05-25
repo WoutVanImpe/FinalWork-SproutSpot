@@ -85,16 +85,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 	const syncPushToken = async (currentToken: string | null) => {
 		try {
-			console.log("[Push] syncPushToken called, currentToken:", currentToken);
 			const expoPushToken = await registerForPushNotificationsAsync();
-			console.log("[Push] Got push token:", expoPushToken);
 			if (expoPushToken && expoPushToken !== currentToken) {
-				console.log("[Push] Sending token to backend...");
 				await updateProfile({ push_token: expoPushToken });
-				console.log("[Push] Token saved!");
 			}
-		} catch (e) {
-			console.error("[Push] Error:", e);
+		} catch {
+			// ignore — non-critical
 		}
 	};
 

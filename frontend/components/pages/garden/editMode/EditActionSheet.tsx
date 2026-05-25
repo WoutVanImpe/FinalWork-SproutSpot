@@ -46,7 +46,7 @@ const EditActionSheet = ({
 
 	return (
 		<View style={styles.wrapper} pointerEvents="box-none">
-			<Animated.View style={[styles.sheet, { transform: [{ translateY: sheetTranslateY }], paddingBottom: Styling.Padding.xlg + insets.bottom + 30 }]}>
+			<Animated.View style={[styles.sheet, { transform: [{ translateY: sheetTranslateY }], paddingBottom: Styling.Padding.xlg + insets.bottom }]}>
 				<View style={styles.handle} />
 				{plant && (
 					<>
