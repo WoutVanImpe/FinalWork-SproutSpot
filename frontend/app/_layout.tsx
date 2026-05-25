@@ -23,6 +23,8 @@ Notifications.setNotificationHandler({
 		shouldShowAlert: true,
 		shouldPlaySound: true,
 		shouldSetBadge: false,
+		shouldShowBanner: true,
+		shouldShowList: true,
 	}),
 });
 
@@ -137,7 +139,7 @@ const AppContent = () => {
 
 	useEffect(() => {
 		const sub = Notifications.addNotificationResponseReceivedListener((response) => {
-			const data = response.notification.request.content.data;
+			const data = response.notification.request.content.data as Record<string, string> | null;
 			if (data?.screen) {
 				router.push(data.screen);
 			} else {
