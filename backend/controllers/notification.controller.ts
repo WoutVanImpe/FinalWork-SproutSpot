@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { NotificationService } from "../services/notification.service";
+import { PushNotificationService } from "../services/push-notification.service";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 import { buildImageUrl } from "../config";
 
@@ -24,9 +25,11 @@ function mapNotification(n: any) {
 
 export class NotificationController {
 	private service: NotificationService;
+	private pushService: PushNotificationService;
 
 	constructor() {
 		this.service = new NotificationService();
+		this.pushService = new PushNotificationService();
 	}
 
 	/**
@@ -110,6 +113,27 @@ export class NotificationController {
 
 			console.error("[NotificationController] Error:", error);
 			res.status(500).json({ error: "Internal Server Error", message: "Failed to resolve issue" });
+		}
+	};
+
+	/**
+	 * @description Send a test push notification to the authenticated user (for debugging).
+	 */
+	sendTestPush = async (req: AuthenticatedRequest, res: Response) => {
+		try {
+			const userId = req.user?.id;
+
+			if (!userId) {
+				res.status(401).json({ error: "Unauthorized", message: "Authentication required" });
+				return;
+			}
+
+			await this.pushService.send(userId, "Test notificatie", "Dit is een testpush van SproutSpot!");
+
+			res.status(200).json({ success: true, message: "Test push sent" });
+		} catch (error) {
+			console.error("[NotificationController] test push error:", error);
+			res.status(500).json({ error: "Internal Server Error", message: "Failed to send test push" });
 		}
 	};
 

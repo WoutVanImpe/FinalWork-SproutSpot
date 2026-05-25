@@ -8,6 +8,7 @@ const controller = new NotificationController();
 router.use(authenticate);
 
 router.get("/", controller.getUserNotifications);
+router.post("/test-push", controller.sendTestPush);
 router.post("/:notificationId/acknowledge", controller.acknowledgeNotification);
 router.post("/issues/:issueId/resolve", controller.resolveIssue);
 router.post("/:notificationId/reset", controller.resetNotificationState);
