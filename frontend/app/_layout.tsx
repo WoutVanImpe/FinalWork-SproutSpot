@@ -23,6 +23,8 @@ Notifications.setNotificationHandler({
 		shouldShowAlert: true,
 		shouldPlaySound: true,
 		shouldSetBadge: false,
+		shouldShowBanner: true,
+		shouldShowList: true,
 	}),
 });
 
@@ -78,7 +80,7 @@ const CustomTabBar = ({ state, navigation }: any) => {
 	}, [visibleIndex]);
 
 	return (
-		<View style={[styles.wrapper, { width: SCREEN_WIDTH, bottom: insets.bottom }]}>
+		<View style={[styles.wrapper, { width: SCREEN_WIDTH, bottom: insets.bottom + 10 }]}>
 			<CurvedBackground width={barWidth} cx={visibleIndex >= 0 ? cx : -999} />
 			<View style={[styles.bar, { width: barWidth }]}>
 				{visibleRoutes.map((route: any, index: number) => (
@@ -137,7 +139,7 @@ const AppContent = () => {
 
 	useEffect(() => {
 		const sub = Notifications.addNotificationResponseReceivedListener((response) => {
-			const data = response.notification.request.content.data;
+			const data = response.notification.request.content.data as Record<string, string> | null;
 			if (data?.screen) {
 				router.push(data.screen);
 			} else {
