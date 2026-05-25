@@ -18,7 +18,6 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
 	}
 
 	if (finalStatus !== "granted") {
-		console.warn("[PushNotifications] Permission not granted");
 		return null;
 	}
 

@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				await updateProfile({ push_token: expoPushToken });
 			}
 		} catch {
-			// ignore — non-critical
+			// ignore
 		}
 	};
 

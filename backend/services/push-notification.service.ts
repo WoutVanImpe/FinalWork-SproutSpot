@@ -37,6 +37,8 @@ export class PushNotificationService {
 				sound: "default",
 				title,
 				body,
+				priority: "high",
+				android: { channelId: "default" },
 				data: { userId },
 			};
 
