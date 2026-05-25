@@ -10,26 +10,20 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
 	}
 
 	const { status: existingStatus } = await Notifications.getPermissionsAsync();
-	console.log("[PushNotifications] Existing permission status:", existingStatus);
 	let finalStatus = existingStatus;
 
 	if (existingStatus !== "granted") {
 		const { status } = await Notifications.requestPermissionsAsync();
 		finalStatus = status;
-		console.log("[PushNotifications] Requested permission, status:", finalStatus);
 	}
 
 	if (finalStatus !== "granted") {
-		console.warn("[PushNotifications] Permission not granted");
 		return null;
 	}
 
 	const projectId = Constants.expoConfig?.extra?.eas?.projectId;
-	console.log("[PushNotifications] projectId:", projectId);
-	console.log("[PushNotifications] expoConfig keys:", Object.keys(Constants.expoConfig ?? {}));
 	const tokenData = await Notifications.getExpoPushTokenAsync({ projectId });
 	const token = tokenData.data;
-	console.log("[PushNotifications] token:", token);
 
 	if (Platform.OS === "android") {
 		await Notifications.setNotificationChannelAsync("default", {
