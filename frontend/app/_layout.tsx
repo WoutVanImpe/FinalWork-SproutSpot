@@ -80,7 +80,7 @@ const CustomTabBar = ({ state, navigation }: any) => {
 	}, [visibleIndex]);
 
 	return (
-		<View style={[styles.wrapper, { width: SCREEN_WIDTH, bottom: insets.bottom + 10 }]}>
+		<View style={[styles.wrapper, { width: SCREEN_WIDTH, bottom: insets.bottom }]}>
 			<CurvedBackground width={barWidth} cx={visibleIndex >= 0 ? cx : -999} />
 			<View style={[styles.bar, { width: barWidth }]}>
 				{visibleRoutes.map((route: any, index: number) => (
