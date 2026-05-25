@@ -1,6 +1,7 @@
 import { Animated, Dimensions, Modal, ScrollView, StyleSheet, TouchableOpacity, View, ViewStyle } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Styling } from "../../../../constants/Styling";
 import Spacer from "../../../style/Spacer";
 import StyledIcon from "../../../style/StyledIcon";
@@ -74,6 +75,7 @@ const rowStyles = StyleSheet.create({
 });
 
 const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; isVisible: boolean; onClose: () => void }) => {
+	const insets = useSafeAreaInsets();
 	const [internalVisible, setInternalVisible] = useState(false);
 	const slideAnim = useRef(new Animated.Value(0)).current;
 	const opacityAnim = useRef(new Animated.Value(0)).current;
@@ -105,7 +107,7 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 				<Animated.View style={[styles.backdrop, { opacity: opacityAnim }]}>
 					<TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
 				</Animated.View>
-				<Animated.View style={[styles.sheet, { transform: [{ translateY: sheetTranslateY }] }]}>
+				<Animated.View style={[styles.sheet, { transform: [{ translateY: sheetTranslateY }], paddingBottom: Styling.Padding.xlg + insets.bottom }]}>
 					<View style={styles.handle} />
 					{plant && (
 						<ScrollView bounces={false} showsVerticalScrollIndicator={false}>
@@ -189,7 +191,6 @@ const styles = StyleSheet.create({
 		borderTopLeftRadius: 30,
 		borderTopRightRadius: 30,
 		paddingHorizontal: 25,
-		paddingBottom: Styling.Padding.xlg,
 		maxHeight: SCREEN_HEIGHT * 0.75,
 		shadowColor: "#000",
 		shadowOffset: { width: 0, height: -3 },
