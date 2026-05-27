@@ -66,6 +66,7 @@ export interface ProbeRecord {
 	pairing_code: string | null;
 	battery_voltage: number;
 	wifi_rssi: number;
+	is_charging: boolean;
 	last_seen: Date;
 }
 

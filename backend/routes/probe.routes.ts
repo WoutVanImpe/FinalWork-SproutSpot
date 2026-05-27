@@ -7,6 +7,7 @@ const router = Router();
 const controller = new ProbeController();
 
 router.post("/register", validateBody(["hardware_id", "pairing_code"]), controller.registerProbe);
+router.post("/sync", validateBody(["hardware_id", "battery_voltage", "wifi_rssi"]), controller.syncProbe);
 
 router.use(authenticate);
 

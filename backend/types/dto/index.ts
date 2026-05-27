@@ -49,7 +49,14 @@ export interface TelemetryEntryDto {
 
 export interface TelemetryBatchUploadDto {
 	hardware_id: string;
-	entries: TelemetryEntryDto[];
+	entries?: TelemetryEntryDto[];
+	is_charging?: boolean;
+}
+
+export interface SyncProbeDto {
+	hardware_id: string;
+	battery_voltage: number;
+	wifi_rssi: number;
 }
 
 export interface TelemetryPayloadDto {

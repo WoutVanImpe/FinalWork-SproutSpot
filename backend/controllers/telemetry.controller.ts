@@ -17,10 +17,16 @@ export class TelemetryController {
 	 */
 	uploadTelemetry = async (req: Request, res: Response) => {
 		try {
-			const { hardware_id, entries } = req.body;
+			const { hardware_id, entries, is_charging } = req.body;
 
 			if (!hardware_id) {
 				res.status(400).json({ error: "Validation Error", message: "hardware_id is required" });
+				return;
+			}
+
+			if (is_charging) {
+				await this.service.handleChargingUpdate(hardware_id, req.body);
+				res.status(200).json({ success: true, message: "Charging status updated" });
 				return;
 			}
 
