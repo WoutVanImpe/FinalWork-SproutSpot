@@ -31,6 +31,11 @@ const AccountMain = ({ onNavigate, onLogout }: AccountMainProps) => (
 						Historiek
 					</StyledButton>
 				</TouchableOpacity>
+				<TouchableOpacity style={styles.fullWidth} onPress={() => onNavigate("probes")}>
+					<StyledButton fullCap style={styles.fullWidth}>
+						Mijn sondes
+					</StyledButton>
+				</TouchableOpacity>
 				<TouchableOpacity style={styles.fullWidth} onPress={() => onNavigate("settings")}>
 					<StyledButton fullCap style={styles.fullWidth}>
 						Instellingen

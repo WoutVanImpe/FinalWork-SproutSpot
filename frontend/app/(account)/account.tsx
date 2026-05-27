@@ -12,6 +12,7 @@ import ValidateStep1 from "../../components/pages/account/validate/ValidateStep1
 import ValidateStep2 from "../../components/pages/account/validate/ValidateStep2";
 import HistoryView from "../../components/pages/account/history/HistoryView";
 import type { HistoryEntry } from "../../components/pages/account/history/HistoryView";
+import ProbesView from "../../components/pages/account/probes/ProbesView";
 import SettingsView from "../../components/pages/account/settings/SettingsView";
 
 function apiNotifToView(n: ApiNotification): NotificationItem {
@@ -146,6 +147,8 @@ const Account = () => {
 			return <ValidateStep2 onBack={() => setCurrentView("validate_step1")} onConfirm={handleConfirmPhaseUpdate} />;
 		case "history":
 			return <HistoryView entries={historyEntries} onBack={() => setCurrentView("main")} />;
+		case "probes":
+			return <ProbesView onBack={() => setCurrentView("main")} />;
 		case "settings":
 			return (
 				<SettingsView
