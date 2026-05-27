@@ -64,6 +64,10 @@ export class TelemetryService {
 	async uploadTelemetry(payload: TelemetryBatchUploadDto): Promise<ProbeEntryRecord[]> {
 		const { hardware_id, entries } = payload;
 
+		if (!entries || entries.length === 0) {
+			throw new Error("entries must be a non-empty array");
+		}
+
 		const probe = await this.probeRepository.findByHardwareId(hardware_id);
 		if (!probe) {
 			throw new Error("Probe not registered");

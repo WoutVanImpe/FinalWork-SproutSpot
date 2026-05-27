@@ -32,15 +32,15 @@ export class PushNotificationService {
 				return;
 			}
 
-			const message: ExpoPushMessage = {
+			const message = {
 				to: token,
 				sound: "default",
 				title,
 				body,
-				priority: "high",
+				priority: "high" as const,
 				android: { channelId: "default" },
 				data: { userId },
-			};
+			} as ExpoPushMessage;
 
 			const tickets: ExpoPushTicket[] = await this.expo.sendPushNotificationsAsync([message]);
 
