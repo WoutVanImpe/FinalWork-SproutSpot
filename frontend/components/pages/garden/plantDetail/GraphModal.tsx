@@ -39,6 +39,8 @@ interface GraphModalProps {
 		light: { optimalMin: number; optimalMax: number };
 		temperature: { optimalMin: number; optimalMax: number };
 	};
+	selectedHours: number;
+	onTimeRangeChange: (hours: number) => void;
 }
 
 const toX = (i: number, total: number) => GRAPH_PAD.left + (i / (total - 1)) * CHART_W;
@@ -68,7 +70,7 @@ function buildMetrics(readings: ReadingRecord[], optimalRanges: GraphModalProps[
 	];
 }
 
-const GraphModal = ({ visible, onDismiss, readings, optimalRanges }: GraphModalProps) => {
+const GraphModal = ({ visible, onDismiss, readings, optimalRanges, selectedHours, onTimeRangeChange }: GraphModalProps) => {
 	const [selectedMetric, setSelectedMetric] = useState(0);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -83,11 +85,7 @@ const GraphModal = ({ visible, onDismiss, readings, optimalRanges }: GraphModalP
 	const optimalY1 = toY(metric.optimalMax, yMax);
 	const optimalY2 = toY(metric.optimalMin, yMax);
 
-	const yLabels: number[] = [];
-	const step = yMax / 4;
-	for (let i = 0; i <= 4; i++) {
-		yLabels.push(Math.round(i * step));
-	}
+	const descriptor = metric.key === "moist" ? { high: "nat", low: "droog" } : metric.key === "temp" ? { high: "warm", low: "koud" } : { high: "licht", low: "donker" };
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
@@ -100,12 +98,32 @@ const GraphModal = ({ visible, onDismiss, readings, optimalRanges }: GraphModalP
 					<StyledText type="head3" style={styles.title}>
 						Grafieken
 					</StyledText>
+					<Spacer space={Styling.Spacing.sml} />
+
+					<View style={styles.timeRangeRow}>
+						{[
+							{ label: "24h", hours: 24 },
+							{ label: "1 week", hours: 168 },
+							{ label: "3 weken", hours: 504 },
+						].map((opt) => (
+							<TouchableOpacity
+								key={opt.hours}
+								style={[styles.timeRangeBtn, selectedHours === opt.hours && styles.timeRangeBtnActive]}
+								onPress={() => onTimeRangeChange(opt.hours)}
+							>
+								<StyledText type="smParagh" style={[styles.timeRangeBtnText, selectedHours === opt.hours && styles.timeRangeBtnTextActive]}>
+									{opt.label}
+								</StyledText>
+							</TouchableOpacity>
+						))}
+					</View>
+
 					<Spacer space={Styling.Spacing.med} />
 
 					<View style={styles.dropdownContainer}>
 						<TouchableOpacity style={styles.dropdown} onPress={() => setDropdownOpen(!dropdownOpen)}>
 							<StyledText type="paragh" style={styles.dropdownText}>
-								{metric.label} ({metric.unit})
+								{metric.label}
 							</StyledText>
 							<StyledText type="paragh" style={styles.dropdownArrow}>
 								{dropdownOpen ? "▲" : "▼"}
@@ -124,7 +142,7 @@ const GraphModal = ({ visible, onDismiss, readings, optimalRanges }: GraphModalP
 										}}
 									>
 										<StyledText type="paragh" style={i === selectedMetric ? styles.dropdownItemTextActive : styles.dropdownItemText}>
-											{m.label} ({m.unit})
+											{m.label}
 										</StyledText>
 									</TouchableOpacity>
 								))}
@@ -139,14 +157,12 @@ const GraphModal = ({ visible, onDismiss, readings, optimalRanges }: GraphModalP
 							<Rect x={GRAPH_PAD.left} y={optimalY1} width={CHART_W} height={optimalY2 - optimalY1} fill={Styling.Colors.green} opacity={0.12} rx={4} />
 							<Line x1={GRAPH_PAD.left} y1={optimalY1} x2={GRAPH_PAD.left + CHART_W} y2={optimalY1} stroke={Styling.Colors.green} strokeWidth={1} strokeDasharray="4,4" opacity={0.5} />
 							<Line x1={GRAPH_PAD.left} y1={optimalY2} x2={GRAPH_PAD.left + CHART_W} y2={optimalY2} stroke={Styling.Colors.green} strokeWidth={1} strokeDasharray="4,4" opacity={0.5} />
-							{yLabels.map((val) => (
-								<React.Fragment key={val}>
-									<Line x1={GRAPH_PAD.left} y1={toY(val, yMax)} x2={GRAPH_PAD.left + CHART_W} y2={toY(val, yMax)} stroke="#e8e8e8" strokeWidth={1} />
-									<SvgText x={GRAPH_PAD.left - 8} y={toY(val, yMax) + 4} fill={Styling.Colors.lightGrey} fontSize={10} textAnchor="end">
-										{val}
-									</SvgText>
-								</React.Fragment>
-							))}
+							<SvgText x={GRAPH_PAD.left - 8} y={GRAPH_PAD.top + 12} fill={Styling.Colors.lightGrey} fontSize={10} textAnchor="end">
+								{descriptor.high}
+							</SvgText>
+							<SvgText x={GRAPH_PAD.left - 8} y={GRAPH_PAD.top + CHART_H} fill={Styling.Colors.lightGrey} fontSize={10} textAnchor="end">
+								{descriptor.low}
+							</SvgText>
 							<Path d={linePath} fill="none" stroke={metric.color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
 							{points.map((p, i) => (
 								<Circle key={i} cx={toX(i, points.length)} cy={toY(p.value, yMax)} r={3} fill={metric.color} />
@@ -172,7 +188,7 @@ const GraphModal = ({ visible, onDismiss, readings, optimalRanges }: GraphModalP
 						<View style={styles.legendRow}>
 							<View style={[styles.legendBar, { backgroundColor: Styling.Colors.green, opacity: 0.4 }]} />
 							<StyledText type="smParagh" style={styles.legendText}>
-								Optimaal ({metric.optimalMin}-{metric.optimalMax} {metric.unit})
+								Optimaal
 							</StyledText>
 						</View>
 					</View>
@@ -297,5 +313,27 @@ const styles = StyleSheet.create({
 	},
 	legendText: {
 		color: Styling.Colors.darkGrey,
+	},
+	timeRangeRow: {
+		flexDirection: "row",
+		justifyContent: "center",
+		gap: Styling.Spacing.sml,
+	},
+	timeRangeBtn: {
+		paddingVertical: Styling.Padding.xsm,
+		paddingHorizontal: Styling.Padding.reg,
+		borderRadius: Styling.BorderRadius.reg,
+		borderWidth: 1,
+		borderColor: Styling.Colors.green,
+		backgroundColor: "transparent",
+	},
+	timeRangeBtnActive: {
+		backgroundColor: Styling.Colors.green,
+	},
+	timeRangeBtnText: {
+		color: Styling.Colors.green,
+	},
+	timeRangeBtnTextActive: {
+		color: Styling.Colors.white,
 	},
 });

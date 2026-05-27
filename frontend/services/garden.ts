@@ -94,6 +94,6 @@ export interface ReadingRecord {
 	created_at: string;
 }
 
-export function getReadings(userPlantId: number) {
-	return api.get<ReadingRecord[]>(`/api/user-plants/${userPlantId}/readings`);
+export function getReadings(userPlantId: number, hours?: number) {
+	return api.get<ReadingRecord[]>(`/api/user-plants/${userPlantId}/readings${hours ? `?hours=${hours}` : ""}`);
 }

@@ -3,6 +3,7 @@ import { ProbeRepository, StaleProbeResult } from "../repositories/probe.reposit
 import { PushNotificationService } from "./push-notification.service";
 import { TelemetryBatchUploadDto, TelemetryEntryDto } from "../types/dto";
 import { ActiveIssueRecord, ProbeEntryRecord, StageThresholdsRecord, UserPlantRecord } from "../types/database";
+import { STALE_THRESHOLD_MINUTES } from "../config";
 
 interface Anomaly {
 	type: string;
@@ -29,6 +30,31 @@ export class TelemetryService {
 		this.pushNotificationService = new PushNotificationService();
 	}
 
+	/**
+	 * @description Handle a charging-only payload from a probe. Updates battery/wifi/last_seen and sets is_charging=true. No plant entries are created.
+	 * @param {string} hardwareId - The probe's hardware identifier.
+	 * @param {{ battery_voltage?: number; wifi_rssi?: number }} body - The charging payload body.
+	 * @returns {Promise<void>}
+	 */
+	async handleChargingUpdate(hardwareId: string, body: { battery_voltage?: number; wifi_rssi?: number }): Promise<void> {
+		const batteryVoltage = body.battery_voltage ?? 0;
+		const wifiRssi = body.wifi_rssi ?? 0;
+
+		const probe = await this.probeRepository.findByHardwareId(hardwareId);
+		if (!probe) {
+			console.warn(`[Telemetry] Charging update for unknown probe ${hardwareId} — ignoring`);
+			return;
+		}
+
+		await this.probeRepository.syncHealth(hardwareId, batteryVoltage, wifiRssi, true);
+
+		if (probe.state === "offline") {
+			await this.probeRepository.resolveBackOnline(probe.id, hardwareId);
+		}
+
+		console.log(`[Telemetry] Charging update for ${hardwareId}: battery=${batteryVoltage}V, rssi=${wifiRssi}`);
+	}
+
 	private batteryPercentage(voltage: number): number {
 		const MIN_VOLTAGE = 3.0;
 		const MAX_VOLTAGE = 4.2;
@@ -39,9 +65,17 @@ export class TelemetryService {
 	async uploadTelemetry(payload: TelemetryBatchUploadDto): Promise<ProbeEntryRecord[]> {
 		const { hardware_id, entries } = payload;
 
+		if (!entries || entries.length === 0) {
+			throw new Error("entries must be a non-empty array");
+		}
+
 		const probe = await this.probeRepository.findByHardwareId(hardware_id);
 		if (!probe) {
 			throw new Error("Probe not registered");
+		}
+
+		if (probe.is_charging) {
+			await this.probeRepository.updateCharging(hardware_id, false);
 		}
 
 		const linked = await this.repository.findActivePlantByProbe(hardware_id);
@@ -235,7 +269,6 @@ export class TelemetryService {
 	}
 
 	async checkStaleProbes(): Promise<void> {
-		const STALE_THRESHOLD_MINUTES = 180;
 		const BATTERY_LOW_VOLTAGE = 3.12;
 
 		const stale = await this.probeRepository.findStaleProbes(STALE_THRESHOLD_MINUTES);
@@ -539,8 +572,8 @@ export class TelemetryService {
 	}
 
 	mapSoilMoisture(rawValue: number): number {
-		const DRY_THRESHOLD = 400;
-		const WET_THRESHOLD = 200;
+		const DRY_THRESHOLD = 2765;
+		const WET_THRESHOLD = 1690;
 
 		if (rawValue <= WET_THRESHOLD) return 100;
 		if (rawValue >= DRY_THRESHOLD) return 0;

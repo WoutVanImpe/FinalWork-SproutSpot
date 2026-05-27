@@ -1,7 +1,8 @@
-import { StyleSheet, ActivityIndicator } from "react-native";
+import { StyleSheet, ActivityIndicator, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import StyledView from "../components/style/StyledView";
 import StyledText from "../components/style/StyledText";
+import StyledButton from "../components/style/StyledButton";
 import Spacer from "../components/style/Spacer";
 import { Styling } from "../constants/Styling";
 import CardContainer from "../components/shared/vegetableCard/CardContainer";
@@ -61,6 +62,25 @@ const Index = () => {
 		return (
 			<StyledView>
 				<ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 100 }} />
+			</StyledView>
+		);
+	}
+
+	if (plants.length === 0) {
+		return (
+			<StyledView>
+				<Spacer space={120} />
+				<StyledText type="head3" style={{ textAlign: "center" }}>
+					Je hebt nog geen planten
+				</StyledText>
+				<Spacer space={Styling.Spacing.med} />
+				<StyledText type="paragh" style={{ textAlign: "center", color: Styling.Colors.white }}>
+					Voeg planten toe om te beginnen met je tuin
+				</StyledText>
+				<Spacer space={Styling.Spacing.lrg} />
+				<TouchableOpacity onPress={() => router.push("/(explore)/explore")}>
+					<StyledButton>Planten ontdekken</StyledButton>
+				</TouchableOpacity>
 			</StyledView>
 		);
 	}

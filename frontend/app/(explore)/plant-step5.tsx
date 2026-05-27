@@ -19,7 +19,7 @@ const PlantStep5 = () => {
   const [renameError, setRenameError] = useState("");
   const [copied, setCopied] = useState(false);
 
-  const pairingCodeRef = useRef(user?.pairing_code ?? "TE123456");
+  const pairingCodeRef = useRef(user?.pairing_code ?? "");
   const displayName = decodeURIComponent(name || "mijn plant");
 
   useFocusEffect(useCallback(() => { setStep(0); setProbeName(""); setProbeId(null); setRenameError(""); }, []));

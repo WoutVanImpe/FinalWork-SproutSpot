@@ -53,19 +53,20 @@ const STAGE_DESCRIPTIONS: Record<string, string[]> = {
 const PlantDetail = () => {
   const { plantData } = useLocalSearchParams<{ plantData: string }>();
   const plant: GardenPlant | null = plantData ? JSON.parse(plantData) : null;
-  const [graphVisible, setGraphVisible] = useState(false);
-  const [readings, setReadings] = useState<ReadingRecord[]>([]);
+	const [graphVisible, setGraphVisible] = useState(false);
+	const [readings, setReadings] = useState<ReadingRecord[]>([]);
+	const [hours, setHours] = useState(24);
 
-  useEffect(() => {
-    if (plant && graphVisible) {
-      const plantId = parseInt(plant.id.replace("up_", ""), 10);
-      if (!isNaN(plantId)) {
-        getReadings(plantId)
-          .then((res) => { if (res.data) setReadings(res.data); })
-          .catch(console.error);
-      }
-    }
-  }, [graphVisible, plant]);
+	useEffect(() => {
+		if (plant && graphVisible) {
+			const plantId = parseInt(plant.id.replace("up_", ""), 10);
+			if (!isNaN(plantId)) {
+				getReadings(plantId, hours)
+					.then((res) => { if (res.data) setReadings(res.data); })
+					.catch(console.error);
+			}
+		}
+	}, [graphVisible, plant, hours]);
 
   if (!plant) return null;
 
@@ -116,8 +117,8 @@ const PlantDetail = () => {
           probeName={plant.probeName || `Sonde ${plant.nickname}`}
           battery={plant.battery}
           lastMeasurement="12/05/2026 14:30"
-          lastMoisture={plant.water.level}
-          lastLight={28000}
+          moistureStatus={plant.water.label}
+          lightStatus={plant.light.label}
           lastTemp={22}
         />
 
@@ -129,16 +130,18 @@ const PlantDetail = () => {
         </TouchableOpacity>
         <Spacer space={175} />
       </StyledView>
-      <GraphModal
-        visible={graphVisible}
-        onDismiss={() => setGraphVisible(false)}
-        readings={readings}
-        optimalRanges={{
-          water: { optimalMin: plant.water.optimalMin, optimalMax: plant.water.optimalMax },
-          light: { optimalMin: plant.light.optimalMin, optimalMax: plant.light.optimalMax },
-          temperature: { optimalMin: plant.temperature.optimalMin, optimalMax: plant.temperature.optimalMax },
-        }}
-      />
+		<GraphModal
+			visible={graphVisible}
+			onDismiss={() => setGraphVisible(false)}
+			readings={readings}
+			optimalRanges={{
+				water: { optimalMin: plant.water.optimalMin, optimalMax: plant.water.optimalMax },
+				light: { optimalMin: plant.light.optimalMin, optimalMax: plant.light.optimalMax },
+				temperature: { optimalMin: plant.temperature.optimalMin, optimalMax: plant.temperature.optimalMax },
+			}}
+			selectedHours={hours}
+			onTimeRangeChange={setHours}
+		/>
     </>
   );
 };

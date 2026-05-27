@@ -6,6 +6,10 @@ export interface StaleProbeResult {
 	userPlant: UserPlantRecord;
 }
 
+export interface ProbeWithPlant extends ProbeRecord {
+	linked_plant: { nickname: string; name: string } | null;
+}
+
 export class ProbeRepository {
 	/**
 	 * @description Create a new probe record with hardware ID and user association. Name defaults to "Unnamed Probe" until the user sets it.
@@ -23,6 +27,7 @@ export class ProbeRepository {
 				pairing_code: pairingCode ?? null,
 				battery_voltage: 0,
 				wifi_rssi: 0,
+				is_charging: false,
 			})
 			.returning("*");
 
@@ -109,14 +114,30 @@ export class ProbeRepository {
 	}
 
 	/**
-	 * @description Retrieve all probes belonging to a user, ordered by last_seen descending.
+	 * @description Retrieve all probes belonging to a user, ordered by last_seen descending. Includes linked plant info.
 	 * @param {number} userId - The user's database ID.
-	 * @returns {Promise<ProbeRecord[]>} List of probe records.
+	 * @returns {Promise<ProbeWithPlant[]>} List of probe records with linked plant info.
 	 */
-	async findByUserId(userId: number): Promise<ProbeRecord[]> {
-		return db("probes")
-			.where("user_id", userId)
-			.orderBy("last_seen", "desc");
+	async findByUserId(userId: number): Promise<ProbeWithPlant[]> {
+		const rows = await db("probes as p")
+			.leftJoin("user_plants as up", "p.hardware_id", "up.sonde_id")
+			.leftJoin("plants as pl", "up.plant_id", "pl.id")
+			.where("p.user_id", userId)
+			.select(
+				"p.*",
+				"up.nickname as plant_nickname",
+				"pl.name as plant_name",
+			)
+			.orderBy("p.last_seen", "desc");
+
+		return rows.map((row: any) => ({
+			...row,
+			linked_plant: row.plant_nickname
+				? { nickname: row.plant_nickname, name: row.plant_name }
+				: null,
+			plant_nickname: undefined,
+			plant_name: undefined,
+		}));
 	}
 
 	/**
@@ -152,6 +173,66 @@ export class ProbeRepository {
 	}
 
 	/**
+	 * @description Sync probe health from a sync/charging payload. Updates battery, wifi, last_seen, and is_charging flag.
+	 * @param {string} hardwareId - The probe's hardware identifier.
+	 * @param {number} batteryVoltage - Current battery voltage reading.
+	 * @param {number} wifiRssi - Current WiFi signal strength in dBm.
+	 * @param {boolean} isCharging - Whether the probe is currently charging.
+	 * @returns {Promise<void>}
+	 */
+	async syncHealth(hardwareId: string, batteryVoltage: number, wifiRssi: number, isCharging: boolean): Promise<void> {
+		await db("probes")
+			.where("hardware_id", hardwareId)
+			.update({
+				battery_voltage: batteryVoltage,
+				wifi_rssi: wifiRssi,
+				is_charging: isCharging,
+				last_seen: db.fn.now(),
+			});
+	}
+
+	/**
+	 * @description Update only the is_charging flag on a probe.
+	 * @param {string} hardwareId - The probe's hardware identifier.
+	 * @param {boolean} isCharging - Whether the probe is currently charging.
+	 * @returns {Promise<void>}
+	 */
+	async updateCharging(hardwareId: string, isCharging: boolean): Promise<void> {
+		await db("probes")
+			.where("hardware_id", hardwareId)
+			.update({ is_charging: isCharging });
+	}
+
+	/**
+	 * @description Resolve a probe coming back online. Resets state to "paired" and closes any open PROBE_STALE issue for the linked plant.
+	 * @param {number} probeId - The probe's database ID.
+	 * @param {string} hardwareId - The probe's hardware identifier.
+	 * @returns {Promise<void>}
+	 */
+	async resolveBackOnline(probeId: number, hardwareId: string): Promise<void> {
+		const linked = await db("user_plants")
+			.where("sonde_id", hardwareId)
+			.where("is_active", true)
+			.first("id");
+
+		if (linked) {
+			const staleIssue = await db("active_issues")
+				.where("user_plant_id", linked.id)
+				.where("issue_type", "PROBE_STALE")
+				.whereNull("resolved_at")
+				.first();
+
+			if (staleIssue) {
+				await db("active_issues")
+					.where("id", staleIssue.id)
+					.update({ resolved_at: db.fn.now() });
+			}
+		}
+
+		await this.updateState(probeId, "paired");
+	}
+
+	/**
 	 * @description Link a probe to a user plant by setting the plant's sonde_id to the probe's hardware_id.
 	 * @param {string} hardwareId - The probe's hardware identifier.
 	 * @param {number} userPlantId - The user plant's database ID.
@@ -164,14 +245,22 @@ export class ProbeRepository {
 	}
 
 	/**
-	 * @description Unlink a probe from a user plant by setting the plant's sonde_id to null.
+	 * @description Unlink a probe from a user plant by setting the plant's sonde_id to null. Returns the previously linked hardware_id.
 	 * @param {number} userPlantId - The user plant's database ID.
-	 * @returns {Promise<void>}
+	 * @returns {Promise<string | null>} The unlinked hardware_id, or null if none was linked.
 	 */
-	async unlinkFromUserPlant(userPlantId: number): Promise<void> {
+	async unlinkFromUserPlant(userPlantId: number): Promise<string | null> {
+		const plant = await db("user_plants")
+			.where("id", userPlantId)
+			.first("sonde_id");
+
+		if (!plant?.sonde_id) return null;
+
 		await db("user_plants")
 			.where("id", userPlantId)
 			.update({ sonde_id: null });
+
+		return plant.sonde_id;
 	}
 
 	/**

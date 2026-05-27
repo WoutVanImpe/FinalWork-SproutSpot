@@ -1,7 +1,7 @@
 {
 	"info": {
 		"name": "SproutSpot API",
-		"description": "Complete API collection for SproutSpot backend. Test user: test@sproutspot.app / test1234. Pairing code: TE123456",
+		"description": "Complete API collection for SproutSpot backend.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"variable": [
@@ -27,7 +27,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"newuser@sproutspot.app\",\n  \"password\": \"test1234\"\n}"
+							"raw": "{\n  \"name\": \"Naam\",\n  \"email\": \"email@voorbeeld.nl\",\n  \"password\": \"wachtwoord\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/users/signup",
@@ -45,7 +45,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"test@sproutspot.app\",\n  \"password\": \"test1234\"\n}"
+							"raw": "{\n  \"email\": \"email@voorbeeld.nl\",\n  \"password\": \"wachtwoord\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/users/login",
@@ -366,7 +366,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"hardware_id\": \"80:F1:B2:64:32:99\",\n  \"pairing_code\": \"TE123456\"\n}"
+							"raw": "{\n  \"hardware_id\": \"AA:BB:CC:DD:EE:FF\",\n  \"pairing_code\": \"CODE1234\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/probes/register",
@@ -432,7 +432,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"pairing_code\": \"TE123456\",\n  \"name\": \"Mijn Sonde\"\n}"
+							"raw": "{\n  \"pairing_code\": \"CODE1234\",\n  \"name\": \"Mijn Sonde\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/probes/rename-by-code",

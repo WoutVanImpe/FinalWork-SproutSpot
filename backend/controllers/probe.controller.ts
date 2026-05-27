@@ -170,6 +170,30 @@ export class ProbeController {
 	};
 
 	/**
+	 * @description Sync probe status from hardware. Updates battery/wifi last_seen, returns paired state. No auth required — the probe uses its hardware_id as identification.
+	 * @param {Request} req - Express request with { hardware_id, battery_voltage, wifi_rssi } in body.
+	 * @param {Response} res - Express response with paired state.
+	 * @returns {void}
+	 */
+	syncProbe = async (req: Request, res: Response) => {
+		try {
+			const { hardware_id, battery_voltage, wifi_rssi } = req.body;
+
+			if (!hardware_id || battery_voltage == null || wifi_rssi == null) {
+				res.status(400).json({ error: "Validation Error", message: "hardware_id, battery_voltage, and wifi_rssi are required" });
+				return;
+			}
+
+			const result = await this.service.syncProbe(hardware_id, battery_voltage, wifi_rssi);
+
+			res.status(200).json({ success: true, data: result });
+		} catch (error) {
+			console.error("[ProbeController] Error:", error);
+			res.status(500).json({ error: "Internal Server Error", message: "Failed to sync probe" });
+		}
+	};
+
+	/**
 	 * @description Retrieve the authenticated user's probes with computed battery and WiFi health status. Optionally filter by a single probe ID.
 	 * @param {AuthenticatedRequest} req - Authenticated request with optional probe ID as URL parameter.
 	 * @param {Response} res - Express response with probe data including battery level percentage and WiFi quality.

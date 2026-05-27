@@ -10,6 +10,7 @@ import type { EnrichedPlant } from "../../services/garden";
 import type { PlantDetail } from "../../services/plants";
 import Spacer from "../../components/style/Spacer";
 import StyledText from "../../components/style/StyledText";
+import StyledButton from "../../components/style/StyledButton";
 import PlantSheet from "../../components/pages/garden/plantSheet/PlantSheet";
 import EditTopBar from "../../components/pages/garden/editMode/EditTopBar";
 import LayoutControls from "../../components/pages/garden/editMode/LayoutControls";
@@ -372,6 +373,25 @@ const Garden = () => {
 		);
 	}
 
+	if (plants.length === 0) {
+		return (
+			<View style={[styles.page, { justifyContent: "center", alignItems: "center" }]}>
+				<Spacer space={120} />
+				<StyledText type="head3" style={{ textAlign: "center" }}>
+					Je tuin is nog leeg
+				</StyledText>
+				<Spacer space={Styling.Spacing.med} />
+				<StyledText type="paragh" style={{ textAlign: "center", color: Styling.Colors.white }}>
+					Voeg planten toe om je tuin tot leven te brengen
+				</StyledText>
+				<Spacer space={Styling.Spacing.lrg} />
+				<TouchableOpacity onPress={() => router.push("/(explore)/explore")}>
+					<StyledButton>Planten ontdekken</StyledButton>
+				</TouchableOpacity>
+			</View>
+		);
+	}
+
 	return (
 		<>
 			<View style={styles.page}>
@@ -464,6 +484,10 @@ const Garden = () => {
 													const created = await createUserPlant({ plant_id: numericId, nickname: decodeURIComponent(params.name || veg?.name || ""), x_pos: cx, y_pos: cy, garden_id: gardenId ?? undefined });
 													if (params.probeId && created.data?.id) {
 														await pairProbe(Number(params.probeId), created.data.id).catch(console.error);
+														setAlertConfig({
+															title: "Sonde gekoppeld",
+															message: "Druk nu kort op de knop van de sonde om te synchroniseren.",
+														});
 													}
 													const res = await getGarden();
 													if (res.data) {

@@ -52,6 +52,7 @@ export async function up(knex: Knex): Promise<void> {
 				table.string("pairing_code").unique().nullable();
 				table.float("battery_voltage").notNullable();
 				table.float("wifi_rssi").notNullable();
+				table.boolean("is_charging").defaultTo(false).notNullable();
 				table.timestamp("last_seen").defaultTo(knex.fn.now());
 			})
 

@@ -95,7 +95,7 @@ export class UserPlantService {
 	 * @param {number} [limit=24] - Maximum number of readings to return.
 	 * @returns {Promise<ProbeEntryRecord[]>} List of recent sensor readings from the linked probe.
 	 */
-	async getLastReadings(userPlantId: number, limit: number = 24): Promise<ProbeEntryRecord[]> {
+	async getLastReadings(userPlantId: number, limit: number = 24, hours?: number): Promise<ProbeEntryRecord[]> {
 		const plant = await this.repository.findByIdWithDetails(userPlantId);
 
 		if (!plant) {
@@ -104,6 +104,10 @@ export class UserPlantService {
 
 		if (!plant.sonde_id) {
 			throw new Error("No probe linked to this plant");
+		}
+
+		if (hours) {
+			return this.telemetryRepository.getRecentEntriesBySondeIdInRange(plant.sonde_id, hours);
 		}
 
 		return this.telemetryRepository.getRecentEntriesBySondeId(plant.sonde_id, limit);
