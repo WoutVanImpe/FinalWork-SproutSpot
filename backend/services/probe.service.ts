@@ -1,4 +1,4 @@
-import { ProbeRepository } from "../repositories/probe.repository";
+import { ProbeRepository, ProbeWithPlant } from "../repositories/probe.repository";
 import { UserRepository } from "../repositories/user.repository";
 import { ProbeRecord } from "../types/database";
 import { ProbeHealthResponse, ProbeWifiResponse } from "../types/response";
@@ -10,6 +10,33 @@ export class ProbeService {
 	constructor() {
 		this.repository = new ProbeRepository();
 		this.userRepository = new UserRepository();
+	}
+
+	/**
+	 * @description Sync probe status. Updates battery/wifi/last_seen, returns whether probe is paired to an active plant.
+	 * @param {string} hardwareId - The probe's hardware identifier.
+	 * @param {number} batteryVoltage - Current battery voltage.
+	 * @param {number} wifiRssi - Current WiFi RSSI.
+	 * @returns {Promise<{ paired: boolean; state: string }>} Whether probe is paired to an active plant + its current state.
+	 */
+	async syncProbe(hardwareId: string, batteryVoltage: number, wifiRssi: number): Promise<{ paired: boolean; state: string }> {
+		const probe = await this.repository.findByHardwareId(hardwareId);
+
+		if (!probe) {
+			return { paired: false, state: "unregistered" };
+		}
+
+		await this.repository.syncHealth(hardwareId, batteryVoltage, wifiRssi, false);
+
+		let currentState = probe.state;
+
+		if (currentState === "offline") {
+			await this.repository.resolveBackOnline(probe.id, hardwareId);
+			currentState = "paired";
+		}
+
+		const isPaired = currentState === "paired";
+		return { paired: isPaired, state: currentState };
 	}
 
 	/**
@@ -107,16 +134,23 @@ export class ProbeService {
 	 * @returns {Promise<void>}
 	 */
 	async unpairProbe(userPlantId: number): Promise<void> {
-		await this.repository.unlinkFromUserPlant(userPlantId);
+		const hardwareId = await this.repository.unlinkFromUserPlant(userPlantId);
+
+		if (hardwareId) {
+			const probe = await this.repository.findByHardwareId(hardwareId);
+			if (probe && probe.state === "paired") {
+				await this.repository.updateState(probe.id, "available");
+			}
+		}
 	}
 
 	/**
 	 * @description Retrieve probes belonging to a user. If probeId is provided, returns a single probe; otherwise returns all probes.
 	 * @param {number} userId - The user's database ID.
 	 * @param {number} [probeId] - Optional probe ID to filter to a single probe.
-	 * @returns {Promise<ProbeRecord[] | ProbeRecord>} Single probe record or array of all probes.
+	 * @returns {Promise<ProbeWithPlant[] | ProbeRecord>} Single probe record or array of all probes with linked plant info.
 	 */
-	async getUserProbes(userId: number, probeId?: number): Promise<ProbeRecord[] | ProbeRecord> {
+	async getUserProbes(userId: number, probeId?: number): Promise<ProbeWithPlant[] | ProbeRecord> {
 		if (probeId) {
 			const probe = await this.repository.findById(probeId);
 
