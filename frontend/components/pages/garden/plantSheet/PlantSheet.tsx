@@ -7,6 +7,8 @@ import StyledIcon from "../../../style/StyledIcon";
 import StyledText from "../../../style/StyledText";
 import CloseIcon from "../../../../assets/icons/close.svg"
 import { GardenPlant } from "../gardenGrid/GardenGridItem";
+import { unpairProbe } from "../../../../services/probes";
+import StyledAlert, { AlertButton } from "../../../style/StyledAlert";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -75,6 +77,7 @@ const rowStyles = StyleSheet.create({
 
 const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; isVisible: boolean; onClose: () => void }) => {
 	const [internalVisible, setInternalVisible] = useState(false);
+	const [alertConfig, setAlertConfig] = useState<{ title: string; message: string; buttons?: AlertButton[] } | null>(null);
 	const slideAnim = useRef(new Animated.Value(0)).current;
 	const opacityAnim = useRef(new Animated.Value(0)).current;
 
@@ -160,6 +163,49 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 							</StyledText>
 							<Spacer space={Styling.Spacing.sml} />
 
+							{plant.probeName && (
+								<TouchableOpacity
+									style={styles.unpairBtn}
+									onPress={() => {
+										setAlertConfig({
+											title: "Sonde ontkoppelen",
+											message: "Weet je zeker dat je de sonde wilt ontkoppelen?",
+											buttons: [
+												{ text: "Annuleren", style: "cancel", onPress: () => setAlertConfig(null) },
+												{
+													text: "Ontkoppelen",
+													style: "destructive",
+													onPress: async () => {
+														const userPlantId = parseInt(plant.id.replace("up_", ""), 10);
+														if (isNaN(userPlantId)) return;
+														try {
+															await unpairProbe(userPlantId);
+															setAlertConfig({
+																title: "Sonde ontkoppeld",
+																message: "Druk kort op de knop van de sonde om de status bij te werken.",
+																buttons: [{ text: "Ok", onPress: () => { setAlertConfig(null); onClose(); } }],
+															});
+														} catch {
+															setAlertConfig({
+																title: "Fout",
+																message: "Kon de sonde niet ontkoppelen. Probeer opnieuw.",
+																buttons: [{ text: "Ok", onPress: () => setAlertConfig(null) }],
+															});
+														}
+													},
+												},
+											],
+										});
+									}}
+								>
+									<StyledText type="smParagh" style={styles.unpairBtnText}>
+										Ontkoppel sonde
+									</StyledText>
+								</TouchableOpacity>
+							)}
+
+							<Spacer space={Styling.Spacing.sml} />
+
 							<TouchableOpacity style={styles.footerBtn} onPress={() => { onClose(); router.push({ pathname: "/(garden)/plant-detail", params: { plantData: JSON.stringify(plant) } }); }}>
 								<StyledText type="head4" style={styles.footerBtnText}>
 									Bekijk in detail
@@ -169,6 +215,7 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 					)}
 				</Animated.View>
 			</View>
+			<StyledAlert visible={alertConfig !== null} title={alertConfig?.title ?? ""} message={alertConfig?.message ?? ""} buttons={alertConfig?.buttons} onDismiss={() => setAlertConfig(null)} />
 		</Modal>
 	);
 };
@@ -244,5 +291,14 @@ const styles = StyleSheet.create({
 	},
 	footerBtnText: {
 		color: Styling.Colors.white,
+	},
+	unpairBtn: {
+		alignSelf: "center",
+		paddingVertical: Styling.Padding.sml,
+		paddingHorizontal: Styling.Padding.reg,
+	},
+	unpairBtnText: {
+		color: Styling.Colors.red,
+		textDecorationLine: "underline",
 	},
 });

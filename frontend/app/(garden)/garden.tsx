@@ -484,6 +484,10 @@ const Garden = () => {
 													const created = await createUserPlant({ plant_id: numericId, nickname: decodeURIComponent(params.name || veg?.name || ""), x_pos: cx, y_pos: cy, garden_id: gardenId ?? undefined });
 													if (params.probeId && created.data?.id) {
 														await pairProbe(Number(params.probeId), created.data.id).catch(console.error);
+														setAlertConfig({
+															title: "Sonde gekoppeld",
+															message: "Druk nu kort op de knop van de sonde om te synchroniseren.",
+														});
 													}
 													const res = await getGarden();
 													if (res.data) {
