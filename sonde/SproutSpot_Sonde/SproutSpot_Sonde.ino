@@ -153,6 +153,10 @@ String getHtmlForm(String error = "") {
   html += "input:focus { border-bottom-color: #00CA68; }";
   html += ".btn-wrapper { margin-top: 20px; }";
   html += "button { width: 100%; padding: 12px 24px; background: #00CA68; color: #fff; border: none; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; text-transform: uppercase; cursor: pointer; }";
+  html += ".loading { text-align: center; padding: 40px 0; }";
+  html += ".spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 4px solid #e0e0e0; border-top: 4px solid #00CA68; border-radius: 50%; animation: spin 0.8s linear infinite; }";
+  html += "@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }";
+  html += ".loading p { color: #555; font-size: 14px; margin: 0; }";
   html += "</style></head><body>";
   
   html += "<div class='battery-status'><span>" + String(pct) + "%</span><div class='battery-icon'><div class='battery-level'></div></div></div>";
@@ -162,9 +166,13 @@ String getHtmlForm(String error = "") {
   
   html += "<form method='POST' action='/save'>";
   html += "<input type='text' name='pairing_code' placeholder='Koppelcode (bv. AB123456)'>";
+  html += "<p style='color:#888; font-size:12px; margin:0 0 8px 0;'>Al gekoppeld? Laat dit veld leeg</p>";
   html += "<input type='text' name='ssid' placeholder='WiFi Naam' required>";
   html += "<input type='password' name='pass' placeholder='Wachtwoord' required>";
-  html += "<div class='btn-wrapper'><button type='submit'>Verifieer & Koppel</button></div></form></div></body></html>";
+  html += "<div class='btn-wrapper'><button type='submit'>Verifieer & Koppel</button></div></form>";
+  html += "<div id='loading' class='loading' style='display:none'><div class='spinner'></div><p>Bezig met verbinden...</p></div>";
+  html += "<script>document.querySelector('form').onsubmit=function(){document.querySelector('form').style.display='none';document.getElementById('loading').style.display='block';}</script>";
+  html += "</div></body></html>";
   return html;
 }
 
