@@ -82,7 +82,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 	const [probeName, setProbeName] = useState("");
 	const [copied, setCopied] = useState(false);
 	const [finderStep, setFinderStep] = useState(0);
-	const pairingCode = user?.pairing_code ?? "TE123456";
+	const pairingCode = user?.pairing_code ?? "";
 
 	const goBack = () => {
 		if (step === "finder") {
