@@ -60,13 +60,9 @@ const ProbesView = ({ onBack }: ProbesViewProps) => {
 							</View>
 							<Spacer space={Styling.Spacing.sml} />
 							<View style={styles.detailRow}>
-								<StyledText type="smParagh" style={styles.label}>Hardware ID:</StyledText>
-								<StyledText type="smParagh" style={styles.value}>{probe.hardware_id}</StyledText>
-							</View>
-							<View style={styles.detailRow}>
 								<StyledText type="smParagh" style={styles.label}>Batterij:</StyledText>
 								<StyledText type="smParagh" style={[styles.value, probe.battery.percentage <= 10 && { color: Styling.Colors.red }]}>
-									{probe.battery.percentage}% ({probe.battery.level})
+									{probe.battery.percentage}%
 								</StyledText>
 							</View>
 							<View style={styles.detailRow}>

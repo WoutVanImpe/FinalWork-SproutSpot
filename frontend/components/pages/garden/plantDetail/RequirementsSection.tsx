@@ -47,7 +47,7 @@ const RequirementsSection = ({ plantName, requirements }: RequirementsSectionPro
     <Spacer space={Styling.Spacing.reg} />
     {requirements.map((req, i) => (
       <View key={i}>
-        <Row label={req.label} value={`${req.optimalMin}%-${req.optimalMax}%`}>
+		<Row label={req.label}>
           <StatusBar level={req.level} optimalMin={req.optimalMin} optimalMax={req.optimalMax} />
         </Row>
         {i < requirements.length - 1 && <Spacer space={Styling.Spacing.sml} />}

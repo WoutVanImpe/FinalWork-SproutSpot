@@ -96,6 +96,13 @@ export class TelemetryRepository {
 			.limit(limit);
 	}
 
+	async getRecentEntriesBySondeIdInRange(sondeId: string, hours: number): Promise<ProbeEntryRecord[]> {
+		return db("probe_entries")
+			.where("sonde_id", sondeId)
+			.where("created_at", ">=", db.raw(`NOW() - INTERVAL '${hours} hours'`))
+			.orderBy("created_at", "desc");
+	}
+
 	/**
 	 * @description Retrieve recent telemetry entries for all probes linked to a specific user plant, ordered newest first.
 	 * @param {number} userPlantId - The user plant's database ID.

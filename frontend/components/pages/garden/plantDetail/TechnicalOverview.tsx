@@ -8,8 +8,8 @@ interface TechnicalOverviewProps {
   probeName: string;
   battery: number;
   lastMeasurement: string;
-  lastMoisture: number;
-  lastLight: number;
+  moistureStatus: string;
+  lightStatus: string;
   lastTemp: number;
 }
 
@@ -24,18 +24,18 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
   </View>
 );
 
-const TechnicalOverview = ({ probeName, battery, lastMeasurement, lastMoisture, lastLight, lastTemp }: TechnicalOverviewProps) => (
+const TechnicalOverview = ({ probeName, battery, lastMeasurement, moistureStatus, lightStatus, lastTemp }: TechnicalOverviewProps) => (
   <View style={styles.container}>
     <StyledText type="head3" style={styles.title}>
-      Technisch overzicht
+      Sonde informatie
     </StyledText>
     <Spacer space={Styling.Spacing.sml} />
     <InfoRow label="Sonde naam" value={probeName} />
     <InfoRow label="Batterij" value={`${battery}%`} />
     <InfoRow label="Laatste meting" value={lastMeasurement} />
-    <InfoRow label="Laatste vocht meting" value={`${lastMoisture}%`} />
-    <InfoRow label="Laatste licht meting" value={`${lastLight} lux`} />
-    <InfoRow label="Laatste temperatuur meting" value={`${lastTemp}°C`} />
+    <InfoRow label="Vocht" value={moistureStatus} />
+    <InfoRow label="Licht" value={lightStatus} />
+    <InfoRow label="Temperatuur" value={`${lastTemp}°C`} />
   </View>
 );
 

@@ -120,7 +120,7 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 							<Spacer space={Styling.Spacing.xsm} />
 
 							<StyledText type="paragh" style={styles.subtitle}>
-								Stadium: {plant.stage.label} ({plant.stage.current}/{plant.stage.max})
+								Stadium: {plant.stage.label}
 							</StyledText>
 							<Spacer space={Styling.Spacing.sml} />
 

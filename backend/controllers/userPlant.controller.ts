@@ -176,13 +176,14 @@ export class UserPlantController {
 		try {
 			const userPlantId = Number.parseInt(req.params.id as string);
 			const limit = Number.parseInt(req.query.limit as string) || 24;
+			const hours = req.query.hours ? Number.parseInt(req.query.hours as string) : undefined;
 
 			if (Number.isNaN(userPlantId)) {
 				res.status(400).json({ error: "Validation Error", message: "Invalid plant ID" });
 				return;
 			}
 
-			const readings = await this.service.getLastReadings(userPlantId, limit);
+			const readings = await this.service.getLastReadings(userPlantId, limit, hours);
 
 			res.status(200).json({ success: true, count: readings.length, data: readings });
 		} catch (error) {
