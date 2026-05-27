@@ -1,6 +1,5 @@
 import { TelemetryService } from "./telemetry.service";
-
-const CHECK_INTERVAL_MS = 60 * 60 * 1000; // 60 min
+import { CHECK_INTERVAL_MS } from "../config";
 
 let intervalHandle: ReturnType<typeof setInterval> | null = null;
 

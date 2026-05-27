@@ -5,10 +5,16 @@ export const DATABASE_USER = process.env.DATABASE_USER;
 export const DATABASE_PASSWORD = process.env.DATABASE_PASSWORD;
 export const DATABASE_DB = process.env.DATABASE_DB;
 export const JWT_SECRET: string = process.env.JWT_SECRET || "sproutspot-dev-secret-key-change-in-production";
+export const MODE = process.env.MODE || "production";
+export const IS_DEV = MODE === "dev";
+
 export const DEEP_SLEEP_INTERVAL_MINUTES = 60;
 export const ENTRIES_PER_CYCLE = 4;
-export const DLI_HOURS_PER_ENTRY = DEEP_SLEEP_INTERVAL_MINUTES / ENTRIES_PER_CYCLE / 60; // = 0.25
+export const DLI_HOURS_PER_ENTRY = DEEP_SLEEP_INTERVAL_MINUTES / ENTRIES_PER_CYCLE / 60; // = 0.25 (prod) or 0.00416 (dev)
 export const ANTI_SPAM_MEASUREMENT_THRESHOLD = 3;
+
+export const CHECK_INTERVAL_MS = IS_DEV ? 60 * 1000 : 60 * 60 * 1000;
+export const STALE_THRESHOLD_MINUTES = IS_DEV ? 5 : 180;
 
 export const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL || `http://localhost:${process.env.API_PORT || "5001"}`;
 

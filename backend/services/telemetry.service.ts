@@ -3,6 +3,7 @@ import { ProbeRepository, StaleProbeResult } from "../repositories/probe.reposit
 import { PushNotificationService } from "./push-notification.service";
 import { TelemetryBatchUploadDto, TelemetryEntryDto } from "../types/dto";
 import { ActiveIssueRecord, ProbeEntryRecord, StageThresholdsRecord, UserPlantRecord } from "../types/database";
+import { STALE_THRESHOLD_MINUTES } from "../config";
 
 interface Anomaly {
 	type: string;
@@ -268,7 +269,6 @@ export class TelemetryService {
 	}
 
 	async checkStaleProbes(): Promise<void> {
-		const STALE_THRESHOLD_MINUTES = 180;
 		const BATTERY_LOW_VOLTAGE = 3.12;
 
 		const stale = await this.probeRepository.findStaleProbes(STALE_THRESHOLD_MINUTES);
