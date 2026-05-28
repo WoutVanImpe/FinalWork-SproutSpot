@@ -43,7 +43,7 @@ const LIGHT_MAP: Record<string, string> = {
 
 const WATER_MAP: Record<string, string> = {
 	"low": "Weinig water",
-	"moderate": "Regelmatig water geven",
+	"moderate": "Regelmatig",
 	"high": "Veel water",
 };
 

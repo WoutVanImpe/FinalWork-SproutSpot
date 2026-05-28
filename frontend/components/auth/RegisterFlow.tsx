@@ -1,4 +1,4 @@
-import { ActivityIndicator, Image, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Styling } from "../../constants/Styling";
 import StyledText from "../style/StyledText";
@@ -255,7 +255,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 				if (!plantDetail) return <View style={styles.content}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></View>;
 				const veg = plantDetail;
 				return (
-					<View style={styles.content}>
+					<ScrollView style={styles.content} contentContainerStyle={detailStyles.scrollContent} showsVerticalScrollIndicator={false}>
 						<View style={styles.finderHeader}>
 							<TouchableOpacity onPress={goBack} style={styles.backBtn} activeOpacity={0.7}>
 								<StyledIcon Icon={BackIcon} size="med" fill={Styling.Colors.white} />
@@ -264,7 +264,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 						</View>
 
 						<View style={detailStyles.infoRow}>
-							<WaveBackground waveHeight={280} leftOffset={-770} widthMultiplier={6} style={{ marginTop: 30 }} />
+							<WaveBackground waveHeight={280} leftOffset={-770} widthMultiplier={6} style={{ marginTop: 25 }} />
 							<View style={detailStyles.infoRowContent}>
 								<View style={detailStyles.imageContainer}>
 									<Image source={{ uri: veg.image }} style={detailStyles.image} resizeMode="contain" />
@@ -345,7 +345,8 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 						<TouchableOpacity style={styles.greenBtn} onPress={() => setStep("step1")} activeOpacity={0.7}>
 							<StyledText type="head4" style={{ color: Styling.Colors.white }}>Starten</StyledText>
 						</TouchableOpacity>
-					</View>
+						<Spacer space={170} />
+					</ScrollView>
 				);
 			}
 
@@ -813,5 +814,9 @@ const detailStyles = StyleSheet.create({
 		color: Styling.Colors.white,
 		marginTop: Styling.Spacing.sml,
 		textAlign: "right",
+	},
+	scrollContent: {
+		alignItems: "center",
+		paddingBottom: 170,
 	},
 });
