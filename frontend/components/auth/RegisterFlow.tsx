@@ -346,7 +346,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 							<TouchableOpacity style={styles.greenBtn} onPress={() => setStep("step1")} activeOpacity={0.7}>
 								<StyledText type="head4" style={{ color: Styling.Colors.white }}>Starten</StyledText>
 							</TouchableOpacity>
-							<Spacer space={40} />
+							<Spacer space={70} />
 						</ScrollView>
 					</View>
 				);
@@ -819,6 +819,5 @@ const detailStyles = StyleSheet.create({
 	},
 	scrollContent: {
 		alignItems: "center",
-		paddingBottom: 40,
 	},
 });
