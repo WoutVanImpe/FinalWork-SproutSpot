@@ -1,4 +1,5 @@
 import { UserPlantRepository } from "../repositories/userPlant.repository";
+import { GardenRepository } from "../repositories/garden.repository";
 import { PlantRepository } from "../repositories/plant.repository";
 import { TelemetryRepository } from "../repositories/telemetry.repository";
 import { CreateUserPlantDto, UpdatePlantStageDto, DeactivatePlantDto } from "../types/dto";
@@ -6,11 +7,13 @@ import { UserPlantRecord, PlantStageRecord, ProbeEntryRecord } from "../types/da
 
 export class UserPlantService {
 	private repository: UserPlantRepository;
+	private gardenRepository: GardenRepository;
 	private plantRepository: PlantRepository;
 	private telemetryRepository: TelemetryRepository;
 
 	constructor() {
 		this.repository = new UserPlantRepository();
+		this.gardenRepository = new GardenRepository();
 		this.plantRepository = new PlantRepository();
 		this.telemetryRepository = new TelemetryRepository();
 	}
@@ -70,6 +73,10 @@ export class UserPlantService {
 	 * @returns {Promise<UserPlantRecord>} The created user plant record.
 	 */
 	async createUserPlant(input: CreateUserPlantDto): Promise<UserPlantRecord> {
+		if (!input.garden_id) {
+			const garden = await this.gardenRepository.getOrCreate(input.user_id);
+			input.garden_id = garden.id;
+		}
 		const createdPlant = await this.repository.create(input);
 		return createdPlant;
 	}

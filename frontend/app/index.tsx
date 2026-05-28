@@ -1,5 +1,5 @@
 import { StyleSheet, ActivityIndicator, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import StyledView from "../components/style/StyledView";
 import StyledText from "../components/style/StyledText";
 import StyledButton from "../components/style/StyledButton";
@@ -9,7 +9,7 @@ import CardContainer from "../components/shared/vegetableCard/CardContainer";
 import StatusHeader from "../components/pages/home/statusHeader/StatusHeader";
 import { getDashboard } from "../services/garden";
 import type { EnrichedPlant } from "../services/garden";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 
 interface HomePlant {
 	id: string;
@@ -45,12 +45,13 @@ const Index = () => {
 	const [plants, setPlants] = useState<EnrichedPlant[]>([]);
 	const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
+	useFocusEffect(useCallback(() => {
+		setLoading(true);
 		getDashboard()
 			.then((res) => { if (res.data) setPlants(res.data.plants); })
 			.catch(console.error)
 			.finally(() => setLoading(false));
-	}, []);
+	}, []));
 
 	const homePlants = plants.map(toHomePlant);
 

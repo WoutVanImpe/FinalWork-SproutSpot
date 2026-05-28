@@ -13,8 +13,9 @@ interface CardContainerProps {
 const CardContainer = ({ data, columns = 3, style, onItemPress }: CardContainerProps) => {
 	const screenWidth = Dimensions.get("window").width;
 	const gap = Styling.Spacing.reg;
-	const availableWidth = screenWidth - gap * (columns - 1) - 10;
-	const cardWidth = availableWidth / columns - gap * (columns - 1) - 10;
+	const padding = 40;
+	const availableWidth = screenWidth - gap * (columns - 1) - padding;
+	const cardWidth = availableWidth / columns;
 
 	const totalSlots = Math.ceil(data.length / columns) * columns;
 	const placeholders = totalSlots - data.length;
