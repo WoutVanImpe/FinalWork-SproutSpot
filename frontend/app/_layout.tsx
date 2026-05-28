@@ -80,7 +80,7 @@ const CustomTabBar = ({ state, navigation }: any) => {
 	}, [visibleIndex]);
 
 	return (
-		<View style={[styles.wrapper, { width: SCREEN_WIDTH, bottom: insets.bottom }]}>
+		<View style={[styles.wrapper, { width: SCREEN_WIDTH, bottom: insets.bottom + 10 }]}>
 			<CurvedBackground width={barWidth} cx={visibleIndex >= 0 ? cx : -999} />
 			<View style={[styles.bar, { width: barWidth }]}>
 				{visibleRoutes.map((route: any, index: number) => (
@@ -124,15 +124,17 @@ const AppContent = () => {
 	const [showOnboarding, setShowOnboarding] = useState(true);
 	const [showAuth, setShowAuth] = useState(false);
 	const [showRegisterFlow, setShowRegisterFlow] = useState(false);
-	const [pendingPlant, setPendingPlant] = useState<{ vegId: string; name: string } | null>(null);
+	const [pendingPlant, setPendingPlant] = useState<{ vegId: string; name: string; probeId?: number } | null>(null);
 	const router = useRouter();
 	const { loading, user } = useAuth();
 	const isLoading = !fontsLoaded || loading;
 
 	useEffect(() => {
 		if (pendingPlant) {
-			const { vegId, name } = pendingPlant;
-			router.push(`/(garden)/garden?placementMode=true&vegId=${vegId}&name=${encodeURIComponent(name)}`);
+			const { vegId, name, probeId } = pendingPlant;
+			let url = `/(garden)/garden?placementMode=true&vegId=${vegId}&name=${encodeURIComponent(name)}`;
+			if (probeId) url += `&probeId=${probeId}`;
+			router.push(url);
 			setPendingPlant(null);
 		}
 	}, [pendingPlant]);
@@ -151,7 +153,9 @@ const AppContent = () => {
 
 	return (
 		<View style={{ flex: 1 }}>
-			{user ? (
+			{showRegisterFlow ? (
+				<RegisterFlow onComplete={(vegId, name, probeId) => { setShowRegisterFlow(false); setPendingPlant({ vegId, name, probeId }); }} />
+			) : user ? (
 				<OverlayProvider>
 					<StatusBar style="light" />
 					{!isAccountPage && <NavHeader />}
@@ -166,8 +170,6 @@ const AppContent = () => {
 				<OnboardingCarousel onComplete={() => { setShowOnboarding(false); setShowAuth(true); }} />
 			) : showAuth ? (
 				<AuthScreen onComplete={(mode) => { setShowAuth(false); if (mode === "register") { setShowRegisterFlow(true); } }} />
-			) : showRegisterFlow ? (
-				<RegisterFlow onComplete={(vegId, name) => { setShowRegisterFlow(false); setPendingPlant({ vegId, name }); }} />
 			) : (
 				<View style={{ flex: 1, backgroundColor: "#3E4348" }} />
 			)}

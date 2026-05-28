@@ -19,22 +19,27 @@ export class ProbeController {
 		try {
 			const { hardware_id, pairing_code } = req.body;
 
-			if (!hardware_id || !pairing_code) {
-				res.status(400).json({ error: "Validation Error", message: "hardware_id and pairing_code are required" });
+			if (!hardware_id) {
+				res.status(400).json({ error: "Validation Error", message: "hardware_id is required" });
 				return;
 			}
 
-			const probe = await this.service.registerProbe(hardware_id, pairing_code);
+			const result = await this.service.registerProbe(hardware_id, pairing_code);
 
-			res.status(201).json({ success: true, message: "Probe registered", data: probe });
+			if (result.existing) {
+				res.status(200).json({ success: true, message: "Probe WiFi update acknowledged" });
+				return;
+			}
+
+			res.status(201).json({ success: true, message: "Probe registered", data: result.probe });
 		} catch (error) {
-			if ((error as Error).message === "Probe with this hardware ID already exists") {
-				res.status(409).json({ error: "Conflict", message: (error as Error).message });
-				return;
-			}
-
 			if ((error as Error).message === "Invalid pairing code") {
 				res.status(401).json({ error: "Unauthorized", message: (error as Error).message });
+				return;
+			}
+
+			if ((error as Error).message === "Pairing code required for new probe") {
+				res.status(400).json({ error: "Validation Error", message: (error as Error).message });
 				return;
 			}
 

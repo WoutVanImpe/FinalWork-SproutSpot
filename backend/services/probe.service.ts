@@ -47,17 +47,21 @@ export class ProbeService {
 	 * @throws {Error} "Invalid pairing code" if no user matches.
 	 * @throws {Error} "Probe with this hardware ID already exists" on duplicate hardware.
 	 */
-	async registerProbe(hardwareId: string, pairingCode: string): Promise<ProbeRecord> {
+	async registerProbe(hardwareId: string, pairingCode?: string): Promise<{ existing: boolean; probe?: ProbeRecord }> {
+		const existing = await this.repository.findByHardwareId(hardwareId);
+
+		if (existing) {
+			return { existing: true };
+		}
+
+		if (!pairingCode) {
+			throw new Error("Pairing code required for new probe");
+		}
+
 		const user = await this.userRepository.findByPairingCode(pairingCode);
 
 		if (!user) {
 			throw new Error("Invalid pairing code");
-		}
-
-		const existing = await this.repository.findByHardwareId(hardwareId);
-
-		if (existing) {
-			throw new Error("Probe with this hardware ID already exists");
 		}
 
 		const probe = await this.repository.create(hardwareId, user.id, pairingCode);
@@ -65,7 +69,7 @@ export class ProbeService {
 		const newPairingCode = await this.generateUniquePairingCode();
 		await this.userRepository.updatePairingCode(user.id, newPairingCode);
 
-		return probe;
+		return { existing: false, probe };
 	}
 
 	/**

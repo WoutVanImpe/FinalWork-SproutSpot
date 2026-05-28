@@ -60,8 +60,8 @@ const Garden = () => {
 	const [plants, setPlants] = useState<GardenPlant[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [gardenId, setGardenId] = useState<number | null>(null);
-	const [cols, setCols] = useState(5);
-	const [rows, setRows] = useState(6);
+	const [cols, setCols] = useState(3);
+	const [rows, setRows] = useState(3);
 	const [isEditing, setIsEditing] = useState(false);
 	const [isPlacing, setIsPlacing] = useState(false);
 	const [hasChanges, setHasChanges] = useState(false);
@@ -373,10 +373,10 @@ const Garden = () => {
 		);
 	}
 
-	if (plants.length === 0) {
+	if (plants.length === 0 && !isPlacing) {
 		return (
-			<View style={[styles.page, { justifyContent: "center", alignItems: "center" }]}>
-				<Spacer space={120} />
+			<View style={[styles.page, { alignItems: "center" }]}>
+				<Spacer space={230} />
 				<StyledText type="head3" style={{ textAlign: "center" }}>
 					Je tuin is nog leeg
 				</StyledText>

@@ -1,5 +1,5 @@
-import { Image, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
-import React, { useState } from "react";
+import { ActivityIndicator, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
 import { Styling } from "../../constants/Styling";
 import StyledText from "../style/StyledText";
 import StyledIcon from "../style/StyledIcon";
@@ -8,21 +8,26 @@ import BackIcon from "../../assets/icons/undo.svg";
 import OptionButton from "../pages/explore/plantFinder/OptionButton";
 import ProgressBar from "../pages/explore/plantFinder/ProgressBar";
 import CardContainer from "../shared/vegetableCard/CardContainer";
-import { VEGETABLES, VEGETABLE_DETAILS, VegetableInfo } from "../../data/vegetables";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Clipboard from "expo-clipboard";
 import StyledView from "../style/StyledView";
 import { BAR_MARGIN } from "../../constants/tabConfig";
 import { useAuth } from "../../context/AuthContext";
+import { getAllPlants, getPlantById } from "../../services/plants";
+import { renameProbeByCode } from "../../services/probes";
+import { formatSowingPeriod, formatTemperature } from "../../data/vegetables";
+import WaveBackground from "../shared/WaveBackground";
+import type { PlantListItem, PlantDetail } from "../../services/plants";
 
 interface RegisterFlowProps {
-	onComplete: (vegId: string, name: string) => void;
+	onComplete: (vegId: string, name: string, probeId?: number) => void;
 }
 
 type Step =
 	| "intro"
 	| "finder"
 	| "results"
+	| "detail"
 	| "step1"
 	| "step2"
 	| "step3"
@@ -77,12 +82,22 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 	const { user } = useAuth();
 	const [step, setStep] = useState<Step>("intro");
 	const [answers, setAnswers] = useState<(string | null)[]>([null, null, null, null]);
-	const [selectedVeg, setSelectedVeg] = useState<VegetableInfo | null>(null);
+	const [selectedVeg, setSelectedVeg] = useState<PlantListItem | null>(null);
+	const [plantDetail, setPlantDetail] = useState<PlantDetail | null>(null);
+	const [allPlants, setAllPlants] = useState<PlantListItem[]>([]);
 	const [plantName, setPlantName] = useState("");
 	const [probeName, setProbeName] = useState("");
 	const [copied, setCopied] = useState(false);
 	const [finderStep, setFinderStep] = useState(0);
 	const pairingCode = user?.pairing_code ?? "";
+	const [renaming, setRenaming] = useState(false);
+	const [renameError, setRenameError] = useState<string | null>(null);
+
+	useEffect(() => {
+		getAllPlants()
+			.then((res) => { if (res.data) setAllPlants(res.data); })
+			.catch(console.error);
+	}, []);
 
 	const goBack = () => {
 		if (step === "finder") {
@@ -95,6 +110,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 			switch (step) {
 				case "intro": break;
 				case "results": setFinderStep(3); setStep("finder"); break;
+				case "detail": setStep("results"); break;
 				case "step1": setStep("results"); break;
 				case "step2": setStep("step1"); break;
 				case "step3": setStep("step2"); break;
@@ -118,18 +134,20 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 		}
 	};
 
-	const getFilteredResults = (): VegetableInfo[] => {
+	const getFilteredResults = () => {
 		const [placement, sunlight, month, careLevel] = answers as string[];
 		const monthNum = parseInt(month, 10);
-		return VEGETABLES.filter((v) => {
-			const d = VEGETABLE_DETAILS[v.id];
-			if (!d) return false;
-			if (placement !== "either" && d.placement !== "both" && d.placement !== placement) return false;
-			if (sunlight !== d.sunlight) return false;
-			if (monthNum < d.sowingPeriod.startMonth || monthNum > d.sowingPeriod.endMonth) return false;
-			if (careLevel !== "either" && d.careLevel !== careLevel) return false;
+		return allPlants.filter((v) => {
+			if (placement !== "either" && v.placement !== "both" && v.placement !== placement) return false;
+			if (sunlight !== v.sunlight) return false;
+			if (monthNum < v.sowingPeriod.startMonth || monthNum > v.sowingPeriod.endMonth) return false;
+			if (careLevel !== "either" && v.careLevel !== careLevel) return false;
 			return true;
-		});
+		}).map((v) => ({
+			id: v.id,
+			name: v.name,
+			image: { uri: v.image },
+		}));
 	};
 
 	const handleCopyCode = async () => {
@@ -224,17 +242,118 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 							{results.length > 0 ? `We vonden ${results.length} geschikte ${results.length === 1 ? "plant" : "planten"} voor jou!` : "Geen resultaten gevonden."}
 						</StyledText>
 						{results.length > 0 ? (
-							<CardContainer data={results} onItemPress={(id) => { const v = VEGETABLES.find((x) => x.id === id); if (v) setSelectedVeg(v); setStep("step1"); }} />
+							<CardContainer data={results} onItemPress={(id) => { const v = allPlants.find((x) => x.id === id); if (v) { setSelectedVeg(v); getPlantById(id).then(r => { if (r.data) setPlantDetail(r.data); }).catch(console.error); } setStep("detail"); }} />
 						) : (
 							<StyledText type="paragh" style={{ color: Styling.Colors.white, textAlign: "center" }}>Probeer andere antwoorden.</StyledText>
 						)}
+						<Spacer space={170} />
+					</View>
+				);
+			}
+
+			case "detail": {
+				if (!plantDetail) return <View style={styles.content}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></View>;
+				const veg = plantDetail;
+				return (
+					<View style={{ flex: 1, alignItems: "center", marginTop: -25 }}>
+						<View style={styles.finderHeader}>
+							<TouchableOpacity onPress={goBack} style={styles.backBtn} activeOpacity={0.7}>
+								<StyledIcon Icon={BackIcon} size="med" fill={Styling.Colors.white} />
+							</TouchableOpacity>
+							<StyledText type="head1" style={styles.finderTitle}>{veg.name}</StyledText>
+						</View>
+
+						<View style={detailStyles.infoRow}>
+							<WaveBackground waveHeight={280} leftOffset={-770} widthMultiplier={6} style={{ marginTop: 25 }} />
+							<View style={detailStyles.infoRowContent}>
+								<View style={detailStyles.imageContainer}>
+									<Image source={{ uri: veg.image }} style={detailStyles.image} resizeMode="contain" />
+								</View>
+								<View style={detailStyles.generalInfo}>
+									<DetailRow label="Licht" value={veg.light} />
+									<DetailRow label="Water" value={veg.water} />
+									<DetailRow label="Moeilijkheid" value={veg.difficulty} />
+									<DetailRow label="Temperatuur" value={formatTemperature(veg.temperature.min, veg.temperature.max)} />
+								</View>
+							</View>
+						</View>
+
+						<ScrollView style={{ flex: 1 }} contentContainerStyle={detailStyles.scrollContent} showsVerticalScrollIndicator={false}>
+							<Spacer space={Styling.Spacing.xsm} />
+
+							<StyledText type="head3" style={detailStyles.sectionTitle}>
+								Zaai specificaties
+							</StyledText>
+							<Spacer space={Styling.Spacing.sml} />
+							<View style={detailStyles.sowingGrid}>
+								<View style={detailStyles.sowingItem}>
+									<StyledText type="smParagh" style={detailStyles.sowingLabel}>
+										Zaaidiepte
+									</StyledText>
+									<StyledText type="paragh" style={detailStyles.sowingValue}>
+										{veg.sowingDepth}
+									</StyledText>
+								</View>
+								<View style={detailStyles.sowingItem}>
+									<StyledText type="smParagh" style={detailStyles.sowingLabel}>
+										Plantafstand
+									</StyledText>
+									<StyledText type="paragh" style={detailStyles.sowingValue}>
+										{veg.sowingDistance}
+									</StyledText>
+								</View>
+								<View style={detailStyles.sowingItem}>
+									<StyledText type="smParagh" style={detailStyles.sowingLabel}>
+										Potdiepte
+									</StyledText>
+									<StyledText type="paragh" style={detailStyles.sowingValue}>
+										{veg.potDepth}
+									</StyledText>
+								</View>
+								<View style={detailStyles.sowingItem}>
+									<StyledText type="smParagh" style={detailStyles.sowingLabel}>
+										Periode
+									</StyledText>
+									<StyledText type="paragh" style={detailStyles.sowingValue}>
+										{formatSowingPeriod(veg.sowingPeriod.startMonth, veg.sowingPeriod.endMonth)}
+									</StyledText>
+								</View>
+							</View>
+
+							<Spacer space={Styling.Spacing.reg} />
+
+							<StyledText type="head3" style={detailStyles.sectionTitle}>
+								Groeicyclus
+							</StyledText>
+							<Spacer space={Styling.Spacing.sml} />
+							<View style={detailStyles.stagesContainer}>
+								{veg.stages.map((stage, i) => (
+									<View key={i} style={detailStyles.stageRow}>
+										<StyledText type="paragh" style={detailStyles.stageLabel}>
+											{stage.label}
+										</StyledText>
+										<StyledText type="smParagh" style={detailStyles.stageDays}>
+											{stage.durationDays} dagen
+										</StyledText>
+									</View>
+								))}
+							</View>
+							<StyledText type="smParagh" style={detailStyles.totalTime}>
+								Totale tijd: ±{veg.totalDays} dagen
+							</StyledText>
+
+							<Spacer space={Styling.Spacing.reg} />
+							<TouchableOpacity style={styles.greenBtn} onPress={() => setStep("step1")} activeOpacity={0.7}>
+								<StyledText type="head4" style={{ color: Styling.Colors.white }}>Starten</StyledText>
+							</TouchableOpacity>
+							<Spacer space={150} />
+						</ScrollView>
 					</View>
 				);
 			}
 
 			case "step1": {
-				const veg = selectedVeg ? VEGETABLE_DETAILS[selectedVeg.id] : null;
-				if (!veg) return null;
+				if (!plantDetail) return <View style={styles.content}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></View>;
 				return (
 					<View style={styles.content}>
 						<View style={styles.finderHeader}>
@@ -244,11 +363,11 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 							<StyledText type="head1" style={styles.finderTitle}>Klaar om te planten?</StyledText>
 						</View>
 						<View style={styles.checklistRow}>
-							<Image source={veg.image} style={styles.vegImage} resizeMode="contain" />
+							<Image source={{ uri: plantDetail.image }} style={styles.vegImage} resizeMode="contain" />
 							<View style={styles.checklistItems}>
 								<StyledText type="head3" style={{ color: Styling.Colors.white }}>Je hebt nodig:</StyledText>
-								<StyledText type="paragh" style={{ color: Styling.Colors.white, paddingVertical: 4 }}>{veg.name.toLowerCase()}zaden</StyledText>
-								<StyledText type="paragh" style={{ color: Styling.Colors.white, paddingVertical: 4 }}>Pot (min. {veg.potDepth} diep)</StyledText>
+								<StyledText type="paragh" style={{ color: Styling.Colors.white, paddingVertical: 4 }}>{plantDetail.name.toLowerCase()}zaden</StyledText>
+								<StyledText type="paragh" style={{ color: Styling.Colors.white, paddingVertical: 4 }}>Pot (min. {plantDetail.potDepth} diep)</StyledText>
 								<StyledText type="paragh" style={{ color: Styling.Colors.white, paddingVertical: 4 }}>Potgrond</StyledText>
 								<StyledText type="paragh" style={{ color: Styling.Colors.white, paddingVertical: 4 }}>Opgeladen sonde</StyledText>
 							</View>
@@ -262,11 +381,10 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 			}
 
 			case "step2": {
-				const veg = selectedVeg ? VEGETABLE_DETAILS[selectedVeg.id] : null;
-				if (!veg) return null;
+				if (!plantDetail) return <View style={styles.content}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></View>;
 				const steps = [
 					`Vul je pot tot 2 cm onder de rand met potgrond. Druk de grond niet aan.`,
-					`Maak een gaatje in de grond van ${veg.sowingDepth} diep. Hou ${veg.sowingDistance} afstand tussen de gaatjes of 1 per pot.`,
+					`Maak een gaatje in de grond van ${plantDetail.sowingDepth} diep. Hou ${plantDetail.sowingDistance} afstand tussen de gaatjes of 1 per pot.`,
 					`Leg het zaadje in het gat. Dek het zaadje af met een dun laagje grond.`,
 				];
 				return (
@@ -275,7 +393,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 							<TouchableOpacity onPress={goBack} style={styles.backBtn} activeOpacity={0.7}>
 								<StyledIcon Icon={BackIcon} size="med" fill={Styling.Colors.white} />
 							</TouchableOpacity>
-							<StyledText type="head1" style={styles.finderTitle}>{veg.name} zaaien</StyledText>
+							<StyledText type="head1" style={styles.finderTitle}>{plantDetail.name} zaaien</StyledText>
 						</View>
 						{steps.map((s, i) => (
 							<View key={i} style={{ width: "100%", paddingVertical: 8 }}>
@@ -292,8 +410,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 			}
 
 			case "step3": {
-				const veg = selectedVeg ? VEGETABLE_DETAILS[selectedVeg.id] : null;
-				if (!veg) return null;
+				if (!selectedVeg) return null;
 				return (
 					<View style={styles.content}>
 						<View style={styles.finderHeader}>
@@ -303,10 +420,10 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 							<StyledText type="head1" style={styles.finderTitle}>Geef je plant een naam</StyledText>
 						</View>
 						<StyledText type="paragh" style={{ color: Styling.Colors.white, textAlign: "center" }}>
-							Kies een leuke naam voor je {veg.name.toLowerCase()}
+							Kies een leuke naam voor je {selectedVeg.name.toLowerCase()}
 						</StyledText>
 						<Spacer space={Styling.Spacing.reg} />
-						<TextInput style={styles.input} value={plantName} onChangeText={setPlantName} placeholder={`Mijn ${veg.name.toLowerCase()}`} placeholderTextColor={Styling.Colors.lightGrey} maxLength={30} />
+						<TextInput style={styles.input} value={plantName} onChangeText={setPlantName} placeholder={`Mijn ${selectedVeg.name.toLowerCase()}`} placeholderTextColor={Styling.Colors.lightGrey} maxLength={30} />
 						<Spacer space={Styling.Spacing.xlg} />
 						<TouchableOpacity style={[styles.nextBtn, !plantName.trim() && styles.nextBtnDisabled]} onPress={() => plantName.trim() && setStep("step4")} disabled={!plantName.trim()} activeOpacity={0.7}>
 							<StyledText type="head4" style={{ color: plantName.trim() ? Styling.Colors.white : Styling.Colors.lightGrey }}>Volgende</StyledText>
@@ -420,8 +537,35 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 									<GuideRow num="1." text="Zorg dat de sonde volledig is opgeladen." />
 									<GuideRow num="2." text="Plaats de sonde 5 cm naast de zaaiplek. Zorg dat de sonde 4 cm diep steekt." />
 									<Spacer space={Styling.Spacing.xlg} />
-									<TouchableOpacity style={[styles.greenBtn, !probeName.trim() && { opacity: 0.4 }]} onPress={() => { if (probeName.trim() && selectedVeg) { onComplete(selectedVeg.id, plantName); setStep("done"); } }} activeOpacity={0.7} disabled={!probeName.trim()}>
-										<StyledText type="head4" style={{ color: Styling.Colors.white }}>Naar de tuin!</StyledText>
+									{renameError && (
+										<StyledText type="paragh" style={{ color: Styling.Colors.red, textAlign: "center", marginBottom: 8 }}>
+											{renameError}
+										</StyledText>
+									)}
+									<TouchableOpacity
+										style={[styles.greenBtn, (!probeName.trim() || renaming) && { opacity: 0.4 }]}
+										onPress={async () => {
+											if (!probeName.trim() || !selectedVeg || renaming) return;
+											setRenaming(true);
+											setRenameError(null);
+											try {
+												const res = await renameProbeByCode(pairingCode, probeName.trim());
+												onComplete(selectedVeg.id, plantName, res.data?.id);
+												setStep("done");
+											} catch {
+												setRenameError("Kon de sonde niet instellen. Controleer of de sonde verbonden is en probeer opnieuw.");
+											} finally {
+												setRenaming(false);
+											}
+										}}
+										activeOpacity={0.7}
+										disabled={!probeName.trim() || renaming}
+									>
+										{renaming ? (
+											<ActivityIndicator color={Styling.Colors.white} />
+										) : (
+											<StyledText type="head4" style={{ color: Styling.Colors.white }}>Naar de tuin!</StyledText>
+										)}
 									</TouchableOpacity>
 								</>
 							)}
@@ -443,6 +587,13 @@ const GuideRow = ({ num, text }: { num: string; text: string }) => (
 	<View style={styles.guideRow}>
 		<StyledText type="paragh" style={{ color: Styling.Colors.green, width: 20 }}>{num}</StyledText>
 		<StyledText type="paragh" style={{ color: Styling.Colors.white, flex: 1, lineHeight: 22 }}>{text}</StyledText>
+	</View>
+);
+
+const DetailRow = ({ label, value }: { label: string; value: string }) => (
+	<View style={detailStyles.row}>
+		<StyledText type="paragh" style={detailStyles.label}>{label}</StyledText>
+		<StyledText type="paragh" style={detailStyles.value}>{value}</StyledText>
 	</View>
 );
 
@@ -582,5 +733,91 @@ const styles = StyleSheet.create({
 	stepTitle: {
 		color: Styling.Colors.white,
 		alignSelf: "flex-start",
+	},
+});
+
+const detailStyles = StyleSheet.create({
+	row: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		paddingVertical: Styling.Spacing.sml,
+		borderBottomWidth: 1,
+		borderBottomColor: Styling.Colors.lightGrey,
+	},
+	label: { color: Styling.Colors.white },
+	value: { color: Styling.Colors.white },
+	infoRow: {
+		position: "relative",
+		height: 260,
+		marginTop: -10,
+		width: "100%",
+	},
+	infoRowContent: {
+		flex: 1,
+		flexDirection: "row",
+		gap: Styling.Spacing.med,
+		zIndex: 2,
+	},
+	imageContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	image: {
+		width: "100%",
+		height: 150,
+	},
+	generalInfo: {
+		flex: 1.5,
+		justifyContent: "center",
+	},
+	sectionTitle: {
+		color: Styling.Colors.white,
+		alignSelf: "flex-start",
+	},
+	sowingGrid: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		justifyContent: "space-between",
+		gap: Styling.Spacing.reg,
+		width: "100%",
+	},
+	sowingItem: {
+		width: "45%",
+		paddingVertical: Styling.Spacing.sml,
+		borderBottomWidth: 1,
+		borderBottomColor: Styling.Colors.lightGrey,
+	},
+	sowingLabel: {
+		color: Styling.Colors.white,
+	},
+	sowingValue: {
+		color: Styling.Colors.white,
+	},
+	stagesContainer: {
+		width: "100%",
+	},
+	stageRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: Styling.Spacing.sml,
+		paddingVertical: Styling.Spacing.sml,
+		borderBottomWidth: 1,
+		borderBottomColor: Styling.Colors.lightGrey,
+	},
+	stageLabel: {
+		color: Styling.Colors.white,
+		flex: 1,
+	},
+	stageDays: {
+		color: Styling.Colors.white,
+	},
+	totalTime: {
+		color: Styling.Colors.white,
+		marginTop: Styling.Spacing.sml,
+		textAlign: "right",
+	},
+	scrollContent: {
+		alignItems: "center",
 	},
 });
