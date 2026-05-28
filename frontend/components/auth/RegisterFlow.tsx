@@ -604,6 +604,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: "center",
 		marginTop: -25,
+		overflow: "visible",
 	},
 	centeredContent: {
 		flex: 1,
@@ -748,6 +749,7 @@ const detailStyles = StyleSheet.create({
 		height: 260,
 		marginTop: -10,
 		width: "100%",
+		overflow: "visible",
 	},
 	infoRowContent: {
 		flex: 1,
