@@ -255,7 +255,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 				if (!plantDetail) return <View style={styles.content}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></View>;
 				const veg = plantDetail;
 				return (
-					<ScrollView style={{ flex: 1 }} contentContainerStyle={detailStyles.scrollContent} showsVerticalScrollIndicator={false}>
+					<View style={{ flex: 1, alignItems: "center", marginTop: -25 }}>
 						<View style={styles.finderHeader}>
 							<TouchableOpacity onPress={goBack} style={styles.backBtn} activeOpacity={0.7}>
 								<StyledIcon Icon={BackIcon} size="med" fill={Styling.Colors.white} />
@@ -278,75 +278,77 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 							</View>
 						</View>
 
-						<Spacer space={Styling.Spacing.xsm} />
+						<ScrollView style={{ flex: 1 }} contentContainerStyle={detailStyles.scrollContent} showsVerticalScrollIndicator={false}>
+							<Spacer space={Styling.Spacing.xsm} />
 
-						<StyledText type="head3" style={detailStyles.sectionTitle}>
-							Zaai specificaties
-						</StyledText>
-						<Spacer space={Styling.Spacing.sml} />
-						<View style={detailStyles.sowingGrid}>
-							<View style={detailStyles.sowingItem}>
-								<StyledText type="smParagh" style={detailStyles.sowingLabel}>
-									Zaaidiepte
-								</StyledText>
-								<StyledText type="paragh" style={detailStyles.sowingValue}>
-									{veg.sowingDepth}
-								</StyledText>
-							</View>
-							<View style={detailStyles.sowingItem}>
-								<StyledText type="smParagh" style={detailStyles.sowingLabel}>
-									Plantafstand
-								</StyledText>
-								<StyledText type="paragh" style={detailStyles.sowingValue}>
-									{veg.sowingDistance}
-								</StyledText>
-							</View>
-							<View style={detailStyles.sowingItem}>
-								<StyledText type="smParagh" style={detailStyles.sowingLabel}>
-									Potdiepte
-								</StyledText>
-								<StyledText type="paragh" style={detailStyles.sowingValue}>
-									{veg.potDepth}
-								</StyledText>
-							</View>
-							<View style={detailStyles.sowingItem}>
-								<StyledText type="smParagh" style={detailStyles.sowingLabel}>
-									Periode
-								</StyledText>
-								<StyledText type="paragh" style={detailStyles.sowingValue}>
-									{formatSowingPeriod(veg.sowingPeriod.startMonth, veg.sowingPeriod.endMonth)}
-								</StyledText>
-							</View>
-						</View>
-
-						<Spacer space={Styling.Spacing.reg} />
-
-						<StyledText type="head3" style={detailStyles.sectionTitle}>
-							Groeicyclus
-						</StyledText>
-						<Spacer space={Styling.Spacing.sml} />
-						<View style={detailStyles.stagesContainer}>
-							{veg.stages.map((stage, i) => (
-								<View key={i} style={detailStyles.stageRow}>
-									<StyledText type="paragh" style={detailStyles.stageLabel}>
-										{stage.label}
+							<StyledText type="head3" style={detailStyles.sectionTitle}>
+								Zaai specificaties
+							</StyledText>
+							<Spacer space={Styling.Spacing.sml} />
+							<View style={detailStyles.sowingGrid}>
+								<View style={detailStyles.sowingItem}>
+									<StyledText type="smParagh" style={detailStyles.sowingLabel}>
+										Zaaidiepte
 									</StyledText>
-									<StyledText type="smParagh" style={detailStyles.stageDays}>
-										{stage.durationDays} dagen
+									<StyledText type="paragh" style={detailStyles.sowingValue}>
+										{veg.sowingDepth}
 									</StyledText>
 								</View>
-							))}
-						</View>
-						<StyledText type="smParagh" style={detailStyles.totalTime}>
-							Totale tijd: ±{veg.totalDays} dagen
-						</StyledText>
+								<View style={detailStyles.sowingItem}>
+									<StyledText type="smParagh" style={detailStyles.sowingLabel}>
+										Plantafstand
+									</StyledText>
+									<StyledText type="paragh" style={detailStyles.sowingValue}>
+										{veg.sowingDistance}
+									</StyledText>
+								</View>
+								<View style={detailStyles.sowingItem}>
+									<StyledText type="smParagh" style={detailStyles.sowingLabel}>
+										Potdiepte
+									</StyledText>
+									<StyledText type="paragh" style={detailStyles.sowingValue}>
+										{veg.potDepth}
+									</StyledText>
+								</View>
+								<View style={detailStyles.sowingItem}>
+									<StyledText type="smParagh" style={detailStyles.sowingLabel}>
+										Periode
+									</StyledText>
+									<StyledText type="paragh" style={detailStyles.sowingValue}>
+										{formatSowingPeriod(veg.sowingPeriod.startMonth, veg.sowingPeriod.endMonth)}
+									</StyledText>
+								</View>
+							</View>
 
-						<Spacer space={Styling.Spacing.reg} />
-						<TouchableOpacity style={styles.greenBtn} onPress={() => setStep("step1")} activeOpacity={0.7}>
-							<StyledText type="head4" style={{ color: Styling.Colors.white }}>Starten</StyledText>
-						</TouchableOpacity>
-						<Spacer space={170} />
-					</ScrollView>
+							<Spacer space={Styling.Spacing.reg} />
+
+							<StyledText type="head3" style={detailStyles.sectionTitle}>
+								Groeicyclus
+							</StyledText>
+							<Spacer space={Styling.Spacing.sml} />
+							<View style={detailStyles.stagesContainer}>
+								{veg.stages.map((stage, i) => (
+									<View key={i} style={detailStyles.stageRow}>
+										<StyledText type="paragh" style={detailStyles.stageLabel}>
+											{stage.label}
+										</StyledText>
+										<StyledText type="smParagh" style={detailStyles.stageDays}>
+											{stage.durationDays} dagen
+										</StyledText>
+									</View>
+								))}
+							</View>
+							<StyledText type="smParagh" style={detailStyles.totalTime}>
+								Totale tijd: ±{veg.totalDays} dagen
+							</StyledText>
+
+							<Spacer space={Styling.Spacing.reg} />
+							<TouchableOpacity style={styles.greenBtn} onPress={() => setStep("step1")} activeOpacity={0.7}>
+								<StyledText type="head4" style={{ color: Styling.Colors.white }}>Starten</StyledText>
+							</TouchableOpacity>
+							<Spacer space={40} />
+						</ScrollView>
+					</View>
 				);
 			}
 
@@ -817,7 +819,6 @@ const detailStyles = StyleSheet.create({
 	},
 	scrollContent: {
 		alignItems: "center",
-		marginTop: -25,
-		paddingBottom: 170,
+		paddingBottom: 40,
 	},
 });
