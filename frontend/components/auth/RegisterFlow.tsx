@@ -264,7 +264,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 						</View>
 
 						<View style={detailStyles.infoRow}>
-							<WaveBackground waveHeight={280} leftOffset={-770} widthMultiplier={6} style={{ marginTop: 10 }} />
+							<WaveBackground waveHeight={280} leftOffset={-770} widthMultiplier={6} style={{ marginTop: 30 }} />
 							<View style={detailStyles.infoRowContent}>
 								<View style={detailStyles.imageContainer}>
 									<Image source={{ uri: veg.image }} style={detailStyles.image} resizeMode="contain" />
@@ -604,7 +604,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: "center",
 		marginTop: -25,
-		overflow: "visible",
 	},
 	centeredContent: {
 		flex: 1,
@@ -749,7 +748,6 @@ const detailStyles = StyleSheet.create({
 		height: 260,
 		marginTop: -10,
 		width: "100%",
-		overflow: "visible",
 	},
 	infoRowContent: {
 		flex: 1,
@@ -779,6 +777,7 @@ const detailStyles = StyleSheet.create({
 		flexWrap: "wrap",
 		justifyContent: "space-between",
 		gap: Styling.Spacing.reg,
+		width: "100%",
 	},
 	sowingItem: {
 		width: "45%",
@@ -792,7 +791,9 @@ const detailStyles = StyleSheet.create({
 	sowingValue: {
 		color: Styling.Colors.white,
 	},
-	stagesContainer: {},
+	stagesContainer: {
+		width: "100%",
+	},
 	stageRow: {
 		flexDirection: "row",
 		alignItems: "center",
