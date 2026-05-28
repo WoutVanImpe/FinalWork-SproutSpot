@@ -127,11 +127,10 @@ int readSoilMoisture() {
   return rawSoil; // Send raw 1690-2765
 }
 
-// --- HTML FORMULIER ---
-String getHtmlForm(String error = "") {
+// --- HTML PAGINA'S ---
+String getHtmlHead() {
   float v = readBatteryVoltage();
   int pct = calculateBatteryPercentage(v);
-
   String batteryColor = "#00CA68";
   if (pct < 20) batteryColor = "#C44028";
 
@@ -157,9 +156,17 @@ String getHtmlForm(String error = "") {
   html += ".spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 4px solid #e0e0e0; border-top: 4px solid #00CA68; border-radius: 50%; animation: spin 0.8s linear infinite; }";
   html += "@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }";
   html += ".loading p { color: #555; font-size: 14px; margin: 0; }";
+  html += ".checkmark { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 50%; background: #00CA68; display: flex; align-items: center; justify-content: center; }";
+  html += ".checkmark svg { width: 32px; height: 32px; }";
+  html += ".success-text { color: #555; font-size: 14px; text-align: center; margin: 0; }";
   html += "</style></head><body>";
-  
+
   html += "<div class='battery-status'><span>" + String(pct) + "%</span><div class='battery-icon'><div class='battery-level'></div></div></div>";
+  return html;
+}
+
+String getHtmlForm(String error = "") {
+  String html = getHtmlHead();
   html += "<div class='card'><h2>Sonde Registratie</h2><p style='color:#555; font-size:14px; text-align:center;'>Koppel je SproutSpot sonde aan je account</p>";
   
   if (error != "") html += "<div class='error'>" + error + "</div>";
@@ -172,6 +179,16 @@ String getHtmlForm(String error = "") {
   html += "<div class='btn-wrapper'><button type='submit'>Verifieer & Koppel</button></div></form>";
   html += "<div id='loading' class='loading' style='display:none'><div class='spinner'></div><p>Bezig met verbinden...</p></div>";
   html += "<script>document.querySelector('form').onsubmit=function(){document.querySelector('form').style.display='none';document.getElementById('loading').style.display='block';}</script>";
+  html += "</div></body></html>";
+  return html;
+}
+
+String getHtmlSuccess() {
+  String html = getHtmlHead();
+  html += "<div class='card' style='text-align:center;'>";
+  html += "<div class='checkmark'><svg viewBox='0 0 24 24' fill='none' stroke='#fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'></polyline></svg></div>";
+  html += "<h2>Gekoppeld!</h2>";
+  html += "<p class='success-text'>Sonde succesvol geregistreerd.<br>Herstarten...</p>";
   html += "</div></body></html>";
   return html;
 }
@@ -215,7 +232,7 @@ void handleSave() {
     
     isSondeActief = true; 
     
-    server.send(200, "text/html", "<html><body><h2>Gekoppeld! Herstarten...</h2></body></html>");
+    server.send(200, "text/html", getHtmlSuccess());
     delay(3000);
     ESP.restart();
   } else {
