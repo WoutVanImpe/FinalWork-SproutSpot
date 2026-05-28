@@ -255,7 +255,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 				if (!plantDetail) return <View style={styles.content}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></View>;
 				const veg = plantDetail;
 				return (
-					<ScrollView style={styles.content} contentContainerStyle={detailStyles.scrollContent} showsVerticalScrollIndicator={false}>
+					<ScrollView style={{ flex: 1 }} contentContainerStyle={detailStyles.scrollContent} showsVerticalScrollIndicator={false}>
 						<View style={styles.finderHeader}>
 							<TouchableOpacity onPress={goBack} style={styles.backBtn} activeOpacity={0.7}>
 								<StyledIcon Icon={BackIcon} size="med" fill={Styling.Colors.white} />
@@ -817,6 +817,7 @@ const detailStyles = StyleSheet.create({
 	},
 	scrollContent: {
 		alignItems: "center",
+		marginTop: -25,
 		paddingBottom: 170,
 	},
 });
