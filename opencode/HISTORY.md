@@ -1829,3 +1829,30 @@ Refactored `POST /api/probes/register` to handle both scenarios:
 
 ### TypeScript
 - Backend: zero errors (`npx tsc --noEmit`)
+
+## 28/05/2026: Registration Flow Fix — RegisterWizard Before Tabs, UI Padding Fixes
+
+### Problem
+1. **Wizard skipped**: After registration, `user` was set immediately, causing the `user ? tabs : ...` branch to render before `showRegisterFlow` could take effect — the 5-step plant wizard never appeared
+2. **Navbar overlapped**: `bottom: insets.bottom` had no extra clearance — tab bar sat flush against system navigation bar
+3. **Bottom sheets overlapped**: EditActionSheet and PlantSheet padding was static, not accounting for safe area bottom
+4. **Empty state off-center**: `Spacer space={120}` with `justifyContent: "center"` pushed garden empty-state content 120px below vertical center
+5. **BorderRadius regression**: Commit `75bddb6` (revert) undid `lrg: 999` back to `"50%"` — percentage borderRadius broken on old architecture
+
+### Fixes
+- `_layout.tsx`: Moved `showRegisterFlow` render to **before** `user` check — wizard renders even after `user` is non-null; existing users unaffected (their `showRegisterFlow` stays `false`)
+- `_layout.tsx:83`: `bottom: insets.bottom` → `bottom: insets.bottom + 10`
+- `EditActionSheet.tsx:49`: Added `+ 30` to `paddingBottom`
+- `PlantSheet.tsx`: Added `useSafeAreaInsets()`, dynamic `paddingBottom: Styling.Padding.xlg + insets.bottom`, removed static style
+- `garden.tsx`: Removed `Spacer space={120}` from empty state
+- `Styling.ts`: `BorderRadius.lrg` changed from `"50%"` (string) to `999` (number); interface updated from `string` to `number`
+
+### Files Modified
+- `frontend/app/_layout.tsx` — render order swap + navbar bottom
+- `frontend/app/(garden)/garden.tsx` — empty state layout
+- `frontend/components/pages/garden/editMode/EditActionSheet.tsx` — bottom padding
+- `frontend/components/pages/garden/plantSheet/PlantSheet.tsx` — bottom padding
+- `frontend/constants/Styling.ts` — BorderRadius.lrg type + value
+
+### TypeScript
+- Frontend: zero errors (`npx tsc --noEmit`)
