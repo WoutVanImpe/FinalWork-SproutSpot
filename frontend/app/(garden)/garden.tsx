@@ -376,7 +376,6 @@ const Garden = () => {
 	if (plants.length === 0) {
 		return (
 			<View style={[styles.page, { justifyContent: "center", alignItems: "center" }]}>
-				<Spacer space={120} />
 				<StyledText type="head3" style={{ textAlign: "center" }}>
 					Je tuin is nog leeg
 				</StyledText>

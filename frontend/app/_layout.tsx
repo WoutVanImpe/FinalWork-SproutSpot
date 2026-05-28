@@ -80,7 +80,7 @@ const CustomTabBar = ({ state, navigation }: any) => {
 	}, [visibleIndex]);
 
 	return (
-		<View style={[styles.wrapper, { width: SCREEN_WIDTH, bottom: insets.bottom }]}>
+		<View style={[styles.wrapper, { width: SCREEN_WIDTH, bottom: insets.bottom + 10 }]}>
 			<CurvedBackground width={barWidth} cx={visibleIndex >= 0 ? cx : -999} />
 			<View style={[styles.bar, { width: barWidth }]}>
 				{visibleRoutes.map((route: any, index: number) => (
@@ -151,7 +151,9 @@ const AppContent = () => {
 
 	return (
 		<View style={{ flex: 1 }}>
-			{user ? (
+			{showRegisterFlow ? (
+				<RegisterFlow onComplete={(vegId, name) => { setShowRegisterFlow(false); setPendingPlant({ vegId, name }); }} />
+			) : user ? (
 				<OverlayProvider>
 					<StatusBar style="light" />
 					{!isAccountPage && <NavHeader />}
@@ -166,8 +168,6 @@ const AppContent = () => {
 				<OnboardingCarousel onComplete={() => { setShowOnboarding(false); setShowAuth(true); }} />
 			) : showAuth ? (
 				<AuthScreen onComplete={(mode) => { setShowAuth(false); if (mode === "register") { setShowRegisterFlow(true); } }} />
-			) : showRegisterFlow ? (
-				<RegisterFlow onComplete={(vegId, name) => { setShowRegisterFlow(false); setPendingPlant({ vegId, name }); }} />
 			) : (
 				<View style={{ flex: 1, backgroundColor: "#3E4348" }} />
 			)}

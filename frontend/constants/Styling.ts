@@ -48,7 +48,7 @@ interface Styling {
 		sml: number;
 		reg: number;
 		med: number;
-		lrg: string;
+		lrg: number;
 	};
 	IconSize: {
 		sml: number;
@@ -116,7 +116,7 @@ export const Styling: Styling = {
 		sml: 4,
 		reg: 8,
 		med: 32,
-		lrg: "50%",
+		lrg: 999,
 	},
 
 	IconSize: {
