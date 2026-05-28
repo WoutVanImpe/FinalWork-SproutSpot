@@ -192,7 +192,7 @@ export class ProbeService {
 	 * @returns {ProbeHealthResponse} Object with level ("Good"/"Medium"/"Low"/"Critical") and percentage (0-100).
 	 */
 	getBatteryStatus(batteryVoltage: number): ProbeHealthResponse {
-		const MIN_VOLTAGE = 3.0;
+		const MIN_VOLTAGE = 3.3;
 		const MAX_VOLTAGE = 4.2;
 
 		const percentage = Math.round(((batteryVoltage - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 100);

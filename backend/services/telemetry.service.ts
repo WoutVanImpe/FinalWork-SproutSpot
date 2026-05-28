@@ -56,7 +56,7 @@ export class TelemetryService {
 	}
 
 	private batteryPercentage(voltage: number): number {
-		const MIN_VOLTAGE = 3.0;
+		const MIN_VOLTAGE = 3.3;
 		const MAX_VOLTAGE = 4.2;
 		const pct = Math.round(((voltage - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 100);
 		return Math.max(0, Math.min(100, pct));
@@ -269,7 +269,7 @@ export class TelemetryService {
 	}
 
 	async checkStaleProbes(): Promise<void> {
-		const BATTERY_LOW_VOLTAGE = 3.12;
+		const BATTERY_LOW_VOLTAGE = 3.39;
 
 		const stale = await this.probeRepository.findStaleProbes(STALE_THRESHOLD_MINUTES);
 

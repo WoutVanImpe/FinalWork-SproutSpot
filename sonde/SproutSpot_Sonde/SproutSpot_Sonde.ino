@@ -71,53 +71,49 @@ int calculateBatteryPercentage(float voltage);
 
 // --- HARDWARE VERIFICATIES ---
 
-// 1. Interne meting (Ongefilterd)
+const float PLUGIN_THRESHOLD = 4.28;
+const float BATTERY_MIN_SAFE = 3.30;
+
 float getRawBatteryVoltage() {
-  int rawADC = analogRead(BATTERY_PIN);
-  float pinVoltage = (rawADC / 4095.0) * 3.3;
-  return pinVoltage * 4.03; // Factor op basis van 100k + 33k
+  uint32_t sum = 0;
+  for (int i = 0; i < 16; i++) {
+    sum += analogReadMilliVolts(BATTERY_PIN);
+    delay(1);
+  }
+  float mv = sum / 16.0;
+  return (mv / 1000.0) * 4.03;
 }
 
-// 2. USB Detectie (Optie 2: Kijkt of de laadchip piekt > 4.21V)
 bool isPluggedIn() {
-  return getRawBatteryVoltage() >= 4.21; 
+  return getRawBatteryVoltage() >= PLUGIN_THRESHOLD;
 }
 
-// 3. Database meting (Gefilterd voor de app)
 float readBatteryVoltage() {
   float v = getRawBatteryVoltage();
   
-  // Als we NIET aan het laden zijn, hanteren we de normale limieten
-  if (!isPluggedIn()) {
+  if (v < PLUGIN_THRESHOLD) {
     if (v > 4.20) return 4.20;
     if (v < 0.50) return 0.00;
     return v;
   }
   
-  // Als we WEL aan het laden zijn, corrigeert de software de laaddruk!
-  // We begrenzen het laadvoltage op max 4.35V (laadspanning van de chip)
   if (v > 4.35) return 4.35;
   return v;
 }
 
 int calculateBatteryPercentage(float voltage) {
-  // Toestand A: Sonde werkt op de batterij (Normaal bereik: 3.0V - 4.2V)
-  if (!isPluggedIn()) {
+  if (voltage < PLUGIN_THRESHOLD) {
     if (voltage >= 4.20) return 100;
-    if (voltage <= 3.00) return 0;
-    return (int)(((voltage - 3.00) / 1.20) * 100.0);
+    if (voltage <= BATTERY_MIN_SAFE) return 0;
+    return (int)(((voltage - BATTERY_MIN_SAFE) / (4.20 - BATTERY_MIN_SAFE)) * 100.0);
   }
   
-  // Toestand B: Sonde hangt aan de USB en laadt op!
-  // Omdat de lader de spanning omhoog stuurt, verschuiven we het meetbereik 
-  // softwarematig naar bijvoorbeeld 3.65V (lege accu aan lader) tot 4.30V (vol aan lader)
-  float minChargingVoltage = 3.65; 
+  float minChargingVoltage = 3.65;
   float maxChargingVoltage = 4.30;
   
   if (voltage >= maxChargingVoltage) return 100;
   if (voltage <= minChargingVoltage) return 0;
   
-  // Berekening tijdens het laden
   return (int)(((voltage - minChargingVoltage) / (maxChargingVoltage - minChargingVoltage)) * 100.0);
 }
 
@@ -147,6 +143,7 @@ String getHtmlHead() {
   html += ".battery-icon::after { content: ''; position: absolute; right: -4px; top: 3px; width: 2px; height: 4px; background: #fff; border-radius: 0 1px 1px 0; }";
   html += ".battery-level { height: 100%; background: " + batteryColor + "; border-radius: 1px; width: " + String(pct) + "%; }"; 
   html += "h2 { color: #00CA68; text-align: center; font-weight: 700; font-size: 24px; margin: 0 0 8px 0; }";
+  html += ".charging { color: #00CA68; font-size: 11px; font-weight: 700; text-align: right; margin-top: 2px; }";
   html += ".error { color: #C44028; background: #fdecea; padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; font-weight: 500; text-align: center; }";
   html += "input { width: 100%; padding: 12px 0; margin: 8px 0 4px; border: none; border-bottom: 1px solid #00CA68; background: transparent; font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 14px; color: #222; outline: none; }";
   html += "input:focus { border-bottom-color: #00CA68; }";
@@ -161,7 +158,11 @@ String getHtmlHead() {
   html += ".success-text { color: #555; font-size: 14px; text-align: center; margin: 0; }";
   html += "</style></head><body>";
 
-  html += "<div class='battery-status'><span>" + String(pct) + "%</span><div class='battery-icon'><div class='battery-level'></div></div></div>";
+  if (isPluggedIn()) {
+    html += "<div class='battery-status'><div><div><span>" + String(pct) + "%</span></div><div class='charging'>Opladen...</div></div><div class='battery-icon'><div class='battery-level'></div></div></div>";
+  } else {
+    html += "<div class='battery-status'><span>" + String(pct) + "%</span><div class='battery-icon'><div class='battery-level'></div></div></div>";
+  }
   return html;
 }
 
@@ -269,6 +270,12 @@ void setup() {
 
   // Configureer de ESP32-C3 GPIO wakeup voor als hij op batterij slaapt
   esp_deep_sleep_enable_gpio_wakeup(1ULL << RESET_BUTTON_PIN, ESP_GPIO_WAKEUP_GPIO_LOW);
+
+  float batteryV = getRawBatteryVoltage();
+  if (batteryV < BATTERY_MIN_SAFE) {
+    Serial.printf("[BATTERY] Spanning te laag (%.2fV < %.2fV). Diepe slaap om batterij te beschermen.\n", batteryV, BATTERY_MIN_SAFE);
+    esp_deep_sleep_start();
+  }
 
   Wire.begin(6, 7); 
   sht31.begin();
