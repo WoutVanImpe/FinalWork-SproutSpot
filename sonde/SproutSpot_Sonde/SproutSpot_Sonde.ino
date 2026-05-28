@@ -296,7 +296,13 @@ void setup() {
 
   // --- CRUCIALE VERPLAATSING: Controleer direct de knop bij boot ---
   // Als je de knop indrukt terwijl de USB-kabel erin zit, vangen we hem NU af!
-  if (digitalRead(RESET_BUTTON_PIN) == LOW) {
+  // Debounce: 5 reads with 5ms delay, all must be LOW
+  bool buttonPressed = true;
+  for (int i = 0; i < 5; i++) {
+    if (digitalRead(RESET_BUTTON_PIN) != LOW) { buttonPressed = false; break; }
+    delay(5);
+  }
+  if (buttonPressed) {
     Serial.println("[KNOP] Knop direct ingedrukt bij opstarten!");
     triggerManualSync();
   }
@@ -341,7 +347,13 @@ void setup() {
 
 void loop() {
   // Live knop check (voor als de lader-modus NIET actief is)
-  if (digitalRead(RESET_BUTTON_PIN) == LOW) {
+  // Debounce: 5 reads with 5ms delay, all must be LOW
+  bool buttonPressed = true;
+  for (int i = 0; i < 5; i++) {
+    if (digitalRead(RESET_BUTTON_PIN) != LOW) { buttonPressed = false; break; }
+    delay(5);
+  }
+  if (buttonPressed) {
     unsigned long pressStartTime = millis();
     bool longPressTriggered = false;
     delay(200); 
