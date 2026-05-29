@@ -1,4 +1,5 @@
 import { TelemetryRepository } from "../repositories/telemetry.repository";
+import { NotificationRepository } from "../repositories/notification.repository";
 import { ProbeRepository, StaleProbeResult } from "../repositories/probe.repository";
 import { PushNotificationService } from "./push-notification.service";
 import { TelemetryBatchUploadDto, TelemetryEntryDto } from "../types/dto";
@@ -21,11 +22,13 @@ interface MeasurementSample {
 
 export class TelemetryService {
 	private repository: TelemetryRepository;
+	private notificationRepository: NotificationRepository;
 	private probeRepository: ProbeRepository;
 	private pushNotificationService: PushNotificationService;
 
 	constructor() {
 		this.repository = new TelemetryRepository();
+		this.notificationRepository = new NotificationRepository();
 		this.probeRepository = new ProbeRepository();
 		this.pushNotificationService = new PushNotificationService();
 	}
@@ -241,29 +244,54 @@ export class TelemetryService {
 		userId: number | undefined,
 		plantNickname: string | null,
 	): Promise<void> {
+		const BATTERY_WARNING_VOLTAGE = 3.5;
 		const BATTERY_LOW_PCT = 10;
 		const pct = this.batteryPercentage(batteryVoltage);
 
-		if (pct < BATTERY_LOW_PCT && userPlantId != null && userId != null) {
-			const openIssues = await this.repository.findOpenIssuesByUserPlant(userPlantId);
-			const existing = openIssues.find((i) => i.issue_type === "BATTERY_LOW");
+		if (userPlantId == null || userId == null) {
+			if (pct < BATTERY_LOW_PCT) {
+				console.warn(`[Telemetry] BATTERY_LOW — probe battery at ${pct}% but no plant linked. Skipping issue creation.`);
+			}
+			return;
+		}
 
+		const openIssues = await this.repository.findOpenIssuesByUserPlant(userPlantId);
+
+		// --- BATTERY_WARNING (3.5V) ---
+		if (batteryVoltage <= BATTERY_WARNING_VOLTAGE && batteryVoltage > 3.3) {
+			const existing = openIssues.find((i) => i.issue_type === "BATTERY_WARNING");
+			if (!existing) {
+				const issue = await this.repository.createIssue(userPlantId, "BATTERY_WARNING");
+				await this.dispatchNotificationForIssue(issue, userId, userPlantId, plantNickname);
+				console.log(`[Telemetry] BATTERY_WARNING — voltage=${batteryVoltage}, pct=${pct}%`);
+			}
+		}
+
+		// --- BATTERY_LOW (10% = 3.39V) ---
+		if (pct < BATTERY_LOW_PCT) {
+			const existing = openIssues.find((i) => i.issue_type === "BATTERY_LOW");
 			if (existing) {
 				await this.repository.incrementIssueOccurrence(existing.id);
 			} else {
 				const issue = await this.repository.createIssue(userPlantId, "BATTERY_LOW");
 				await this.dispatchNotificationForIssue(issue, userId, userPlantId, plantNickname);
 			}
-
 			console.log(`[Telemetry] BATTERY_LOW — voltage=${batteryVoltage}, pct=${pct}% (instant trigger)`);
-		} else if (pct < BATTERY_LOW_PCT) {
-			console.warn(`[Telemetry] BATTERY_LOW — probe battery at ${pct}% but no plant linked. Skipping issue creation.`);
-		} else if (userPlantId != null) {
-			const openIssues = await this.repository.findOpenIssuesByUserPlant(userPlantId);
+		} else {
+			// Auto-resolve BATTERY_LOW bij herstel
 			const batteryIssue = openIssues.find((i) => i.issue_type === "BATTERY_LOW");
 			if (batteryIssue) {
 				console.log(`[Telemetry] Auto-resolving BATTERY_LOW (issue #${batteryIssue.id}) — battery recovered to ${pct}%`);
 				await this.repository.resolveIssue(batteryIssue.id);
+			}
+		}
+
+		// Auto-resolve BATTERY_WARNING bij herstel (> 3.5V)
+		if (batteryVoltage > BATTERY_WARNING_VOLTAGE) {
+			const warningIssue = openIssues.find((i) => i.issue_type === "BATTERY_WARNING");
+			if (warningIssue) {
+				console.log(`[Telemetry] Auto-resolving BATTERY_WARNING (issue #${warningIssue.id}) — battery recovered to ${batteryVoltage}V`);
+				await this.repository.resolveIssue(warningIssue.id);
 			}
 		}
 	}
@@ -357,6 +385,32 @@ export class TelemetryService {
 				}
 
 				console.log(`[Telemetry] TEMP_TOO_LOW — daily avg ${s.dailyAvgTemp.toFixed(1)}°C < ${s.tempMin}°C (end-of-day trigger)`);
+			}
+		}
+	}
+
+	async processSnoozedNotifications(): Promise<void> {
+		const due = await this.notificationRepository.getDueSnoozedNotifications();
+
+		for (const n of due) {
+			try {
+				const now = new Date();
+
+				if (n.notification_window_start && this.isWithinWindow(now, n.notification_window_start, n.notification_window_end)) {
+					await this.notificationRepository.activateSnoozedNotification(n.id);
+					await this.pushNotificationService.send(n.user_id, n.title, n.message);
+					console.log(`[Telemetry] Delivered snoozed notification ${n.id} to user ${n.user_id}`);
+				} else if (n.notification_window_start) {
+					const snoozedUntil = this.computeNextWindowStart(n.notification_window_start);
+					await this.notificationRepository.rescheduleSnoozedNotification(n.id, snoozedUntil);
+					console.log(`[Telemetry] Rescheduled snoozed notification ${n.id} to ${snoozedUntil.toISOString()}`);
+				} else {
+					await this.notificationRepository.activateSnoozedNotification(n.id);
+					await this.pushNotificationService.send(n.user_id, n.title, n.message);
+					console.log(`[Telemetry] Delivered snoozed notification ${n.id} (no window set)`);
+				}
+			} catch (err) {
+				console.error(`[Telemetry] Error processing snoozed notification ${n.id}:`, err);
 			}
 		}
 	}
@@ -490,7 +544,8 @@ export class TelemetryService {
 			case "TEMP_TOO_HIGH": return { title: "Temperatuur te hoog", message: `Het is te warm voor ${name}.` };
 			case "LIGHT_TOO_LOW": return { title: "Te weinig licht", message: `${name} krijgt te weinig licht.` };
 			case "LIGHT_TOO_HIGH": return { title: "Te veel licht", message: `${name} staat te fel.` };
-			case "BATTERY_LOW": return { title: "Batterij bijna leeg", message: `De batterij van de sonde bij ${name} is bijna leeg.` };
+			case "BATTERY_WARNING": return { title: "Batterij bijna leeg", message: `Laad de batterij van de sonde bij ${name} op.` };
+			case "BATTERY_LOW": return { title: "Batterij kritiek", message: `De batterij van de sonde bij ${name} is bijna leeg. Laad onmiddellijk op.` };
 			case "PROBE_STALE": return { title: "Sonde reageert niet", message: `De sonde bij ${name} stuurt al meer dan 3 uur geen data.` };
 			default: return { title: "Sensor alert", message: `Er is een probleem met ${name}.` };
 		}

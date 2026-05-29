@@ -13,11 +13,13 @@ export function startScheduler(): void {
 	telemetryService.checkStaleProbes();
 	telemetryService.checkDailyLightIntegral();
 	telemetryService.checkDailyTemperatureIntegral();
+	telemetryService.processSnoozedNotifications();
 
 	intervalHandle = setInterval(() => {
 		telemetryService.checkStaleProbes();
 		telemetryService.checkDailyLightIntegral();
 		telemetryService.checkDailyTemperatureIntegral();
+		telemetryService.processSnoozedNotifications();
 	}, CHECK_INTERVAL_MS);
 }
 
