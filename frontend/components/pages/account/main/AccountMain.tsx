@@ -3,6 +3,7 @@ import React from "react";
 import { Styling } from "../../../../constants/Styling";
 import StyledView from "../../../style/StyledView";
 import StyledButton from "../../../style/StyledButton";
+import StyledText from "../../../style/StyledText";
 import StyledIcon from "../../../style/StyledIcon";
 import Spacer from "../../../style/Spacer";
 import AccountSvg from "../../../../assets/icons/account.svg";
@@ -11,9 +12,10 @@ import { BAR_MARGIN } from "../../../../constants/tabConfig";
 interface AccountMainProps {
 	onNavigate: (view: string) => void;
 	onLogout: () => void;
+	notificationCount?: number;
 }
 
-const AccountMain = ({ onNavigate, onLogout }: AccountMainProps) => (
+const AccountMain = ({ onNavigate, onLogout, notificationCount }: AccountMainProps) => (
 	<StyledView>
 		<View style={styles.mainContent}>
 			<View style={styles.profileCircle}>
@@ -22,9 +24,16 @@ const AccountMain = ({ onNavigate, onLogout }: AccountMainProps) => (
 			<Spacer space={Styling.Spacing.xxl} />
 			<View style={styles.buttonStack}>
 				<TouchableOpacity style={styles.fullWidth} onPress={() => onNavigate("notifications")}>
-					<StyledButton fullCap style={styles.fullWidth}>
-						Notificaties
-					</StyledButton>
+					<View style={styles.notifBtnRow}>
+						<StyledButton fullCap style={styles.fullWidth}>
+							Notificaties
+						</StyledButton>
+						{notificationCount !== undefined && notificationCount > 0 && (
+							<View style={styles.notifBadge}>
+								<StyledText style={styles.notifBadgeText}>{notificationCount > 9 ? "9+" : notificationCount}</StyledText>
+							</View>
+						)}
+					</View>
 				</TouchableOpacity>
 				<TouchableOpacity style={styles.fullWidth} onPress={() => onNavigate("history")}>
 					<StyledButton fullCap style={styles.fullWidth}>
@@ -76,5 +85,29 @@ const styles = StyleSheet.create({
 	logoutButton: {
 		alignSelf: "stretch",
 		backgroundColor: Styling.Colors.red,
+	},
+	notifBtnRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		position: "relative",
+	},
+	notifBadge: {
+		position: "absolute",
+		right: 12,
+		top: "50%",
+		transform: [{ translateY: -9 }],
+		minWidth: 18,
+		height: 18,
+		borderRadius: 9,
+		backgroundColor: Styling.Colors.white,
+		justifyContent: "center",
+		alignItems: "center",
+		paddingHorizontal: 4,
+	},
+	notifBadgeText: {
+		color: Styling.Colors.darkGrey,
+		fontSize: 10,
+		fontFamily: Styling.Fonts.Family.bold,
+		lineHeight: 12,
 	},
 });

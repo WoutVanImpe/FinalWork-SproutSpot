@@ -25,3 +25,7 @@ export function resolveIssue(issueId: string) {
 export function resetNotification(notificationId: string) {
 	return api.post<void>(`/api/notifications/${notificationId}/reset`);
 }
+
+export function getNotificationCount() {
+	return api.get<{ count: number }>("/api/notifications/count");
+}
