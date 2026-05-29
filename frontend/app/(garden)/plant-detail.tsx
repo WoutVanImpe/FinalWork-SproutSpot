@@ -50,6 +50,20 @@ const STAGE_DESCRIPTIONS: Record<string, string[]> = {
   ],
 };
 
+function daysSince(dateStr: string): number {
+  if (!dateStr) return 1;
+  const created = new Date(dateStr);
+  const now = new Date();
+  const diff = now.getTime() - created.getTime();
+  return Math.max(1, Math.floor(diff / (1000 * 60 * 60 * 24)));
+}
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return "Onbekend";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("nl-BE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
+}
+
 const PlantDetail = () => {
   const { plantData } = useLocalSearchParams<{ plantData: string }>();
   const plant: GardenPlant | null = plantData ? JSON.parse(plantData) : null;
@@ -76,13 +90,13 @@ const PlantDetail = () => {
   const currentStageIndex = Math.min(plant.stage.current, stages.length - 1);
 
   const requirements = [
-    { label: "Water", level: plant.water.level, optimalMin: plant.water.optimalMin, optimalMax: plant.water.optimalMax },
-    { label: "Licht", level: plant.light.level, optimalMin: plant.light.optimalMin, optimalMax: plant.light.optimalMax },
-    { label: "Warmte", level: plant.temperature.level, optimalMin: plant.temperature.optimalMin, optimalMax: plant.temperature.optimalMax },
+    { label: "Water", value: `${plant.water.level}%`, level: plant.water.level, optimalMin: plant.water.optimalMin, optimalMax: plant.water.optimalMax },
+    { label: "Licht", value: `${plant.light.level}%`, level: plant.light.level, optimalMin: plant.light.optimalMin, optimalMax: plant.light.optimalMax },
+    { label: "Warmte", value: `${plant.temperature.level}%`, level: plant.temperature.level, optimalMin: plant.temperature.optimalMin, optimalMax: plant.temperature.optimalMax },
   ];
 
   const totalDays = stages[stages.length - 1].dayEnd;
-  const currentDay = stages[currentStageIndex]?.dayStart + Math.floor((stages[currentStageIndex]?.dayEnd - stages[currentStageIndex]?.dayStart) / 2) || 1;
+  const currentDay = daysSince(plant.created_at);
 
   return (
     <>
@@ -116,10 +130,10 @@ const PlantDetail = () => {
         <TechnicalOverview
           probeName={plant.probeName || `Sonde ${plant.nickname}`}
           battery={plant.battery}
-          lastMeasurement="12/05/2026 14:30"
+          lastMeasurement={formatDate(plant.last_seen)}
           moistureStatus={plant.water.label}
           lightStatus={plant.light.label}
-          lastTemp={22}
+          lastTemp={plant.last_temp}
         />
 
         <Spacer space={Styling.Spacing.lrg} />

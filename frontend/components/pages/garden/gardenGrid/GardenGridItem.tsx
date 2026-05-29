@@ -26,6 +26,9 @@ export interface GardenPlant {
 	advice: string;
 	battery: number;
 	probeName: string;
+	created_at: string;
+	last_seen: string | null;
+	last_temp: number;
 }
 
 const GardenGridItem = ({ plant }: { plant: GardenPlant }) => {
