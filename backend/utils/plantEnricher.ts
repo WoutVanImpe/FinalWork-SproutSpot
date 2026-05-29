@@ -1,6 +1,6 @@
 import { db } from "../db/connection";
 import { ProbeEntryRecord, PlantStageRecord } from "../types/database";
-import { toStageInfo } from "./plantMapper";
+import { toStageInfo, LIGHT_MAP, WATER_MAP } from "./plantMapper";
 import { buildImageUrl } from "../config";
 
 export interface PlantStatusData {
@@ -25,6 +25,9 @@ export interface EnrichedGardenPlant {
 	advice: string;
 	battery: number;
 	probe_name: string;
+	created_at: string;
+	last_seen: string | null;
+	last_temp: number;
 }
 
 function batteryPercentage(voltage: number): number {
@@ -66,14 +69,14 @@ export async function enrichPlant(
 
 	const waterStatus: PlantStatusData = {
 		level: latestTelemetry?.soil_moist_pct ?? 50,
-		label: rawPlant.water_label ?? "",
+		label: WATER_MAP[rawPlant.water_label?.toLowerCase()] ?? rawPlant.water_label ?? "",
 		optimalMin: stage?.thresholds?.soil_min ?? 30,
 		optimalMax: stage?.thresholds?.soil_max ?? 80,
 	};
 
 	const lightStatus: PlantStatusData = {
 		level: latestTelemetry?.light_lux != null ? Math.round((latestTelemetry.light_lux / 50000) * 100) : 50,
-		label: rawPlant.light_label ?? "",
+		label: LIGHT_MAP[rawPlant.light_label?.toLowerCase()] ?? rawPlant.light_label ?? "",
 		optimalMin: stage?.thresholds?.light_min != null ? Math.round((stage.thresholds.light_min / 50000) * 100) : 40,
 		optimalMax: stage?.thresholds?.light_max != null ? Math.round((stage.thresholds.light_max / 50000) * 100) : 80,
 	};
@@ -113,6 +116,9 @@ export async function enrichPlant(
 		advice: computeAdvice(namedStatuses),
 		battery: batteryPercentage(rawPlant.battery_voltage ?? 0),
 		probe_name: rawPlant.probe_name ?? "",
+		created_at: rawPlant.created_at ?? "",
+		last_seen: rawPlant.last_seen ?? null,
+		last_temp: latestTelemetry?.temp_c ?? 20,
 	};
 }
 
@@ -160,6 +166,9 @@ export async function enrichPlants(rawPlants: any[]): Promise<EnrichedGardenPlan
 				advice: "",
 				battery: batteryPercentage(rawPlant.battery_voltage ?? 0),
 				probe_name: rawPlant.probe_name ?? "",
+				created_at: rawPlant.created_at ?? "",
+				last_seen: rawPlant.last_seen ?? null,
+				last_temp: 20,
 			};
 		}
 	});

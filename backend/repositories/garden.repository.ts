@@ -65,6 +65,7 @@ export class GardenRepository {
 				"p.image as plant_image",
 				"up.current_stage_order",
 				"up.sonde_id",
+				"up.created_at",
 				"pr.name as probe_name",
 				"pr.battery_voltage",
 				"pr.wifi_rssi",
