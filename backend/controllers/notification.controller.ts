@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { NotificationService } from "../services/notification.service";
+import { PushNotificationService } from "../services/push-notification.service";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 import { buildImageUrl } from "../config";
 
@@ -24,9 +25,11 @@ function mapNotification(n: any) {
 
 export class NotificationController {
 	private service: NotificationService;
+	private pushService: PushNotificationService;
 
 	constructor() {
 		this.service = new NotificationService();
+		this.pushService = new PushNotificationService();
 	}
 
 	/**
