@@ -38,6 +38,9 @@ function enrichedToGardenPlant(p: EnrichedPlant): GardenPlant {
 		advice: p.advice,
 		battery: p.battery,
 		probeName: p.probe_name,
+		created_at: p.created_at,
+		last_seen: p.last_seen,
+		last_temp: p.last_temp,
 	};
 }
 

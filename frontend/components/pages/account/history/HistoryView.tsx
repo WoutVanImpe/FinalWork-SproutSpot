@@ -1,4 +1,4 @@
-import { Image, ScrollView, StyleSheet, View } from "react-native";
+import { Image, ImageSourcePropType, ScrollView, StyleSheet, View } from "react-native";
 import React from "react";
 import { Styling } from "../../../../constants/Styling";
 import StyledView from "../../../style/StyledView";
@@ -11,7 +11,7 @@ export interface HistoryEntry {
 	date: string;
 	time: string;
 	event: string;
-	image?: number;
+	image?: ImageSourcePropType;
 }
 
 interface HistoryViewProps {

@@ -21,7 +21,7 @@ function apiNotifToView(n: ApiNotification): NotificationItem {
 		type: n.type,
 		title: n.title,
 		description: n.description,
-		image: n.image ?? (0 as unknown as number),
+		image: n.image ?? null,
 		snoozed: n.snoozed,
 	};
 }
@@ -69,7 +69,8 @@ const Account = () => {
 	const [pairingCode, setPairingCode] = useState("");
 	const [pushEnabled, setPushEnabled] = useState(true);
 	const [activeHours, setActiveHours] = useState<number[]>([8, 9, 10]);
-	const [historyEntries] = useState<HistoryEntry[]>([]);
+	const [historyEntries, setHistoryEntries] = useState<HistoryEntry[]>([]);
+	const unacknowledgedCount = notifications.filter((n) => !n.snoozed).length;
 
 	useEffect(() => {
 		getNotifications(true)
@@ -136,9 +137,37 @@ const Account = () => {
 		setActiveHours(hours);
 	};
 
+	useEffect(() => {
+		if (currentView === "notifications") {
+			getNotifications(true)
+				.then((res) => { if (res.data) setNotifications(res.data.map(apiNotifToView)); })
+				.catch(console.error);
+		}
+		if (currentView === "history") {
+			getNotifications(true)
+				.then((res) => {
+					if (res.data) {
+						setHistoryEntries(
+							res.data.map((n) => {
+								const dt = n.created_at ? new Date(n.created_at) : new Date();
+								return {
+									id: n.id,
+									date: dt.toLocaleDateString("nl-BE", { day: "2-digit", month: "2-digit", year: "numeric" }),
+									time: dt.toLocaleTimeString("nl-BE", { hour: "2-digit", minute: "2-digit", hour12: false }),
+									event: n.title + (n.description ? ` — ${n.description}` : ""),
+									image: n.image ?? undefined,
+								};
+							}),
+						);
+					}
+				})
+				.catch(console.error);
+		}
+	}, [currentView]);
+
 	switch (currentView) {
 		case "main":
-			return <AccountMain onNavigate={setCurrentView} onLogout={handleLogout} />;
+			return <AccountMain onNavigate={setCurrentView} onLogout={handleLogout} notificationCount={unacknowledgedCount} />;
 		case "notifications":
 			return <NotificationsView notifications={notifications} onBack={() => setCurrentView("main")} onDismiss={handleDismiss} onSnooze={handleSnooze} onValidate={() => setCurrentView("validate_step1")} />;
 		case "validate_step1":

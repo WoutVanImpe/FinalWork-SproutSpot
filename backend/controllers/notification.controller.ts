@@ -117,30 +117,9 @@ export class NotificationController {
 	};
 
 	/**
-	 * @description Send a test push notification to the authenticated user (for debugging).
-	 */
-	sendTestPush = async (req: AuthenticatedRequest, res: Response) => {
-		try {
-			const userId = req.user?.id;
-
-			if (!userId) {
-				res.status(401).json({ error: "Unauthorized", message: "Authentication required" });
-				return;
-			}
-
-			await this.pushService.send(userId, "Test notificatie", "Dit is een testpush van SproutSpot!");
-
-			res.status(200).json({ success: true, message: "Test push sent" });
-		} catch (error) {
-			console.error("[NotificationController] test push error:", error);
-			res.status(500).json({ error: "Internal Server Error", message: "Failed to send test push" });
-		}
-	};
-
-	/**
-	 * @description Reset a notification's state back to "sent" and clear any snooze timer, effectively re-triggering it.
+	 * @description Reset a notification's state — now snoozes for 12 hours instead of immediately re-sending.
 	 * @param {AuthenticatedRequest} req - Authenticated request with notificationId as URL parameter.
-	 * @param {Response} res - Express response with reset notification data.
+	 * @param {Response} res - Express response with updated notification data.
 	 * @returns {void}
 	 */
 	resetNotificationState = async (req: AuthenticatedRequest, res: Response) => {
@@ -154,7 +133,7 @@ export class NotificationController {
 
 			const notification = await this.service.resetNotificationState(id);
 
-			res.status(200).json({ success: true, message: "Notification state reset to sent", data: notification });
+			res.status(200).json({ success: true, message: "Notification snoozed for 12 hours", data: notification });
 		} catch (error) {
 			if ((error as Error).message === "Notification not found") {
 				res.status(404).json({ error: "Not Found", message: (error as Error).message });
@@ -163,6 +142,30 @@ export class NotificationController {
 
 			console.error("[NotificationController] Error:", error);
 			res.status(500).json({ error: "Internal Server Error", message: "Failed to reset notification" });
+		}
+	};
+
+	/**
+	 * @description Get the count of unacknowledged notifications for the authenticated user.
+	 * @param {AuthenticatedRequest} req - Authenticated request.
+	 * @param {Response} res - Express response with count.
+	 * @returns {void}
+	 */
+	getNotificationCount = async (req: AuthenticatedRequest, res: Response) => {
+		try {
+			const userId = req.user?.id;
+
+			if (!userId) {
+				res.status(401).json({ error: "Unauthorized", message: "Authentication required" });
+				return;
+			}
+
+			const count = await this.service.getUnacknowledgedCount(userId);
+
+			res.status(200).json({ success: true, count });
+		} catch (error) {
+			console.error("[NotificationController] Error:", error);
+			res.status(500).json({ error: "Internal Server Error", message: "Failed to get notification count" });
 		}
 	};
 }

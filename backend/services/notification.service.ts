@@ -56,9 +56,9 @@ export class NotificationService {
 	}
 
 	/**
-	 * @description Reset a notification's state back to "sent" and clear any snooze timer, effectively re-triggering it.
+	 * @description Snooze a notification for half a day (12 hours) instead of immediately re-sending it.
 	 * @param {number} notificationId - The notification's database ID.
-	 * @returns {Promise<PendingNotificationRecord>} The reset notification record.
+	 * @returns {Promise<PendingNotificationRecord>} The updated notification record.
 	 */
 	async resetNotificationState(notificationId: number): Promise<PendingNotificationRecord> {
 		const notification = await this.repository.getNotificationById(notificationId);
@@ -67,6 +67,15 @@ export class NotificationService {
 			throw new Error("Notification not found");
 		}
 
-		return this.repository.resetNotificationState(notificationId);
+		return this.repository.snoozeForHalfDay(notificationId);
+	}
+
+	/**
+	 * @description Get the count of unacknowledged notifications for a user.
+	 * @param {number} userId - The user's database ID.
+	 * @returns {Promise<number>} The count.
+	 */
+	async getUnacknowledgedCount(userId: number): Promise<number> {
+		return this.repository.getUnacknowledgedCount(userId);
 	}
 }

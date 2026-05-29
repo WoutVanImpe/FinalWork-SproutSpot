@@ -22,6 +22,9 @@ export interface EnrichedPlant {
 	advice: string;
 	battery: number;
 	probe_name: string;
+	created_at: string;
+	last_seen: string | null;
+	last_temp: number;
 }
 
 export interface GardenData {

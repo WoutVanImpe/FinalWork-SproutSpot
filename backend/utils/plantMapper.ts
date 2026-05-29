@@ -35,13 +35,13 @@ export interface StageInfo {
 	durationDays: number;
 }
 
-const LIGHT_MAP: Record<string, string> = {
+export const LIGHT_MAP: Record<string, string> = {
 	"full sun": "Volle zon",
 	"partial shade": "Halfschaduw",
 	"shade": "Schaduw",
 };
 
-const WATER_MAP: Record<string, string> = {
+export const WATER_MAP: Record<string, string> = {
 	"low": "Weinig water",
 	"moderate": "Regelmatig",
 	"high": "Veel water",

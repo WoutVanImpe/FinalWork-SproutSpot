@@ -12,7 +12,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CHART_PADDING = 40;
 const CHART_W = SCREEN_WIDTH - 80 - CHART_PADDING * 2;
 const CHART_H = 150;
-const GRAPH_PAD = { top: 12, bottom: 20, left: 35, right: 15 };
+const GRAPH_PAD = { top: 12, bottom: 20, left: 45, right: 15 };
 
 interface DataPoint {
 	value: number;
@@ -43,12 +43,40 @@ interface GraphModalProps {
 	onTimeRangeChange: (hours: number) => void;
 }
 
+function aggregateData(readings: ReadingRecord[], hours: number): ReadingRecord[] {
+  if (readings.length === 0) return [];
+  if (hours <= 24) return readings;
+  const threshold = hours <= 168 ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+  const groups = new Map<number, ReadingRecord[]>();
+  for (const r of readings) {
+    const t = new Date(r.created_at).getTime();
+    const bucket = Math.floor(t / threshold) * threshold;
+    if (!groups.has(bucket)) groups.set(bucket, []);
+    groups.get(bucket)!.push(r);
+  }
+  return Array.from(groups.values()).map((bucket) => {
+    const avg = (key: "soil_moist_pct" | "temp_c" | "light_lux" | "battery_voltage") =>
+      bucket.reduce((s, r) => s + (r[key] ?? 0), 0) / bucket.length;
+    return {
+      id: bucket[0].id,
+      sonde_id: bucket[0].sonde_id,
+      temp_c: Math.round(avg("temp_c") * 10) / 10,
+      humidity_pct: Math.round(avg("soil_moist_pct")),
+      light_lux: Math.round(avg("light_lux")),
+      soil_moist_pct: Math.round(avg("soil_moist_pct")),
+      battery_voltage: Math.round(avg("battery_voltage") * 100) / 100,
+      wifi_rssi: bucket[0].wifi_rssi,
+      created_at: bucket[0].created_at,
+    };
+  });
+}
+
 const toX = (i: number, total: number) => GRAPH_PAD.left + (i / (total - 1)) * CHART_W;
 const toY = (value: number, yMax: number) => GRAPH_PAD.top + CHART_H - (value / yMax) * (CHART_H - GRAPH_PAD.top - GRAPH_PAD.bottom);
 
 function formatLabel(iso: string): string {
 	const d = new Date(iso);
-	return String(d.getHours()).padStart(2, "0") + ":00";
+	return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
 }
 
 function getDataLabel(iso: string, index: number, total: number): string {
@@ -58,8 +86,9 @@ function getDataLabel(iso: string, index: number, total: number): string {
 	return "";
 }
 
-function buildMetrics(readings: ReadingRecord[], optimalRanges: GraphModalProps["optimalRanges"]): MetricConfig[] {
-	const sorted = [...readings].reverse();
+function buildMetrics(readings: ReadingRecord[], optimalRanges: GraphModalProps["optimalRanges"], hours: number): MetricConfig[] {
+	const aggregated = aggregateData(readings, hours);
+	const sorted = [...aggregated].reverse();
 	const dataMap = sorted.map((r) => ({ label: r.created_at, mo: r.soil_moist_pct ?? 0, te: r.temp_c ?? 0, li: r.light_lux ?? 0 }));
 	const maxTemp = Math.max(...dataMap.map((d) => d.te), 40);
 	const maxLight = Math.max(...dataMap.map((d) => d.li), 50000);
@@ -74,7 +103,7 @@ const GraphModal = ({ visible, onDismiss, readings, optimalRanges, selectedHours
 	const [selectedMetric, setSelectedMetric] = useState(0);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 
-	const METRICS = useMemo(() => buildMetrics(readings, optimalRanges), [readings, optimalRanges]);
+	const METRICS = useMemo(() => buildMetrics(readings, optimalRanges, selectedHours), [readings, optimalRanges, selectedHours]);
 
 	const metric = METRICS[selectedMetric] || METRICS[0];
 	const yMax = metric?.yMax ?? 100;
@@ -150,7 +179,7 @@ const GraphModal = ({ visible, onDismiss, readings, optimalRanges, selectedHours
 						)}
 					</View>
 
-					<View style={{ marginTop: -20 }} />
+					<Spacer space={8} />
 
 					<View style={styles.chartContainer}>
 						<Svg width={CHART_W + GRAPH_PAD.left + GRAPH_PAD.right} height={CHART_H + GRAPH_PAD.top + GRAPH_PAD.bottom}>
