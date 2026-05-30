@@ -15,6 +15,51 @@ import { GardenPlant } from "../../components/pages/garden/gardenGrid/GardenGrid
 import { getReadings } from "../../services/garden";
 import type { ReadingRecord } from "../../services/garden";
 
+const FALLBACK_STAGES: Record<string, { label: string; dayStart: number; dayEnd: number }[]> = {
+  Tomaat: [
+    { label: "Zaaien", dayStart: 0, dayEnd: 7 },
+    { label: "Kiem", dayStart: 7, dayEnd: 21 },
+    { label: "Blad", dayStart: 21, dayEnd: 42 },
+    { label: "Groeispurt", dayStart: 42, dayEnd: 63 },
+    { label: "Bloei", dayStart: 63, dayEnd: 77 },
+    { label: "Oogst", dayStart: 77, dayEnd: 90 },
+  ],
+  Kool: [
+    { label: "Zaaien", dayStart: 0, dayEnd: 10 },
+    { label: "Kiem", dayStart: 10, dayEnd: 25 },
+    { label: "Blad", dayStart: 25, dayEnd: 50 },
+    { label: "Groeispurt", dayStart: 50, dayEnd: 70 },
+    { label: "Oogst", dayStart: 70, dayEnd: 85 },
+  ],
+};
+
+const PLANT_DESCRIPTIONS: Record<string, string[]> = {
+  Tomaat: [
+    "Zaai de tomatenzaden in vochtige potgrond op een warme plek. Houd de grond constant vochtig maar niet nat.",
+    "De zaden ontkiemen. Kleine kiemblaadjes verschijnen boven de grond. Zorg voor voldoende licht om strekken te voorkomen.",
+    "De plant ontwikkelt echte bladeren. Verpot naar een grotere pot en begin met het afharden van de plant.",
+    "De plant maakt veel blad en stengels aan. Verhoog de watergift en begin met wekelijkse bemesting.",
+    "Bloemknoppen verschijnen aan de toppen. Zorg voor goede luchtcirculatie en blijf regelmatig water geven.",
+    "De tomaten zijn rijp en kunnen geoogst worden. Pluk regelmatig om nieuwe vruchtvorming te stimuleren.",
+  ],
+  Kool: [
+    "Zaai de koolzaden in zaaitrays met lichte potgrond. Heldere plek zonder directe felle zon.",
+    "De zaden ontkiemen en kleine kiemplantjes verschijnen. Verplaats naar een lichtere plek.",
+    "De plant vormt stevige bladeren. Verplant naar de definitieve plek met voldoende ruimte.",
+    "De kool begint een krop of stronk te vormen. Gelijkmatig water geven is nu belangrijk.",
+    "De kool is volgroeid en klaar om geoogst te worden. Snijd de stronk onder de krop af.",
+  ],
+};
+
+const GENERIC_STAGE_DESCRIPTIONS: Record<string, string> = {
+  "Zaaien": "Zaai de zaden in vochtige potgrond. Houd de grond constant vochtig maar niet te nat.",
+  "Kiem": "De zaden ontkiemen. Zorg voor voldoende licht en blijf de grond licht vochtig houden.",
+  "Blad": "De plant ontwikkelt bladeren. Verhoog de watergift en zorg voor voldoende voedingsstoffen.",
+  "Groeispurt": "De plant groeit snel. Geef regelmatig water en begin met wekelijkse bemesting.",
+  "Bloei": "Bloemknoppen verschijnen. Zorg voor goede luchtcirculatie en blijf regelmatig water geven.",
+  "Oogst": "De plant is klaar om geoogst te worden. Pluk of snijd regelmatig om nieuwe groei te stimuleren.",
+};
+
 function daysSince(dateStr: string): number {
   if (!dateStr) return 1;
   const created = new Date(dateStr);
@@ -29,9 +74,9 @@ function formatDate(dateStr: string | null): string {
   return d.toLocaleDateString("nl-BE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
-function buildStages(stageDefs?: { label: string; durationDays: number }[]) {
+function buildStages(stageDefs: { label: string; durationDays: number }[] | undefined, plantType: string) {
   if (!stageDefs || stageDefs.length === 0) {
-    return [{ label: "Onbekend", dayStart: 0, dayEnd: 90 }];
+    return FALLBACK_STAGES[plantType] ?? FALLBACK_STAGES["Tomaat"];
   }
   let cursor = 0;
   return stageDefs.map((s) => {
@@ -41,16 +86,10 @@ function buildStages(stageDefs?: { label: string; durationDays: number }[]) {
   });
 }
 
-function getStageDescription(stageLabel: string): string {
-  const descriptions: Record<string, string> = {
-    "Zaaien": "Zaai de zaden in vochtige potgrond. Houd de grond constant vochtig maar niet te nat.",
-    "Kiem": "De zaden ontkiemen. Zorg voor voldoende licht en blijf de grond licht vochtig houden.",
-    "Blad": "De plant ontwikkelt bladeren. Verhoog de watergift en zorg voor voldoende voedingsstoffen.",
-    "Groeispurt": "De plant groeit snel. Geef regelmatig water en begin met wekelijkse bemesting.",
-    "Bloei": "Bloemknoppen verschijnen. Zorg voor goede luchtcirculatie en blijf regelmatig water geven.",
-    "Oogst": "De plant is klaar om geoogst te worden. Pluk of snijd regelmatig om nieuwe groei te stimuleren.",
-  };
-  return descriptions[stageLabel] ?? "Volg de algemene verzorgingsinstructies voor deze plant.";
+function getStageDescription(stageLabel: string, plantType: string, stageIndex: number): string {
+  const plantDesc = PLANT_DESCRIPTIONS[plantType];
+  if (plantDesc && plantDesc[stageIndex]) return plantDesc[stageIndex];
+  return GENERIC_STAGE_DESCRIPTIONS[stageLabel] ?? "Volg de algemene verzorgingsinstructies voor deze plant.";
 }
 
 function waterDescription(waterLabel: string): string {
@@ -91,7 +130,7 @@ const PlantDetail = () => {
 
   if (!plant) return null;
 
-  const stages = buildStages(plant.stages);
+  const stages = buildStages(plant.stages, plant.type);
   const currentStageIndex = Math.min(plant.stage.current, stages.length - 1);
   const totalDays = plant.totalDays || stages[stages.length - 1]?.dayEnd || 1;
   const currentDay = daysSince(plant.created_at);
@@ -122,7 +161,7 @@ const PlantDetail = () => {
           currentStageIndex={currentStageIndex}
           currentDay={currentDay}
           totalDays={totalDays}
-          stageDescription={getStageDescription(stages[currentStageIndex]?.label ?? "")}
+          stageDescription={getStageDescription(stages[currentStageIndex]?.label ?? "", plant.type, currentStageIndex)}
         />
 
         <Spacer space={Styling.Spacing.xlg} />
