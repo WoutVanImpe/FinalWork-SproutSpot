@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		position: "relative",
+		width: "100%",
 	},
 	notifBadge: {
 		position: "absolute",
