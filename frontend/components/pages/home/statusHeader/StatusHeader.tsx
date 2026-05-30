@@ -140,9 +140,11 @@ const StatusHeader = ({ items, onItemPress }: StatusHeaderProps) => {
             </View>
 
             <View style={styles.contentRow}>
-                <TouchableOpacity onPress={prevItem} style={styles.navButton}>
-                    <StyledIcon Icon={ChevronLeft} fill={Styling.Colors.white} size="med" />
-                </TouchableOpacity>
+                {items.length > 1 && (
+                    <TouchableOpacity onPress={prevItem} style={styles.navButton}>
+                        <StyledIcon Icon={ChevronLeft} fill={Styling.Colors.white} size="med" />
+                    </TouchableOpacity>
+                )}
 
                 <View style={styles.centerSlideArea} {...panResponder.panHandlers}>
                     {transition ? (
@@ -201,9 +203,11 @@ const StatusHeader = ({ items, onItemPress }: StatusHeaderProps) => {
                     )}
                 </View>
 
-                <TouchableOpacity onPress={nextItem} style={styles.navButton}>
-                    <StyledIcon Icon={ChevronRight} fill={Styling.Colors.white} size="med" />
-                </TouchableOpacity>
+                {items.length > 1 && (
+                    <TouchableOpacity onPress={nextItem} style={styles.navButton}>
+                        <StyledIcon Icon={ChevronRight} fill={Styling.Colors.white} size="med" />
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     );
