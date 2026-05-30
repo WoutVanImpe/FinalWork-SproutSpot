@@ -39,8 +39,5 @@
   "private": true,
   "overrides": {
     "@expo/metro-runtime": "6.1.1"
-  },
-  "peerDependencies": {
-    "react-dom": "^19.1.0"
   }
 }
