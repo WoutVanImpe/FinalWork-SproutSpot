@@ -60,12 +60,12 @@ const Explore = () => {
 	}
 
 	return (
-		<View style={styles.page}>
+		<View style={[styles.page, { paddingTop: insets.top + 60 }]}>
 			<FlatList
 				data={filteredData}
 				numColumns={3}
 				keyExtractor={(item) => item.id}
-				contentContainerStyle={{ paddingTop: insets.top + 60, paddingBottom: 175, paddingHorizontal: BAR_MARGIN }}
+				contentContainerStyle={{ paddingBottom: 175, paddingHorizontal: BAR_MARGIN }}
 				columnWrapperStyle={styles.row}
 				keyboardShouldPersistTaps="handled"
 				showsVerticalScrollIndicator={false}

@@ -23,7 +23,7 @@ const StyledView = ({ style, children, ...props }: { style?: ViewStyle | ViewSty
 	return (
 		<ScrollView
 			ref={scrollRef}
-			style={[styles.base, { paddingBottom: insets.bottom }, style]}
+			style={[styles.base, { paddingTop: 110, paddingBottom: insets.bottom }, style]}
 			contentContainerStyle={styles.content}
 			keyboardShouldPersistTaps="handled"
 			showsVerticalScrollIndicator={false}
@@ -50,7 +50,6 @@ const styles = StyleSheet.create({
 		justifyContent: "flex-start",
 	},
 	contentPadding: {
-		paddingTop: 110,
 		paddingHorizontal: BAR_MARGIN,
 	},
 });
