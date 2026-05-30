@@ -24,7 +24,7 @@ interface NotificationsViewProps {
 }
 
 const NotificationsView = ({ notifications, onBack, onDismiss, onSnooze, onValidate }: NotificationsViewProps) => (
-	<StyledView>
+	<StyledView safe={false}>
 		<AccountHeader title="Notificaties" onBack={onBack} />
 		<Spacer space={Styling.Spacing.med}/>
 		<ScrollView contentContainerStyle={styles.scrollContent}>

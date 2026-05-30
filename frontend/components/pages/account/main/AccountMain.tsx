@@ -16,7 +16,7 @@ interface AccountMainProps {
 }
 
 const AccountMain = ({ onNavigate, onLogout, notificationCount }: AccountMainProps) => (
-	<StyledView>
+	<StyledView safe={false}>
 		<View style={styles.mainContent}>
 			<View style={styles.profileCircle}>
 				<StyledIcon Icon={AccountSvg} size={150} fill={Styling.Colors.white} />

@@ -39,7 +39,7 @@ const ProbesView = ({ onBack }: ProbesViewProps) => {
 	}, []);
 
 	return (
-		<StyledView>
+		<StyledView safe={false}>
 			<AccountHeader title="Mijn sondes" onBack={onBack} />
 			<Spacer space={Styling.Spacing.lrg} />
 			<View style={styles.content}>
