@@ -96,13 +96,18 @@ function getDataLabel(iso: string, index: number, total: number, hours: number):
 function buildMetrics(readings: ReadingRecord[], optimalRanges: GraphModalProps["optimalRanges"], hours: number): MetricConfig[] {
 	const aggregated = aggregateData(readings, hours);
 	const sorted = [...aggregated].reverse();
-	const dataMap = sorted.map((r) => ({ label: r.created_at, mo: r.soil_moist_pct ?? 0, te: r.temp_c ?? 0, li: r.light_lux ?? 0 }));
+	const dataMap = sorted.map((r) => ({
+		label: r.created_at,
+		mo: r.soil_moist_pct ?? 0,
+		te: r.temp_c ?? 0,
+		li: Math.round((r.light_lux ?? 0) / 50000 * 100),
+	}));
 	const maxTemp = Math.max(...dataMap.map((d) => d.te), 40);
-	const maxLight = Math.max(...dataMap.map((d) => d.li), 50000);
+	const maxLight = Math.max(...dataMap.map((d) => d.li), 100);
 	return [
 		{ key: "moist", label: "Vocht", unit: "%", optimalMin: optimalRanges.water.optimalMin, optimalMax: optimalRanges.water.optimalMax, yMax: 100, color: "#4A90D9", data: dataMap.map((d) => ({ value: d.mo, label: d.label })) },
 		{ key: "temp", label: "Temperatuur", unit: "°C", optimalMin: optimalRanges.temperature.optimalMin, optimalMax: optimalRanges.temperature.optimalMax, yMax: maxTemp, color: "#C44028", data: dataMap.map((d) => ({ value: d.te, label: d.label })) },
-		{ key: "light", label: "Licht", unit: "lux", optimalMin: optimalRanges.light.optimalMin, optimalMax: optimalRanges.light.optimalMax, yMax: maxLight, color: "#F5A623", data: dataMap.map((d) => ({ value: d.li, label: d.label })) },
+		{ key: "light", label: "Licht", unit: "%", optimalMin: optimalRanges.light.optimalMin, optimalMax: optimalRanges.light.optimalMax, yMax: maxLight, color: "#F5A623", data: dataMap.map((d) => ({ value: d.li, label: d.label })) },
 	];
 }
 
