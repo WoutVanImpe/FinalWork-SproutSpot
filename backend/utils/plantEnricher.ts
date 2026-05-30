@@ -19,6 +19,8 @@ export interface EnrichedGardenPlant {
 	nickname: string;
 	type: string;
 	stage: { current: number; max: number; label: string };
+	stages: { label: string; durationDays: number }[];
+	totalDays: number;
 	water: PlantStatusData;
 	light: PlantStatusData;
 	temperature: PlantStatusData;
@@ -96,6 +98,8 @@ export async function enrichPlant(
 	];
 
 	const imageUrl = buildImageUrl(rawPlant.plant_image ?? "");
+	const stageDefs = allStages.map((s) => toStageInfo(s));
+	const totalDays = stageDefs.reduce((sum, s) => sum + s.durationDays, 0);
 
 	return {
 		id: String(rawPlant.id),
@@ -110,6 +114,8 @@ export async function enrichPlant(
 			max: maxStages,
 			label: stageLabel,
 		},
+		stages: stageDefs,
+		totalDays,
 		water: waterStatus,
 		light: lightStatus,
 		temperature: tempStatus,
@@ -160,6 +166,8 @@ export async function enrichPlants(rawPlants: any[]): Promise<EnrichedGardenPlan
 				nickname: rawPlant.nickname ?? rawPlant.plant_name ?? "Plant",
 				type: rawPlant.plant_name ?? "",
 				stage: { current: rawPlant.current_stage_order ?? 1, max: 1, label: "Onbekend" },
+				stages: [],
+				totalDays: 0,
 				water: { level: 50, label: "", optimalMin: 30, optimalMax: 80 },
 				light: { level: 50, label: "", optimalMin: 40, optimalMax: 80 },
 				temperature: { level: 20, label: "", optimalMin: 10, optimalMax: 30 },

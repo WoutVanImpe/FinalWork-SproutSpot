@@ -26,6 +26,7 @@ const StyledView = ({ style, children, ...props }: { style?: ViewStyle | ViewSty
 			style={[styles.base, { paddingBottom: insets.bottom }, style]}
 			contentContainerStyle={styles.content}
 			keyboardShouldPersistTaps="handled"
+			showsVerticalScrollIndicator={false}
 			{...props}
 		>
 			<ScrollContext.Provider value={{ scrollTo }}>

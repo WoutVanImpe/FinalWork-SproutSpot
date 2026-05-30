@@ -25,7 +25,7 @@ const AccountMain = ({ onNavigate, onLogout, notificationCount }: AccountMainPro
 			<View style={styles.buttonStack}>
 				<TouchableOpacity style={styles.fullWidth} onPress={() => onNavigate("notifications")}>
 					<View style={styles.notifBtnRow}>
-						<StyledButton fullCap style={styles.fullWidth}>
+						<StyledButton fullCap style={{ width: "100%" }}>
 							Notificaties
 						</StyledButton>
 						{notificationCount !== undefined && notificationCount > 0 && (
@@ -90,14 +90,15 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		position: "relative",
+		width: "100%",
 	},
 	notifBadge: {
 		position: "absolute",
-		right: 12,
-		top: "50%",
+		right: 10,
+		top: 17,
 		transform: [{ translateY: -9 }],
-		minWidth: 18,
-		height: 18,
+		minWidth: 24,
+		height: 24,
 		borderRadius: 9,
 		backgroundColor: Styling.Colors.white,
 		justifyContent: "center",
@@ -106,7 +107,7 @@ const styles = StyleSheet.create({
 	},
 	notifBadgeText: {
 		color: Styling.Colors.darkGrey,
-		fontSize: 10,
+		fontSize: 12,
 		fontFamily: Styling.Fonts.Family.bold,
 		lineHeight: 12,
 	},

@@ -16,7 +16,7 @@ const NavHeader = ({ style, ...props }: { style?: ViewStyle }) => {
 
 	useEffect(() => {
 		getNotificationCount()
-			.then((res) => setCount(res.data?.count ?? 0))
+			.then((res) => setCount(res.count ?? 0))
 			.catch(() => setCount(0));
 	}, [segments]);
 

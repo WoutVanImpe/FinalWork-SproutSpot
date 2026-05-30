@@ -71,18 +71,24 @@ function aggregateData(readings: ReadingRecord[], hours: number): ReadingRecord[
   });
 }
 
-const toX = (i: number, total: number) => GRAPH_PAD.left + (i / (total - 1)) * CHART_W;
+const toX = (i: number, total: number) => {
+  if (total <= 1) return GRAPH_PAD.left + CHART_W / 2;
+  return GRAPH_PAD.left + (i / (total - 1)) * CHART_W;
+};
 const toY = (value: number, yMax: number) => GRAPH_PAD.top + CHART_H - (value / yMax) * (CHART_H - GRAPH_PAD.top - GRAPH_PAD.bottom);
 
-function formatLabel(iso: string): string {
+function formatLabel(iso: string, hours: number): string {
 	const d = new Date(iso);
-	return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+	const time = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+	if (hours <= 24) return time;
+	const date = String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0");
+	return hours <= 168 ? date + " " + time : date;
 }
 
-function getDataLabel(iso: string, index: number, total: number): string {
-	if (total <= 5) return formatLabel(iso);
+function getDataLabel(iso: string, index: number, total: number, hours: number): string {
+	if (total <= 5) return formatLabel(iso, hours);
 	const step = Math.max(1, Math.floor((total - 1) / 4));
-	if (index % step === 0 || index === total - 1) return formatLabel(iso);
+	if (index % step === 0 || index === total - 1) return formatLabel(iso, hours);
 	return "";
 }
 
@@ -200,7 +206,7 @@ const GraphModal = ({ visible, onDismiss, readings, optimalRanges, selectedHours
 								.filter((_, i) => i % Math.max(1, Math.floor(points.length / 4)) === 0 || i === points.length - 1)
 								.map((p, i) => (
 									<SvgText key={i} x={toX(points.indexOf(p), points.length)} y={CHART_H + GRAPH_PAD.top + GRAPH_PAD.bottom - 5} fill={Styling.Colors.lightGrey} fontSize={9} textAnchor="middle">
-										{getDataLabel(p.label, points.indexOf(p), points.length)}
+										{getDataLabel(p.label, points.indexOf(p), points.length, selectedHours)}
 									</SvgText>
 								))}
 						</Svg>

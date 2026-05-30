@@ -32,6 +32,8 @@ function enrichedToGardenPlant(p: EnrichedPlant): GardenPlant {
 		nickname: p.nickname,
 		type: p.type,
 		stage: p.stage,
+		stages: p.stages,
+		totalDays: p.totalDays,
 		water: p.water,
 		light: p.light,
 		temperature: p.temperature,
