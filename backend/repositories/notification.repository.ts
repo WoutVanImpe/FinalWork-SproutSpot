@@ -80,7 +80,7 @@ export class NotificationRepository {
 			.where("id", notificationId)
 			.update({
 				notification_state: "snoozed",
-				snoozed_until: db.raw("NOW() + INTERVAL '12 hours'"),
+				snoozed_until: db.raw("NOW() + INTERVAL '6 hours'"),
 			})
 			.returning("*");
 
@@ -139,7 +139,7 @@ export class NotificationRepository {
 	async getUnacknowledgedCount(userId: number): Promise<number> {
 		const [result] = await db("pending_notifications")
 			.where("user_id", userId)
-			.andWhereNot("notification_state", "acknowledged")
+			.andWhere("notification_state", "sent")
 			.count("* as count");
 
 		return Number(result?.count ?? 0);
