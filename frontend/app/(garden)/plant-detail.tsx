@@ -1,6 +1,7 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { useLocalSearchParams, router } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import { Styling } from "../../constants/Styling";
 import StyledView from "../../components/style/StyledView";
 import StyledText from "../../components/style/StyledText";
@@ -117,7 +118,7 @@ const PlantDetail = () => {
   const [readings, setReadings] = useState<ReadingRecord[]>([]);
   const [hours, setHours] = useState(24);
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     if (plant && graphVisible) {
       const plantId = parseInt(plant.id.replace("up_", ""), 10);
       if (!isNaN(plantId)) {
@@ -126,7 +127,7 @@ const PlantDetail = () => {
           .catch(console.error);
       }
     }
-  }, [graphVisible, plant, hours]);
+  }, [graphVisible, plant, hours]));
 
   if (!plant) return null;
 

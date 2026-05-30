@@ -57,12 +57,6 @@ const Account = () => {
 	const { logout: authLogout } = useAuth();
 	const [currentView, setCurrentView] = useState<string>("main");
 
-	useFocusEffect(
-		useCallback(() => {
-			setCurrentView("main");
-		}, []),
-	);
-
 	const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
@@ -72,24 +66,27 @@ const Account = () => {
 	const [historyEntries, setHistoryEntries] = useState<HistoryEntry[]>([]);
 	const unacknowledgedCount = notifications.filter((n) => !n.snoozed).length;
 
-	useEffect(() => {
-		getNotifications(true)
-			.then((res) => { if (res.data) setNotifications(res.data.map(apiNotifToView)); })
-			.catch(console.error);
-		getProfile()
-			.then((res) => {
-				if (res.data) {
-					setName(res.data.name);
-					setEmail(res.data.email);
-					setPairingCode(res.data.pairing_code);
-					setPushEnabled(res.data.push_enabled);
-					if (res.data.notification_window_start && res.data.notification_window_end) {
-						setActiveHours(parseTimeRangeToHours(res.data.notification_window_start, res.data.notification_window_end));
+	useFocusEffect(
+		useCallback(() => {
+			setCurrentView("main");
+			getNotifications(true)
+				.then((res) => { if (res.data) setNotifications(res.data.map(apiNotifToView)); })
+				.catch(console.error);
+			getProfile()
+				.then((res) => {
+					if (res.data) {
+						setName(res.data.name);
+						setEmail(res.data.email);
+						setPairingCode(res.data.pairing_code);
+						setPushEnabled(res.data.push_enabled);
+						if (res.data.notification_window_start && res.data.notification_window_end) {
+							setActiveHours(parseTimeRangeToHours(res.data.notification_window_start, res.data.notification_window_end));
+						}
 					}
-				}
-			})
-			.catch(console.error);
-	}, []);
+				})
+				.catch(console.error);
+		}, []),
+	);
 
 	const handleLogout = () => {
 		authLogout();

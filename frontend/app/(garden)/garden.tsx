@@ -1,5 +1,6 @@
 import { PanResponder, StyleSheet, TouchableOpacity, View, ActivityIndicator } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { CELL, MAX_SCALE, MIN_SCALE, SCALE_STEP, clampOffset, gridDimensions } from "../../constants/garden";
 import { Styling } from "../../constants/Styling";
 import { BAR_HEIGHT } from "../../constants/tabConfig";
@@ -75,7 +76,8 @@ const Garden = () => {
 	const [selectedPlant, setSelectedPlant] = useState<GardenPlant | null>(null);
 	const [alertConfig, setAlertConfig] = useState<{ title: string; message: string; buttons?: AlertButton[] } | null>(null);
 
-	useEffect(() => {
+	useFocusEffect(useCallback(() => {
+		setLoading(true);
 		getGarden()
 			.then((res) => {
 				if (res.data) {
@@ -87,7 +89,7 @@ const Garden = () => {
 			})
 			.catch(console.error)
 			.finally(() => setLoading(false));
-	}, []);
+	}, []));
 
 	useEffect(() => {
 		if (params.selectedPlantId) {
