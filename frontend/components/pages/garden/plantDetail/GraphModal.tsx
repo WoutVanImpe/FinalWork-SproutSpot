@@ -45,8 +45,9 @@ interface GraphModalProps {
 
 function aggregateData(readings: ReadingRecord[], hours: number): ReadingRecord[] {
   if (readings.length === 0) return [];
-  if (hours <= 24) return readings;
-  const threshold = hours <= 168 ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+  const MAX_RAW = 96;
+  if (hours <= 24 && readings.length <= MAX_RAW) return readings;
+  const threshold = hours <= 24 ? 30 * 60 * 1000 : hours <= 168 ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
   const groups = new Map<number, ReadingRecord[]>();
   for (const r of readings) {
     const t = new Date(r.created_at).getTime();
@@ -80,14 +81,14 @@ const toY = (value: number, yMax: number) => GRAPH_PAD.top + CHART_H - (value / 
 function formatLabel(iso: string, hours: number): string {
 	const d = new Date(iso);
 	const time = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
-	if (hours <= 24) return time;
 	const date = String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0");
-	return hours <= 168 ? date + " " + time : date;
+	if (hours <= 24) return time;
+	return date;
 }
 
 function getDataLabel(iso: string, index: number, total: number, hours: number): string {
 	if (total <= 5) return formatLabel(iso, hours);
-	const step = Math.max(1, Math.floor((total - 1) / 4));
+	const step = Math.max(1, Math.floor(total / 5));
 	if (index % step === 0 || index === total - 1) return formatLabel(iso, hours);
 	return "";
 }
@@ -203,10 +204,11 @@ const GraphModal = ({ visible, onDismiss, readings, optimalRanges, selectedHours
 								<Circle key={i} cx={toX(i, points.length)} cy={toY(p.value, yMax)} r={3} fill={metric.color} />
 							))}
 							{points
-								.filter((_, i) => i % Math.max(1, Math.floor(points.length / 4)) === 0 || i === points.length - 1)
-								.map((p, i) => (
+								.map((p, i) => ({ p, label: getDataLabel(p.label, i, points.length, selectedHours) }))
+								.filter(({ label }) => label !== "")
+								.map(({ p, label }, i) => (
 									<SvgText key={i} x={toX(points.indexOf(p), points.length)} y={CHART_H + GRAPH_PAD.top + GRAPH_PAD.bottom - 5} fill={Styling.Colors.lightGrey} fontSize={9} textAnchor="middle">
-										{getDataLabel(p.label, points.indexOf(p), points.length, selectedHours)}
+										{label}
 									</SvgText>
 								))}
 						</Svg>
