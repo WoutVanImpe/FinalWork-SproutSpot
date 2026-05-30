@@ -44,7 +44,7 @@ const HistoryView = ({ entries, onBack }: HistoryViewProps) => {
 	const groups = groupByDate(entries);
 
 	return (
-		<StyledView safe={false}>
+		<StyledView>
 			<AccountHeader title="Historiek" onBack={onBack} />
 			<Spacer space={Styling.Spacing.med} />
 			<ScrollView contentContainerStyle={styles.scrollContent}>

@@ -3,10 +3,10 @@ import { Styling } from "../../constants/Styling";
 import React, { ReactNode, useRef, useCallback } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
-import { BAR_MARGIN, BAR_HEIGHT } from "../../constants/tabConfig";
+import { BAR_MARGIN } from "../../constants/tabConfig";
 import { ScrollContext } from "../../context/ScrollContext";
 
-const StyledView = ({ style, children, safe = true, ...props }: { style?: ViewStyle | ViewStyle[]; safe?: boolean; children?: ReactNode }) => {
+const StyledView = ({ style, children, ...props }: { style?: ViewStyle | ViewStyle[]; safe?: boolean; children?: ReactNode }) => {
 	const insets = useSafeAreaInsets();
 	const scrollRef = useRef<ScrollView>(null);
 
@@ -21,22 +21,20 @@ const StyledView = ({ style, children, safe = true, ...props }: { style?: ViewSt
 	);
 
 	return (
-		<View style={[styles.base, { paddingTop: safe ? 110 : 0, paddingBottom: insets.bottom + BAR_HEIGHT + 30 }, style]}>
-			<ScrollView
-				ref={scrollRef}
-				style={styles.scroll}
-				contentContainerStyle={styles.content}
-				keyboardShouldPersistTaps="handled"
-				showsVerticalScrollIndicator={false}
-				{...props}
-			>
-				<ScrollContext.Provider value={{ scrollTo }}>
-					<View style={styles.contentPadding}>
-						{children}
-					</View>
-				</ScrollContext.Provider>
-			</ScrollView>
-		</View>
+		<ScrollView
+			ref={scrollRef}
+			style={[styles.base, { paddingTop: 110, paddingBottom: insets.bottom }, style]}
+			contentContainerStyle={styles.content}
+			keyboardShouldPersistTaps="handled"
+			showsVerticalScrollIndicator={false}
+			{...props}
+		>
+			<ScrollContext.Provider value={{ scrollTo }}>
+				<View style={styles.contentPadding}>
+					{children}
+				</View>
+			</ScrollContext.Provider>
+		</ScrollView>
 	);
 };
 
@@ -44,10 +42,7 @@ export default StyledView;
 
 const styles = StyleSheet.create({
 	base: {
-		flex: 1,
 		backgroundColor: Styling.Colors.gradGrey,
-	},
-	scroll: {
 		flex: 1,
 	},
 	content: {

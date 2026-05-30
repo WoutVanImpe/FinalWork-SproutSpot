@@ -42,7 +42,7 @@ const SettingsView = ({ onBack, name, email, pairingCode, pushEnabled, activeHou
 	};
 
 	return (
-		<StyledView safe={false}>
+		<StyledView>
 			<AccountHeader title="Instellingen" onBack={onBack} />
 			<Spacer space={Styling.Spacing.med} />
 			<ScrollView contentContainerStyle={styles.scrollContent}>

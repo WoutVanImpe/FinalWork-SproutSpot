@@ -13,7 +13,7 @@ interface ValidateStep1Props {
 }
 
 const ValidateStep1 = ({ onBack, onNext }: ValidateStep1Props) => (
-	<StyledView safe={false}>
+	<StyledView>
 		<AccountHeader title="Fase herkenning" onBack={onBack} />
 		<Spacer space={Styling.Spacing.med} />
 		<ScrollView contentContainerStyle={styles.scrollContent}>
