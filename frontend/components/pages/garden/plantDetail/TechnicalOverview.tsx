@@ -47,7 +47,7 @@ const TechnicalOverview = ({ probeName, battery, lastMeasurement, soilMoisture, 
     <InfoRow label="Sonde naam" value={probeName} />
     <InfoRow label="Batterij" value={`${battery}%`} />
     <InfoRow label="Laatste meting" value={lastMeasurement} />
-    <InfoRow label="Vocht" value={moistureLabel(soilMoisture)} />
+    <InfoRow label="Vochtigheid" value={moistureLabel(soilMoisture)} />
     <InfoRow label="Licht" value={lightLabel(lightLevel)} />
     <InfoRow label="Temperatuur" value={`${lastTemp}°C`} />
   </View>

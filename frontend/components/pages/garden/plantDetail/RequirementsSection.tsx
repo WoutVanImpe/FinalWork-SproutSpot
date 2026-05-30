@@ -4,8 +4,8 @@ import { Styling } from "../../../../constants/Styling";
 import StyledText from "../../../style/StyledText";
 import Spacer from "../../../style/Spacer";
 
-const BAR_TRACK_H = 14;
-const BAR_FILL_MIN_H = 10;
+const BAR_TRACK_H = 10;
+const BAR_FILL_MIN_H = 8;
 
 const StatusBar = ({ level, optimalMin, optimalMax }: { level: number; optimalMin: number; optimalMax: number }) => {
   return (
@@ -55,7 +55,7 @@ const RequirementsSection = ({ plantName, requirements }: RequirementsSectionPro
             {req.description}
           </StyledText>
         )}
-        {i < requirements.length - 1 && <Spacer space={Styling.Spacing.sml} />}
+        {i < requirements.length - 1 && <Spacer space={Styling.Spacing.reg} />}
       </View>
     ))}
   </View>
@@ -77,11 +77,11 @@ const styles = StyleSheet.create({
   },
   rowLabel: {
     color: Styling.Colors.white,
-    width: "50%",
+    width: "25%",
     flexShrink: 0,
   },
   description: {
-    color: Styling.Colors.lightGrey,
+    color: Styling.Colors.white,
     fontStyle: "italic",
     marginTop: 4,
     lineHeight: 18,

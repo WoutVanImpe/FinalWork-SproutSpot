@@ -137,7 +137,7 @@ const PlantDetail = () => {
           lastMeasurement={formatDate(plant.last_seen)}
           soilMoisture={plant.water.level}
           lightLevel={plant.light.level}
-          lastTemp={plant.last_temp}
+          lastTemp={Math.floor(plant.last_temp)}
         />
 
         <Spacer space={Styling.Spacing.lrg} />
