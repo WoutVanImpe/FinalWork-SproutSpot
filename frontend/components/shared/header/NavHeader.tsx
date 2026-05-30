@@ -1,5 +1,6 @@
 import { StyleSheet, Text, ViewStyle, View } from "react-native";
 import React, { useState, useEffect } from "react";
+import { BlurView } from "expo-blur";
 import { Styling } from "../../../constants/Styling";
 import { Link, useSegments } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -22,19 +23,21 @@ const NavHeader = ({ style, ...props }: { style?: ViewStyle }) => {
 
 	return (
 		<View style={[styles.wrapper, { top: insets.top }, style]}>
-			<Link href="/" {...props}>
-				<Text style={styles.logo}>SproutSpot</Text>
-			</Link>
-			<Link href="/account">
-				<View style={styles.accountBtn}>
-					<StyledIcon Icon={AccountIcon} size="med" />
-					{count > 0 && (
-						<View style={styles.badge}>
-							<StyledText style={styles.badgeText}>{count > 9 ? "9+" : count}</StyledText>
-						</View>
-					)}
-				</View>
-			</Link>
+			<BlurView intensity={40} tint="dark" style={styles.blur}>
+				<Link href="/" {...props}>
+					<Text style={styles.logo}>SproutSpot</Text>
+				</Link>
+				<Link href="/account">
+					<View style={styles.accountBtn}>
+						<StyledIcon Icon={AccountIcon} size="med" />
+						{count > 0 && (
+							<View style={styles.badge}>
+								<StyledText style={styles.badgeText}>{count > 9 ? "9+" : count}</StyledText>
+							</View>
+						)}
+					</View>
+				</Link>
+			</BlurView>
 		</View>
 	);
 };
@@ -46,15 +49,15 @@ const styles = StyleSheet.create({
 		position: "absolute",
 		zIndex: 99,
 		left: 0,
-        
-        width: "100%",
-
+		width: "100%",
+	},
+	blur: {
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "stretch",
-
 		paddingHorizontal: BAR_MARGIN,
-        paddingTop: 20,
+		paddingTop: 20,
+		paddingBottom: 12,
 	},
 	logo: {
 		color: Styling.Colors.white,
