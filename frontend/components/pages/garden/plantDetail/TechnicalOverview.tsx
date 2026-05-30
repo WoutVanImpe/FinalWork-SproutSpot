@@ -4,12 +4,26 @@ import { Styling } from "../../../../constants/Styling";
 import StyledText from "../../../style/StyledText";
 import Spacer from "../../../style/Spacer";
 
+function moistureLabel(pct: number): string {
+  if (pct < 20) return "Droog";
+  if (pct < 50) return "Licht vochtig";
+  if (pct < 80) return "Vochtig";
+  return "Nat";
+}
+
+function lightLabel(pct: number): string {
+  if (pct < 20) return "Donker";
+  if (pct < 50) return "Gedimd";
+  if (pct < 80) return "Helder";
+  return "Fel";
+}
+
 interface TechnicalOverviewProps {
   probeName: string;
   battery: number;
   lastMeasurement: string;
-  moistureStatus: string;
-  lightStatus: string;
+  soilMoisture: number;
+  lightLevel: number;
   lastTemp: number;
 }
 
@@ -24,7 +38,7 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
   </View>
 );
 
-const TechnicalOverview = ({ probeName, battery, lastMeasurement, moistureStatus, lightStatus, lastTemp }: TechnicalOverviewProps) => (
+const TechnicalOverview = ({ probeName, battery, lastMeasurement, soilMoisture, lightLevel, lastTemp }: TechnicalOverviewProps) => (
   <View style={styles.container}>
     <StyledText type="head3" style={styles.title}>
       Sonde informatie
@@ -33,8 +47,8 @@ const TechnicalOverview = ({ probeName, battery, lastMeasurement, moistureStatus
     <InfoRow label="Sonde naam" value={probeName} />
     <InfoRow label="Batterij" value={`${battery}%`} />
     <InfoRow label="Laatste meting" value={lastMeasurement} />
-    <InfoRow label="Vocht" value={moistureStatus} />
-    <InfoRow label="Licht" value={lightStatus} />
+    <InfoRow label="Vocht" value={moistureLabel(soilMoisture)} />
+    <InfoRow label="Licht" value={lightLabel(lightLevel)} />
     <InfoRow label="Temperatuur" value={`${lastTemp}°C`} />
   </View>
 );

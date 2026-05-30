@@ -4,8 +4,8 @@ import { Styling } from "../../../../constants/Styling";
 import StyledText from "../../../style/StyledText";
 import Spacer from "../../../style/Spacer";
 
-const BAR_TRACK_H = 8;
-const BAR_FILL_MIN_H = 6;
+const BAR_TRACK_H = 14;
+const BAR_FILL_MIN_H = 10;
 
 const StatusBar = ({ level, optimalMin, optimalMax }: { level: number; optimalMin: number; optimalMax: number }) => {
   return (
@@ -19,7 +19,7 @@ const StatusBar = ({ level, optimalMin, optimalMax }: { level: number; optimalMi
 
 interface RequirementData {
   label: string;
-  value?: string;
+  description?: string;
   level: number;
   optimalMin: number;
   optimalMax: number;
@@ -30,11 +30,10 @@ interface RequirementsSectionProps {
   requirements: RequirementData[];
 }
 
-const Row = ({ label, value, children, style }: { label: string; value?: string; children?: React.ReactNode; style?: ViewStyle }) => (
+const Row = ({ label, children, style }: { label: string; children?: React.ReactNode; style?: ViewStyle }) => (
   <View style={[styles.row, style]}>
     <StyledText type="paragh" style={styles.rowLabel}>
       {label}
-      {value ? `: ${value}` : ""}
     </StyledText>
     {children}
   </View>
@@ -48,9 +47,14 @@ const RequirementsSection = ({ plantName, requirements }: RequirementsSectionPro
     <Spacer space={Styling.Spacing.reg} />
     {requirements.map((req, i) => (
       <View key={i}>
-		<Row label={req.label} value={req.value}>
+        <Row label={req.label}>
           <StatusBar level={req.level} optimalMin={req.optimalMin} optimalMax={req.optimalMax} />
         </Row>
+        {req.description && (
+          <StyledText type="smParagh" style={styles.description}>
+            {req.description}
+          </StyledText>
+        )}
         {i < requirements.length - 1 && <Spacer space={Styling.Spacing.sml} />}
       </View>
     ))}
@@ -75,6 +79,12 @@ const styles = StyleSheet.create({
     color: Styling.Colors.white,
     width: "50%",
     flexShrink: 0,
+  },
+  description: {
+    color: Styling.Colors.lightGrey,
+    fontStyle: "italic",
+    marginTop: 4,
+    lineHeight: 18,
   },
   track: {
     flex: 1,

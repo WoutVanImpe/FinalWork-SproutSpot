@@ -15,41 +15,6 @@ import { GardenPlant } from "../../components/pages/garden/gardenGrid/GardenGrid
 import { getReadings } from "../../services/garden";
 import type { ReadingRecord } from "../../services/garden";
 
-const TOMATO_STAGES = [
-  { label: "Zaaien", dayStart: 0, dayEnd: 7 },
-  { label: "Kiem", dayStart: 7, dayEnd: 21 },
-  { label: "Blad", dayStart: 21, dayEnd: 42 },
-  { label: "Groeispurt", dayStart: 42, dayEnd: 63 },
-  { label: "Bloei", dayStart: 63, dayEnd: 77 },
-  { label: "Oogst", dayStart: 77, dayEnd: 90 },
-];
-
-const CABBAGE_STAGES = [
-  { label: "Zaaien", dayStart: 0, dayEnd: 10 },
-  { label: "Kiem", dayStart: 10, dayEnd: 25 },
-  { label: "Blad", dayStart: 25, dayEnd: 50 },
-  { label: "Groeispurt", dayStart: 50, dayEnd: 70 },
-  { label: "Oogst", dayStart: 70, dayEnd: 85 },
-];
-
-const STAGE_DESCRIPTIONS: Record<string, string[]> = {
-  Tomaat: [
-    "Zaai de tomatenzaden in vochtige potgrond op een warme plek. Houd de grond constant vochtig maar niet nat.",
-    "De zaden ontkiemen. Kleine kiemblaadjes verschijnen boven de grond. Zorg voor voldoende licht om strekken te voorkomen.",
-    "De plant ontwikkelt echte bladeren. Verpot naar een grotere pot en begin met het afharden van de plant.",
-    "De plant maakt veel blad en stengels aan. Verhoog de watergift en begin met wekelijkse bemesting.",
-    "Bloemknoppen verschijnen aan de toppen. Zorg voor goede luchtcirculatie en blijf regelmatig water geven.",
-    "De tomaten zijn rijp en kunnen geoogst worden. Pluk regelmatig om nieuwe vruchtvorming te stimuleren.",
-  ],
-  Kool: [
-    "Zaai de koolzaden in zaaitrays met lichte potgrond. Heldere plek zonder directe felle zon.",
-    "De zaden ontkiemen en kleine kiemplantjes verschijnen. Verplaats naar een lichtere plek.",
-    "De plant vormt stevige bladeren. Verplant naar de definitieve plek met voldoende ruimte.",
-    "De kool begint een krop of stronk te vormen. Gelijkmatig water geven is nu belangrijk.",
-    "De kool is volgroeid en klaar om geoogst te worden. Snijd de stronk onder de krop af.",
-  ],
-};
-
 function daysSince(dateStr: string): number {
   if (!dateStr) return 1;
   const created = new Date(dateStr);
@@ -64,39 +29,75 @@ function formatDate(dateStr: string | null): string {
   return d.toLocaleDateString("nl-BE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
+function buildStages(stageDefs: { label: string; durationDays: number }[]) {
+  let cursor = 0;
+  return stageDefs.map((s) => {
+    const stage = { label: s.label, dayStart: cursor, dayEnd: cursor + s.durationDays };
+    cursor += s.durationDays;
+    return stage;
+  });
+}
+
+function getStageDescription(stageLabel: string): string {
+  const descriptions: Record<string, string> = {
+    "Zaaien": "Zaai de zaden in vochtige potgrond. Houd de grond constant vochtig maar niet te nat.",
+    "Kiem": "De zaden ontkiemen. Zorg voor voldoende licht en blijf de grond licht vochtig houden.",
+    "Blad": "De plant ontwikkelt bladeren. Verhoog de watergift en zorg voor voldoende voedingsstoffen.",
+    "Groeispurt": "De plant groeit snel. Geef regelmatig water en begin met wekelijkse bemesting.",
+    "Bloei": "Bloemknoppen verschijnen. Zorg voor goede luchtcirculatie en blijf regelmatig water geven.",
+    "Oogst": "De plant is klaar om geoogst te worden. Pluk of snijd regelmatig om nieuwe groei te stimuleren.",
+  };
+  return descriptions[stageLabel] ?? "Volg de algemene verzorgingsinstructies voor deze plant.";
+}
+
+function waterDescription(waterLabel: string): string {
+  if (waterLabel === "Weinig water") return "Laat de grond drogen tussen gietbeurten. Geef pas opnieuw water als de grond droog aanvoelt.";
+  if (waterLabel === "Regelmatig") return "Houd de grond licht vochtig. Geef om de dag water, of dagelijks bij warm weer.";
+  if (waterLabel === "Veel water") return "Houd de grond altijd vochtig. Geef dagelijks water en laat de grond niet uitdrogen.";
+  return "Geef regelmatig water. Pas aan op basis van het seizoen.";
+}
+
+function lightDescription(lightLabel: string): string {
+  if (lightLabel === "Volle zon") return "Zet op een zonnige plek met minstens 6 uur direct zonlicht per dag.";
+  if (lightLabel === "Halfschaduw") return "Zet op een plek met halfschaduw. Vermijd de felle middagzon.";
+  if (lightLabel === "Schaduw") return "Zet op een schaduwrijke plek. Vermijd direct zonlicht om verbranding te voorkomen.";
+  return "Zet op een lichte plek, vermijd extreme schaduw of felle zon.";
+}
+
+function tempDescription(tempLabel: string): string {
+  return tempLabel ? `Optimale temperatuur: ${tempLabel}. Vermijd extreme temperatuurschommelingen.` : "Gedijt bij normale kamertemperatuur. Bescherm tegen vorst.";
+}
+
 const PlantDetail = () => {
   const { plantData } = useLocalSearchParams<{ plantData: string }>();
   const plant: GardenPlant | null = plantData ? JSON.parse(plantData) : null;
-	const [graphVisible, setGraphVisible] = useState(false);
-	const [readings, setReadings] = useState<ReadingRecord[]>([]);
-	const [hours, setHours] = useState(24);
+  const [graphVisible, setGraphVisible] = useState(false);
+  const [readings, setReadings] = useState<ReadingRecord[]>([]);
+  const [hours, setHours] = useState(24);
 
-	useEffect(() => {
-		if (plant && graphVisible) {
-			const plantId = parseInt(plant.id.replace("up_", ""), 10);
-			if (!isNaN(plantId)) {
-				getReadings(plantId, hours)
-					.then((res) => { if (res.data) setReadings(res.data); })
-					.catch(console.error);
-			}
-		}
-	}, [graphVisible, plant, hours]);
+  useEffect(() => {
+    if (plant && graphVisible) {
+      const plantId = parseInt(plant.id.replace("up_", ""), 10);
+      if (!isNaN(plantId)) {
+        getReadings(plantId, hours)
+          .then((res) => { if (res.data) setReadings(res.data); })
+          .catch(console.error);
+      }
+    }
+  }, [graphVisible, plant, hours]);
 
   if (!plant) return null;
 
-  const isTomato = plant.type === "Tomaat";
-  const stages = isTomato ? TOMATO_STAGES : CABBAGE_STAGES;
-  const descriptions = STAGE_DESCRIPTIONS[plant.type] || STAGE_DESCRIPTIONS["Tomaat"];
+  const stages = buildStages(plant.stages);
   const currentStageIndex = Math.min(plant.stage.current, stages.length - 1);
+  const totalDays = plant.totalDays || stages[stages.length - 1]?.dayEnd || 1;
+  const currentDay = daysSince(plant.created_at);
 
   const requirements = [
-    { label: "Water", value: `${plant.water.level}%`, level: plant.water.level, optimalMin: plant.water.optimalMin, optimalMax: plant.water.optimalMax },
-    { label: "Licht", value: `${plant.light.level}%`, level: plant.light.level, optimalMin: plant.light.optimalMin, optimalMax: plant.light.optimalMax },
-    { label: "Warmte", value: `${plant.temperature.level}%`, level: plant.temperature.level, optimalMin: plant.temperature.optimalMin, optimalMax: plant.temperature.optimalMax },
+    { label: "Water", description: waterDescription(plant.water.label), level: plant.water.level, optimalMin: plant.water.optimalMin, optimalMax: plant.water.optimalMax },
+    { label: "Licht", description: lightDescription(plant.light.label), level: plant.light.level, optimalMin: plant.light.optimalMin, optimalMax: plant.light.optimalMax },
+    { label: "Warmte", description: tempDescription(plant.temperature.label), level: plant.temperature.level, optimalMin: plant.temperature.optimalMin, optimalMax: plant.temperature.optimalMax },
   ];
-
-  const totalDays = stages[stages.length - 1].dayEnd;
-  const currentDay = daysSince(plant.created_at);
 
   return (
     <>
@@ -118,7 +119,7 @@ const PlantDetail = () => {
           currentStageIndex={currentStageIndex}
           currentDay={currentDay}
           totalDays={totalDays}
-          stageDescription={descriptions[currentStageIndex] || ""}
+          stageDescription={getStageDescription(stages[currentStageIndex]?.label ?? "")}
         />
 
         <Spacer space={Styling.Spacing.xlg} />
@@ -131,8 +132,8 @@ const PlantDetail = () => {
           probeName={plant.probeName || `Sonde ${plant.nickname}`}
           battery={plant.battery}
           lastMeasurement={formatDate(plant.last_seen)}
-          moistureStatus={plant.water.label}
-          lightStatus={plant.light.label}
+          soilMoisture={plant.water.level}
+          lightLevel={plant.light.level}
           lastTemp={plant.last_temp}
         />
 
@@ -144,18 +145,18 @@ const PlantDetail = () => {
         </TouchableOpacity>
         <Spacer space={175} />
       </StyledView>
-		<GraphModal
-			visible={graphVisible}
-			onDismiss={() => setGraphVisible(false)}
-			readings={readings}
-			optimalRanges={{
-				water: { optimalMin: plant.water.optimalMin, optimalMax: plant.water.optimalMax },
-				light: { optimalMin: plant.light.optimalMin, optimalMax: plant.light.optimalMax },
-				temperature: { optimalMin: plant.temperature.optimalMin, optimalMax: plant.temperature.optimalMax },
-			}}
-			selectedHours={hours}
-			onTimeRangeChange={setHours}
-		/>
+      <GraphModal
+        visible={graphVisible}
+        onDismiss={() => setGraphVisible(false)}
+        readings={readings}
+        optimalRanges={{
+          water: { optimalMin: plant.water.optimalMin, optimalMax: plant.water.optimalMax },
+          light: { optimalMin: plant.light.optimalMin, optimalMax: plant.light.optimalMax },
+          temperature: { optimalMin: plant.temperature.optimalMin, optimalMax: plant.temperature.optimalMax },
+        }}
+        selectedHours={hours}
+        onTimeRangeChange={setHours}
+      />
     </>
   );
 };
