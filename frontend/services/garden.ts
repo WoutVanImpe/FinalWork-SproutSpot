@@ -16,6 +16,8 @@ export interface EnrichedPlant {
 	nickname: string;
 	type: string;
 	stage: { current: number; max: number; label: string };
+	stages: { label: string; durationDays: number }[];
+	totalDays: number;
 	water: PlantStatusData;
 	light: PlantStatusData;
 	temperature: PlantStatusData;
