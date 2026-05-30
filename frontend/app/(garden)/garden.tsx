@@ -400,6 +400,7 @@ const Garden = () => {
 	return (
 		<>
 			<View style={styles.page}>
+				<Spacer space={110} />
 
 				{isEditing ? (
 					<>
@@ -533,7 +534,6 @@ export default Garden;
 const styles = StyleSheet.create({
 	page: {
 		flex: 1,
-		paddingTop: 110,
 		backgroundColor: Styling.Colors.gradGrey,
 	},
 	viewportFill: {
