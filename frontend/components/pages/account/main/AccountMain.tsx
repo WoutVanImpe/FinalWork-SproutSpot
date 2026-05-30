@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
 	},
 	notifBadge: {
 		position: "absolute",
-		right: 12,
+		right: 4,
 		top: "50%",
 		transform: [{ translateY: -9 }],
 		minWidth: 18,
