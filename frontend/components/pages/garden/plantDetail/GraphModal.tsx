@@ -88,7 +88,7 @@ function formatLabel(iso: string, hours: number): string {
 
 function getDataLabel(iso: string, index: number, total: number, hours: number): string {
 	if (total <= 5) return formatLabel(iso, hours);
-	const step = Math.max(1, Math.floor(total / 5));
+	const step = Math.max(1, Math.ceil((total - 1) / 4));
 	if (index % step === 0 || index === total - 1) return formatLabel(iso, hours);
 	return "";
 }
