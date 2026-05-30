@@ -71,7 +71,10 @@ function aggregateData(readings: ReadingRecord[], hours: number): ReadingRecord[
   });
 }
 
-const toX = (i: number, total: number) => GRAPH_PAD.left + (i / (total - 1)) * CHART_W;
+const toX = (i: number, total: number) => {
+  if (total <= 1) return GRAPH_PAD.left + CHART_W / 2;
+  return GRAPH_PAD.left + (i / (total - 1)) * CHART_W;
+};
 const toY = (value: number, yMax: number) => GRAPH_PAD.top + CHART_H - (value / yMax) * (CHART_H - GRAPH_PAD.top - GRAPH_PAD.bottom);
 
 function formatLabel(iso: string): string {
