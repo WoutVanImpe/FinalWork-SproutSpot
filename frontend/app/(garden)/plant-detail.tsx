@@ -29,7 +29,10 @@ function formatDate(dateStr: string | null): string {
   return d.toLocaleDateString("nl-BE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
-function buildStages(stageDefs: { label: string; durationDays: number }[]) {
+function buildStages(stageDefs?: { label: string; durationDays: number }[]) {
+  if (!stageDefs || stageDefs.length === 0) {
+    return [{ label: "Onbekend", dayStart: 0, dayEnd: 90 }];
+  }
   let cursor = 0;
   return stageDefs.map((s) => {
     const stage = { label: s.label, dayStart: cursor, dayEnd: cursor + s.durationDays };
