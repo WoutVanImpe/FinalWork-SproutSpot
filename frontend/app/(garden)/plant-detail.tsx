@@ -131,7 +131,7 @@ const PlantDetail = () => {
   if (!plant) return null;
 
   const stages = buildStages(plant.stages, plant.type);
-  const currentStageIndex = Math.min(plant.stage.current, stages.length - 1);
+  const currentStageIndex = Math.max(0, Math.min((plant.stage.current || 1) - 1, stages.length - 1));
   const totalDays = plant.totalDays || stages[stages.length - 1]?.dayEnd || 1;
   const currentDay = daysSince(plant.created_at);
 
