@@ -34,6 +34,7 @@ interface GraphModalProps {
 	visible: boolean;
 	onDismiss: () => void;
 	readings: ReadingRecord[];
+	readingsLoading?: boolean;
 	optimalRanges: {
 		water: { optimalMin: number; optimalMax: number };
 		light: { optimalMin: number; optimalMax: number };
@@ -111,7 +112,7 @@ function buildMetrics(readings: ReadingRecord[], optimalRanges: GraphModalProps[
 	];
 }
 
-const GraphModal = ({ visible, onDismiss, readings, optimalRanges, selectedHours, onTimeRangeChange }: GraphModalProps) => {
+const GraphModal = ({ visible, onDismiss, readings, readingsLoading, optimalRanges, selectedHours, onTimeRangeChange }: GraphModalProps) => {
 	const [selectedMetric, setSelectedMetric] = useState(0);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -193,6 +194,13 @@ const GraphModal = ({ visible, onDismiss, readings, optimalRanges, selectedHours
 
 					<Spacer space={8} />
 
+					{readingsLoading || points.length === 0 ? (
+						<View style={styles.loadingContainer}>
+							<StyledText type="paragh" style={styles.loadingText}>
+								{readingsLoading ? "Gegevens laden..." : "Geen meetgegevens beschikbaar."}
+							</StyledText>
+						</View>
+					) : (
 					<View style={styles.chartContainer}>
 						<Svg width={CHART_W + GRAPH_PAD.left + GRAPH_PAD.right} height={CHART_H + GRAPH_PAD.top + GRAPH_PAD.bottom}>
 							<Rect x={GRAPH_PAD.left} y={optimalY1} width={CHART_W} height={optimalY2 - optimalY1} fill={Styling.Colors.green} opacity={0.12} rx={4} />
@@ -218,6 +226,7 @@ const GraphModal = ({ visible, onDismiss, readings, optimalRanges, selectedHours
 								))}
 						</Svg>
 					</View>
+					)}
 
 					<Spacer space={Styling.Spacing.sml} />
 					<View style={styles.legend}>
@@ -331,6 +340,14 @@ const styles = StyleSheet.create({
 	},
 	chartContainer: {
 		alignItems: "center",
+	},
+	loadingContainer: {
+		alignItems: "center",
+		justifyContent: "center",
+		height: CHART_H + GRAPH_PAD.top + GRAPH_PAD.bottom,
+	},
+	loadingText: {
+		color: Styling.Colors.darkGrey,
 	},
 	legend: {
 		flexDirection: "row",

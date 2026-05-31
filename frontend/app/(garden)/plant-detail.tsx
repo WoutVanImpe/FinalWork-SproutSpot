@@ -118,18 +118,38 @@ const PlantDetail = () => {
   const [readings, setReadings] = useState<ReadingRecord[]>([]);
   const [hours, setHours] = useState(24);
 
+  const [readingsLoading, setReadingsLoading] = useState(false);
+
   useFocusEffect(useCallback(() => {
-    if (plant && graphVisible) {
+    if (plant) {
       const plantId = parseInt(plant.id.replace("up_", ""), 10);
       if (!isNaN(plantId)) {
+        setReadingsLoading(true);
         getReadings(plantId, hours)
           .then((res) => { if (res.data) setReadings(res.data); })
-          .catch(console.error);
+          .catch(console.error)
+          .finally(() => setReadingsLoading(false));
       }
     }
-  }, [graphVisible, plant, hours]));
+  }, [plant, hours]));
 
-  if (!plant) return null;
+  if (!plant) {
+    return (
+      <StyledView>
+        <View style={styles.header}>
+          <View style={styles.headerBack}>
+            <TouchableOpacity onPress={() => router.navigate("/(garden)/garden")}>
+              <StyledIcon Icon={BackIcon} size="med" fill={Styling.Colors.white} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <Spacer space={120} />
+        <StyledText type="paragh" style={{ textAlign: "center", color: Styling.Colors.white }}>
+          Plant niet gevonden.
+        </StyledText>
+      </StyledView>
+    );
+  }
 
   const stages = buildStages(plant.stages, plant.type);
   const currentStageIndex = Math.max(0, Math.min((plant.stage.current || 1) - 1, stages.length - 1));
@@ -198,6 +218,7 @@ const PlantDetail = () => {
         visible={graphVisible}
         onDismiss={() => setGraphVisible(false)}
         readings={readings}
+        readingsLoading={readingsLoading}
         optimalRanges={{
           water: { optimalMin: plant.water.optimalMin, optimalMax: plant.water.optimalMax },
           light: { optimalMin: plant.light.optimalMin, optimalMax: plant.light.optimalMax },

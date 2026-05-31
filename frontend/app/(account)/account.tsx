@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { Alert } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
@@ -70,11 +70,14 @@ const Account = () => {
 	const [activeHours, setActiveHours] = useState<number[]>([8, 9, 10]);
 	const [historyEntries, setHistoryEntries] = useState<HistoryEntry[]>([]);
 	const [validatingNotif, setValidatingNotif] = useState<{ id: string; userPlantId: number; nextStageOrder: number; plantName?: string } | null>(null);
+	const isValidatingRef = useRef(false);
 	const unacknowledgedCount = notifications.filter((n) => !n.snoozed).length;
 
 	useFocusEffect(
 		useCallback(() => {
-			setCurrentView("main");
+			if (!isValidatingRef.current) {
+				setCurrentView("main");
+			}
 			getNotifications(true)
 				.then((res) => { if (res.data) setNotifications(res.data.map(apiNotifToView)); })
 				.catch(console.error);
@@ -103,7 +106,7 @@ const Account = () => {
 			await acknowledgeNotification(id);
 			setNotifications((prev) => prev.filter((n) => n.id !== id));
 		} catch (err) {
-			console.error(err);
+			Alert.alert("Fout", "Notificatie kon niet worden verwijderd.");
 		}
 	};
 
@@ -112,7 +115,7 @@ const Account = () => {
 			await resetNotification(id);
 			setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, snoozed: true } : n)));
 		} catch (err) {
-			console.error(err);
+			Alert.alert("Fout", "Notificatie kon niet worden uitgesteld.");
 		}
 	};
 
@@ -127,6 +130,7 @@ const Account = () => {
 				return;
 			}
 		}
+		isValidatingRef.current = false;
 		setValidatingNotif(null);
 		setCurrentView("main");
 	};
@@ -183,9 +187,9 @@ const Account = () => {
 		case "main":
 			return <AccountMain onNavigate={setCurrentView} onLogout={handleLogout} notificationCount={unacknowledgedCount} />;
 		case "notifications":
-			return <NotificationsView notifications={notifications} onBack={() => setCurrentView("main")} onDismiss={handleDismiss} onSnooze={handleSnooze} onValidate={(notifId, userPlantId, nextStageOrder, plantName) => { setValidatingNotif({ id: notifId, userPlantId, nextStageOrder, plantName }); setCurrentView("validate_step1"); }} />;
+			return <NotificationsView notifications={notifications} onBack={() => setCurrentView("main")} onDismiss={handleDismiss} onSnooze={handleSnooze} onValidate={(notifId, userPlantId, nextStageOrder, plantName) => { isValidatingRef.current = true; setValidatingNotif({ id: notifId, userPlantId, nextStageOrder, plantName }); setCurrentView("validate_step1"); }} />;
 		case "validate_step1":
-			return <ValidateStep1 plantName={validatingNotif?.plantName} onBack={() => { if (validatingNotif) { resetNotification(validatingNotif.id, 48); setValidatingNotif(null); } setCurrentView("main"); }} onNext={() => setCurrentView("validate_step2")} />;
+			return <ValidateStep1 plantName={validatingNotif?.plantName} onBack={() => { isValidatingRef.current = false; if (validatingNotif) { resetNotification(validatingNotif.id, 48); setValidatingNotif(null); } setCurrentView("main"); }} onNext={() => setCurrentView("validate_step2")} />;
 		case "validate_step2":
 			return <ValidateStep2 plantName={validatingNotif?.plantName} onBack={() => setCurrentView("validate_step1")} onConfirm={handleConfirmPhaseUpdate} />;
 		case "history":
