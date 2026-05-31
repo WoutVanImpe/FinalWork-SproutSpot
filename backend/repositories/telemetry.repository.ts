@@ -199,10 +199,10 @@ export class TelemetryRepository {
 	async createNotification(params: {
 		userId: number;
 		userPlantId: number;
-		issueId: number;
+		issueId: number | null;
 		title: string;
 		message: string;
-		notificationType: "sensor_alert";
+		notificationType: "sensor_alert" | "stage_validation";
 		state: "sent" | "snoozed";
 		snoozedUntil?: Date | null;
 	}): Promise<PendingNotificationRecord> {

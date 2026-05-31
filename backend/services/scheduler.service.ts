@@ -14,12 +14,14 @@ export function startScheduler(): void {
 	telemetryService.checkDailyLightIntegral();
 	telemetryService.checkDailyTemperatureIntegral();
 	telemetryService.processSnoozedNotifications();
+	telemetryService.checkStageAdvancement();
 
 	intervalHandle = setInterval(() => {
 		telemetryService.checkStaleProbes();
 		telemetryService.checkDailyLightIntegral();
 		telemetryService.checkDailyTemperatureIntegral();
 		telemetryService.processSnoozedNotifications();
+		telemetryService.checkStageAdvancement();
 	}, CHECK_INTERVAL_MS);
 }
 

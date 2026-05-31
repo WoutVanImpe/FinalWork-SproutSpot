@@ -149,7 +149,7 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 								Advies:
 							</StyledText>
 							<Spacer space={Styling.Spacing.xsm} />
-							<StyledText type="paragh" style={plant.advice ? styles.bodyText : styles.okText}>
+							<StyledText type="paragh" style={styles.bodyText}>
 								{plant.advice || "Alles is in orde, er is geen actie nodig."}
 							</StyledText>
 							<Spacer space={Styling.Spacing.sml} />
@@ -237,9 +237,6 @@ const styles = StyleSheet.create({
 	},
 	bodyText: {
 		color: Styling.Colors.darkGrey,
-	},
-	okText: {
-		color: Styling.Colors.green,
 	},
 	footerBtn: {
 		backgroundColor: Styling.Colors.green,

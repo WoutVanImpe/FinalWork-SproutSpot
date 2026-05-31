@@ -8,6 +8,8 @@ export interface NotificationItem {
 	image: { uri: string } | null;
 	snoozed: boolean;
 	created_at: string;
+	userPlantId: number | null;
+	nextStageOrder: number | null;
 }
 
 export function getNotifications(all = false) {
@@ -22,8 +24,8 @@ export function resolveIssue(issueId: string) {
 	return api.post<void>(`/api/notifications/issues/${issueId}/resolve`);
 }
 
-export function resetNotification(notificationId: string) {
-	return api.post<void>(`/api/notifications/${notificationId}/reset`);
+export function resetNotification(notificationId: string, hours?: number) {
+	return api.post<void>(`/api/notifications/${notificationId}/reset`, hours ? { hours } : undefined);
 }
 
 export function getNotificationCount() {

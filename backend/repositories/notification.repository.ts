@@ -23,7 +23,10 @@ export class NotificationRepository {
 		return query.select(
 			"pn.*",
 			"pl.image as plant_image",
-			"pl.name as plant_name"
+			"pl.name as plant_name",
+			"up.id as raw_user_plant_id",
+			"up.current_stage_order",
+			db.raw("(SELECT stage_order FROM plant_stages WHERE plant_id = up.plant_id AND stage_order = up.current_stage_order + 1 LIMIT 1) as next_stage_order"),
 		);
 	}
 
@@ -75,12 +78,12 @@ export class NotificationRepository {
 	 * @param {number} notificationId - The notification's database ID.
 	 * @returns {Promise<PendingNotificationRecord>} The updated notification record.
 	 */
-	async snoozeForHalfDay(notificationId: number): Promise<PendingNotificationRecord> {
+	async snoozeForDuration(notificationId: number, hours: number = 6): Promise<PendingNotificationRecord> {
 		const [notification] = await db("pending_notifications")
 			.where("id", notificationId)
 			.update({
 				notification_state: "snoozed",
-				snoozed_until: db.raw("NOW() + INTERVAL '6 hours'"),
+				snoozed_until: db.raw(`NOW() + INTERVAL '${hours} hours'`),
 			})
 			.returning("*");
 

@@ -1,10 +1,11 @@
 import { TelemetryRepository } from "../repositories/telemetry.repository";
 import { NotificationRepository } from "../repositories/notification.repository";
 import { ProbeRepository, StaleProbeResult } from "../repositories/probe.repository";
+import { UserPlantRepository } from "../repositories/userPlant.repository";
 import { PushNotificationService } from "./push-notification.service";
 import { TelemetryBatchUploadDto, TelemetryEntryDto } from "../types/dto";
 import { ActiveIssueRecord, ProbeEntryRecord, StageThresholdsRecord, UserPlantRecord } from "../types/database";
-import { STALE_THRESHOLD_MINUTES } from "../config";
+import { STALE_THRESHOLD_MINUTES, IS_DEV } from "../config";
 
 interface Anomaly {
 	type: string;
@@ -24,12 +25,14 @@ export class TelemetryService {
 	private repository: TelemetryRepository;
 	private notificationRepository: NotificationRepository;
 	private probeRepository: ProbeRepository;
+	private userPlantRepository: UserPlantRepository;
 	private pushNotificationService: PushNotificationService;
 
 	constructor() {
 		this.repository = new TelemetryRepository();
 		this.notificationRepository = new NotificationRepository();
 		this.probeRepository = new ProbeRepository();
+		this.userPlantRepository = new UserPlantRepository();
 		this.pushNotificationService = new PushNotificationService();
 	}
 
@@ -412,6 +415,74 @@ export class TelemetryService {
 			} catch (err) {
 				console.error(`[Telemetry] Error processing snoozed notification ${n.id}:`, err);
 			}
+		}
+	}
+
+	async checkStageAdvancement(): Promise<void> {
+		try {
+			const readyPlants = await this.userPlantRepository.findPlantsReadyForStageAdvancement();
+
+			for (const plant of readyPlants) {
+				try {
+					const window = await this.repository.findUserNotificationWindow(plant.user_id);
+					const now = new Date();
+					const title = "Tijd voor een nieuwe fase!";
+					const message = `${plant.plant_name} is klaar om naar de volgende fase te gaan. Controleer of de plant de kenmerken vertoont.`;
+
+					if (window && this.isWithinWindow(now, window.notification_window_start, window.notification_window_end)) {
+						await this.repository.createNotification({
+							userId: plant.user_id,
+							userPlantId: plant.user_plant_id,
+							issueId: null,
+							title,
+							message,
+							notificationType: "stage_validation",
+							state: "sent",
+						});
+
+						if (!IS_DEV) {
+							await this.pushNotificationService.send(plant.user_id, title, message);
+						}
+
+						console.log(`[Telemetry] Stage validation notification created for plant ${plant.user_plant_id} (user ${plant.user_id})`);
+					} else if (window) {
+						const snoozedUntil = this.computeNextWindowStart(window.notification_window_start);
+
+						await this.repository.createNotification({
+							userId: plant.user_id,
+							userPlantId: plant.user_plant_id,
+							issueId: null,
+							title,
+							message,
+							notificationType: "stage_validation",
+							state: "snoozed",
+							snoozedUntil,
+						});
+
+						console.log(`[Telemetry] Stage validation notification snoozed until ${snoozedUntil.toISOString()} (outside quiet hours) for plant ${plant.user_plant_id}`);
+					} else {
+						await this.repository.createNotification({
+							userId: plant.user_id,
+							userPlantId: plant.user_plant_id,
+							issueId: null,
+							title,
+							message,
+							notificationType: "stage_validation",
+							state: "sent",
+						});
+
+						if (!IS_DEV) {
+							await this.pushNotificationService.send(plant.user_id, title, message);
+						}
+
+						console.log(`[Telemetry] Stage validation notification created for plant ${plant.user_plant_id} (no window set)`);
+					}
+				} catch (err) {
+					console.error(`[Telemetry] Error creating stage validation for plant ${plant.user_plant_id}:`, err);
+				}
+			}
+		} catch (err) {
+			console.error("[Telemetry] Error checking stage advancement:", err);
 		}
 	}
 

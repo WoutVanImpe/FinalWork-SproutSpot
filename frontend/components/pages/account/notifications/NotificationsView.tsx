@@ -13,6 +13,8 @@ export interface NotificationItem {
 	description: string;
 	image: number | { uri: string } | null;
 	snoozed?: boolean;
+	userPlantId?: number;
+	nextStageOrder?: number;
 }
 
 interface NotificationsViewProps {
@@ -20,7 +22,7 @@ interface NotificationsViewProps {
 	onBack: () => void;
 	onDismiss: (id: string) => void;
 	onSnooze: (id: string) => void;
-	onValidate: () => void;
+	onValidate: (notificationId: string, userPlantId: number, nextStageOrder: number) => void;
 }
 
 const NotificationsView = ({ notifications, onBack, onDismiss, onSnooze, onValidate }: NotificationsViewProps) => (
@@ -63,11 +65,18 @@ const NotificationsView = ({ notifications, onBack, onDismiss, onSnooze, onValid
 									</TouchableOpacity>
 								</View>
 							) : (
-								<TouchableOpacity style={styles.notifActionButtonFilled} onPress={onValidate}>
-									<StyledText type="head4" fullCap style={styles.notifActionFilledText}>
-										Valideer
-									</StyledText>
-								</TouchableOpacity>
+								<View style={styles.cardActions}>
+									<TouchableOpacity style={styles.notifActionButton} onPress={() => onSnooze(item.id)}>
+										<StyledText type="head4" fullCap style={styles.notifActionOutlineText}>
+											Herinner mij
+										</StyledText>
+									</TouchableOpacity>
+									<TouchableOpacity style={styles.notifActionButtonFilled} onPress={() => { if (item.userPlantId && item.nextStageOrder) onValidate(item.id, item.userPlantId, item.nextStageOrder); }}>
+										<StyledText type="head4" fullCap style={styles.notifActionFilledText}>
+											Valideer
+										</StyledText>
+									</TouchableOpacity>
+								</View>
 							)}
 						</View>
 					))

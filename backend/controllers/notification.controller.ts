@@ -20,6 +20,8 @@ function mapNotification(n: any) {
 		image: imageUri ? { uri: imageUri } : null,
 		snoozed: n.notification_state === "snoozed",
 		created_at: n.created_at,
+		userPlantId: n.raw_user_plant_id ?? null,
+		nextStageOrder: n.next_stage_order ?? null,
 	};
 }
 
@@ -131,9 +133,10 @@ export class NotificationController {
 				return;
 			}
 
-			const notification = await this.service.resetNotificationState(id);
+			const hours = req.body?.hours ? Number(req.body.hours) : undefined;
+			const notification = await this.service.resetNotificationState(id, hours);
 
-			res.status(200).json({ success: true, message: "Notification snoozed for 12 hours", data: notification });
+			res.status(200).json({ success: true, message: "Notification snoozed", data: notification });
 		} catch (error) {
 			if ((error as Error).message === "Notification not found") {
 				res.status(404).json({ error: "Not Found", message: (error as Error).message });
