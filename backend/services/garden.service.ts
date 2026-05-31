@@ -1,8 +1,8 @@
 import { db } from "../db/connection";
 import { GardenRepository } from "../repositories/garden.repository";
 import { UserPlantRepository } from "../repositories/userPlant.repository";
-import { UserGardenRecord } from "../types/database";
-import { enrichPlants } from "../utils/plantEnricher";
+import { UserGardenRecord, ProbeEntryRecord, PlantStageRecord } from "../types/database";
+import { enrichPlant, enrichPlants } from "../utils/plantEnricher";
 
 interface GardenUpdateInput {
 	width?: number;
@@ -61,6 +61,71 @@ export class GardenService {
 				active_plants: enrichedPlants.filter((p: any) => p.warning !== undefined).length,
 			},
 		};
+	}
+
+	/**
+	 * @description Retrieve a single enriched plant by its user_plant ID. Verifies the plant belongs to the user's garden.
+	 * @param {number} userId - The user's database ID.
+	 * @param {number} plantId - The user_plant ID.
+	 * @returns {Promise<any>} Enriched plant data.
+	 */
+	async getUserPlantById(userId: number, plantId: number) {
+		const garden = await this.repository.findByUserId(userId);
+		if (!garden) {
+			throw new Error("Garden not found");
+		}
+
+		const rawPlant = await db("user_plants as up")
+			.join("plants as p", "up.plant_id", "p.id")
+			.leftJoin("probes as pr", "up.sonde_id", "pr.hardware_id")
+			.where("up.id", plantId)
+			.andWhere("up.garden_id", garden.id)
+			.andWhere("up.is_active", true)
+			.select(
+				"up.id",
+				"up.plant_id",
+				"up.x_pos",
+				"up.y_pos",
+				"up.nickname",
+				"p.name as plant_name",
+				"p.image as plant_image",
+				"up.current_stage_order",
+				"up.sonde_id",
+				"up.created_at",
+				"pr.name as probe_name",
+				"pr.battery_voltage",
+				"pr.wifi_rssi",
+				"pr.last_seen",
+			)
+			.first();
+
+		if (!rawPlant) {
+			throw new Error("Plant not found");
+		}
+
+		const plantRecord = await db("plants").where("id", rawPlant.plant_id).first();
+
+		const allStages: PlantStageRecord[] = await db("plant_stages")
+			.where("plant_id", rawPlant.plant_id)
+			.orderBy("stage_order", "asc");
+
+		const currentStage = allStages.find((s) => s.stage_order === rawPlant.current_stage_order) ?? null;
+
+		let latestTelemetry: ProbeEntryRecord | null = null;
+		if (rawPlant.sonde_id) {
+			const entries = await db("probe_entries")
+				.where("sonde_id", rawPlant.sonde_id)
+				.orderBy("created_at", "desc")
+				.limit(1);
+			latestTelemetry = entries[0] ?? null;
+		}
+
+		return enrichPlant(
+			{ ...rawPlant, water_label: plantRecord?.water ?? "", light_label: plantRecord?.light ?? "", temp_min: plantRecord?.temperature_min, temp_max: plantRecord?.temperature_max },
+			currentStage,
+			allStages,
+			latestTelemetry,
+		);
 	}
 
 	/**

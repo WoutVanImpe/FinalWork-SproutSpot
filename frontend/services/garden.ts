@@ -100,6 +100,10 @@ export interface ReadingRecord {
 	created_at: string;
 }
 
+export function getPlantById(userPlantId: number) {
+	return api.get<EnrichedPlant>(`/api/gardens/${userPlantId}`);
+}
+
 export function getReadings(userPlantId: number, hours?: number) {
 	return api.get<ReadingRecord[]>(`/api/user-plants/${userPlantId}/readings${hours ? `?hours=${hours}` : ""}`);
 }
