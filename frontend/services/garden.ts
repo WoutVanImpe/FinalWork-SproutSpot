@@ -11,6 +11,7 @@ export interface EnrichedPlant {
 	id: string;
 	image: string;
 	warning: boolean;
+	hasTelemetry: boolean;
 	x: number;
 	y: number;
 	nickname: string;

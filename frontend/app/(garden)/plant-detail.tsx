@@ -167,7 +167,13 @@ const PlantDetail = () => {
 
         <Spacer space={Styling.Spacing.xlg} />
 
-        <RequirementsSection plantName={plant.nickname} requirements={requirements} />
+        {plant.hasTelemetry ? (
+          <RequirementsSection plantName={plant.nickname} requirements={requirements} />
+        ) : (
+          <StyledText type="paragh" style={styles.noDataText}>
+            Nog geen meetgegevens beschikbaar.
+          </StyledText>
+        )}
 
         <Spacer space={Styling.Spacing.xlg} />
 
@@ -234,5 +240,9 @@ const styles = StyleSheet.create({
   },
   graphBtnText: {
     color: Styling.Colors.white,
+  },
+  noDataText: {
+    color: Styling.Colors.white,
+    textAlign: "center",
   },
 });

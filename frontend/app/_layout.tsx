@@ -43,7 +43,7 @@ const CustomTabBar = ({ state, navigation }: any) => {
 	const visibleRoutes = state.routes.filter((r: any) => routeOrder.includes(r.name));
 	const tabAnims = useRef(visibleRoutes.map(() => new Animated.Value(0))).current;
 
-	const visibleIndex = segments[0] === "(garden)" ? 1 : segments[0] === "(explore)" ? 2 : 0;
+	const visibleIndex = segments[0] === "(garden)" ? 1 : segments[0] === "(explore)" ? 2 : segments[0] === "(account)" ? -1 : 0;
 	const prevVisibleIndex = useRef(visibleIndex);
 
 	useEffect(() => {
@@ -55,9 +55,6 @@ const CustomTabBar = ({ state, navigation }: any) => {
 		if (visibleIndex < 0) {
 			prevVisibleIndex.current = visibleIndex;
 			return;
-		}
-		if (prevVisibleIndex.current < 0) {
-			animatedCx.setValue(getCx(visibleIndex));
 		}
 		Animated.spring(animatedCx, {
 			toValue: getCx(visibleIndex),

@@ -15,6 +15,7 @@ export interface NotificationItem {
 	snoozed?: boolean;
 	userPlantId?: number;
 	nextStageOrder?: number;
+	plantName?: string;
 }
 
 interface NotificationsViewProps {
@@ -22,7 +23,7 @@ interface NotificationsViewProps {
 	onBack: () => void;
 	onDismiss: (id: string) => void;
 	onSnooze: (id: string) => void;
-	onValidate: (notificationId: string, userPlantId: number, nextStageOrder: number) => void;
+	onValidate: (notificationId: string, userPlantId: number, nextStageOrder: number, plantName?: string) => void;
 }
 
 const NotificationsView = ({ notifications, onBack, onDismiss, onSnooze, onValidate }: NotificationsViewProps) => (
@@ -71,7 +72,7 @@ const NotificationsView = ({ notifications, onBack, onDismiss, onSnooze, onValid
 											Herinner mij
 										</StyledText>
 									</TouchableOpacity>
-									<TouchableOpacity style={styles.notifActionButtonFilled} onPress={() => { if (item.userPlantId && item.nextStageOrder) onValidate(item.id, item.userPlantId, item.nextStageOrder); }}>
+									<TouchableOpacity style={styles.notifActionButtonFilled} onPress={() => { if (item.userPlantId && item.nextStageOrder) onValidate(item.id, item.userPlantId, item.nextStageOrder, item.plantName); }}>
 										<StyledText type="head4" fullCap style={styles.notifActionFilledText}>
 											Valideer
 										</StyledText>

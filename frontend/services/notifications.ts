@@ -10,6 +10,7 @@ export interface NotificationItem {
 	created_at: string;
 	userPlantId: number | null;
 	nextStageOrder: number | null;
+	plantName: string | null;
 }
 
 export function getNotifications(all = false) {

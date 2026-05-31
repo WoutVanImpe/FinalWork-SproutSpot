@@ -127,31 +127,39 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 							</StyledText>
 							<Spacer space={Styling.Spacing.sml} />
 
-							<StyledText type="head4" style={styles.sectionTitle}>
-								Hoe gaat het nu:
-							</StyledText>
-							<Spacer space={Styling.Spacing.xsm} />
+							{plant.hasTelemetry ? (
+								<>
+									<StyledText type="head4" style={styles.sectionTitle}>
+										Hoe gaat het nu:
+									</StyledText>
+									<Spacer space={Styling.Spacing.xsm} />
 
-							<Row label="Water" value={plant.water.label}>
-								<StatusBar level={plant.water.level} optimalMin={plant.water.optimalMin} optimalMax={plant.water.optimalMax} />
-							</Row>
-							<Spacer space={Styling.Spacing.sml} />
-							<Row label="Licht" value={plant.light.label}>
-								<StatusBar level={plant.light.level} optimalMin={plant.light.optimalMin} optimalMax={plant.light.optimalMax} />
-							</Row>
-							<Spacer space={Styling.Spacing.sml} />
-							<Row label="Warmte" value={plant.temperature.label}>
-								<StatusBar level={plant.temperature.level} optimalMin={plant.temperature.optimalMin} optimalMax={plant.temperature.optimalMax} />
-							</Row>
-							<Spacer space={Styling.Spacing.sml} />
+									<Row label="Water" value={plant.water.label}>
+										<StatusBar level={plant.water.level} optimalMin={plant.water.optimalMin} optimalMax={plant.water.optimalMax} />
+									</Row>
+									<Spacer space={Styling.Spacing.sml} />
+									<Row label="Licht" value={plant.light.label}>
+										<StatusBar level={plant.light.level} optimalMin={plant.light.optimalMin} optimalMax={plant.light.optimalMax} />
+									</Row>
+									<Spacer space={Styling.Spacing.sml} />
+									<Row label="Warmte" value={plant.temperature.label}>
+										<StatusBar level={plant.temperature.level} optimalMin={plant.temperature.optimalMin} optimalMax={plant.temperature.optimalMax} />
+									</Row>
+									<Spacer space={Styling.Spacing.sml} />
 
-							<StyledText type="head4" style={styles.sectionTitle}>
-								Advies:
-							</StyledText>
-							<Spacer space={Styling.Spacing.xsm} />
-							<StyledText type="paragh" style={styles.bodyText}>
-								{plant.advice || "Alles is in orde, er is geen actie nodig."}
-							</StyledText>
+									<StyledText type="head4" style={styles.sectionTitle}>
+										Advies:
+									</StyledText>
+									<Spacer space={Styling.Spacing.xsm} />
+									<StyledText type="paragh" style={styles.bodyText}>
+										{plant.advice || "Alles is in orde, er is geen actie nodig."}
+									</StyledText>
+								</>
+							) : (
+								<StyledText type="paragh" style={styles.bodyText}>
+									Nog geen metingen ontvangen.
+								</StyledText>
+							)}
 							<Spacer space={Styling.Spacing.sml} />
 
 							<StyledText type="head4" style={styles.sectionTitle}>

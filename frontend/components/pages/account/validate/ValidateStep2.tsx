@@ -8,6 +8,7 @@ import Spacer from "../../../style/Spacer";
 import AccountHeader from "../header/AccountHeader";
 
 interface ValidateStep2Props {
+	plantName?: string;
 	onBack: () => void;
 	onConfirm: () => void;
 }

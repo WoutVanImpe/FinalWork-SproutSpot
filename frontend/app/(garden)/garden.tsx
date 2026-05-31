@@ -28,6 +28,7 @@ function enrichedToGardenPlant(p: EnrichedPlant): GardenPlant {
 		id: p.id,
 		image: p.image ? { uri: p.image } : (0 as unknown as number),
 		warning: p.warning,
+		hasTelemetry: p.hasTelemetry,
 		x: p.x,
 		y: p.y,
 		nickname: p.nickname,

@@ -14,6 +14,7 @@ export interface EnrichedGardenPlant {
 	id: string;
 	image: string;
 	warning: boolean;
+	hasTelemetry: boolean;
 	x: number;
 	y: number;
 	nickname: string;
@@ -101,10 +102,13 @@ export async function enrichPlant(
 	const stageDefs = allStages.map((s) => toStageInfo(s));
 	const totalDays = stageDefs.reduce((sum, s) => sum + s.durationDays, 0);
 
+	const hasTelemetry = latestTelemetry != null;
+
 	return {
 		id: String(rawPlant.id),
 		image: imageUrl,
-		warning: computeWarning(statuses),
+		warning: hasTelemetry && computeWarning(statuses),
+		hasTelemetry,
 		x: rawPlant.x_pos,
 		y: rawPlant.y_pos,
 		nickname: rawPlant.nickname ?? rawPlant.plant_name ?? "Plant",
@@ -161,6 +165,7 @@ export async function enrichPlants(rawPlants: any[]): Promise<EnrichedGardenPlan
 				id: String(rawPlant.id),
 				image: imageUrl,
 				warning: false,
+				hasTelemetry: false,
 				x: rawPlant.x_pos,
 				y: rawPlant.y_pos,
 				nickname: rawPlant.nickname ?? rawPlant.plant_name ?? "Plant",
