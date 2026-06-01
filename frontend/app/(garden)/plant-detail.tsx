@@ -13,8 +13,8 @@ import RequirementsSection from "../../components/pages/garden/plantDetail/Requi
 import TechnicalOverview from "../../components/pages/garden/plantDetail/TechnicalOverview";
 import GraphModal from "../../components/pages/garden/plantDetail/GraphModal";
 import { GardenPlant } from "../../components/pages/garden/gardenGrid/GardenGridItem";
-import { getReadings, getPlantById } from "../../services/garden";
-import type { ReadingRecord, EnrichedPlant } from "../../services/garden";
+import { getReadings, getPlantById, enrichedToGardenPlant } from "../../services/garden";
+import type { ReadingRecord } from "../../services/garden";
 
 const FALLBACK_STAGES: Record<string, { label: string; dayStart: number; dayEnd: number }[]> = {
   Tomaat: [
@@ -111,36 +111,10 @@ function tempDescription(tempLabel: string): string {
   return tempLabel ? `Optimale temperatuur: ${tempLabel}. Vermijd extreme temperatuurschommelingen.` : "Gedijt bij normale kamertemperatuur. Bescherm tegen vorst.";
 }
 
-function enrichedToGardenPlant(p: EnrichedPlant): GardenPlant {
-  return {
-    id: p.id,
-    image: p.image ? { uri: p.image } : (0 as unknown as number),
-    warning: p.warning,
-    hasTelemetry: p.hasTelemetry,
-    x: p.x,
-    y: p.y,
-    nickname: p.nickname,
-    type: p.type,
-    stage: p.stage,
-    stages: p.stages,
-    totalDays: p.totalDays,
-    water: p.water,
-    light: p.light,
-    temperature: p.temperature,
-    advice: p.advice,
-    battery: p.battery,
-    probeName: p.probe_name,
-    created_at: p.created_at,
-    last_seen: p.last_seen,
-    last_temp: p.last_temp,
-  };
-}
-
 const PlantDetail = () => {
-  const { plantData } = useLocalSearchParams<{ plantData: string }>();
-  const initialPlant: GardenPlant | null = plantData ? JSON.parse(plantData) : null;
-  const plantIdRef = useRef(initialPlant ? parseInt(initialPlant.id.replace("up_", ""), 10) : NaN);
-  const [plant, setPlant] = useState<GardenPlant | null>(initialPlant);
+  const { plantId } = useLocalSearchParams<{ plantId: string }>();
+  const plantIdRef = useRef(plantId ? parseInt(plantId.replace("up_", ""), 10) : NaN);
+  const [plant, setPlant] = useState<GardenPlant | null>(null);
   const [plantLoading, setPlantLoading] = useState(false);
   const [graphVisible, setGraphVisible] = useState(false);
   const [readings, setReadings] = useState<ReadingRecord[]>([]);

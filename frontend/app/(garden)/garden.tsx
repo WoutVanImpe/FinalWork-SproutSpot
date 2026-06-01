@@ -4,7 +4,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { CELL, MAX_SCALE, MIN_SCALE, SCALE_STEP, clampOffset, gridDimensions } from "../../constants/garden";
 import { Styling } from "../../constants/Styling";
 import { BAR_HEIGHT } from "../../constants/tabConfig";
-import { getGarden, getDashboard, createUserPlant, updateGarden } from "../../services/garden";
+import { getGarden, getDashboard, createUserPlant, updateGarden, enrichedToGardenPlant } from "../../services/garden";
 import { pairProbe } from "../../services/probes";
 import { getPlantById } from "../../services/plants";
 import type { EnrichedPlant } from "../../services/garden";
@@ -22,31 +22,6 @@ import GardenGridItem, { GardenPlant } from "../../components/pages/garden/garde
 import { useOverlay } from "../../context/OverlayContext";
 import StyledAlert, { AlertButton } from "../../components/style/StyledAlert";
 import { useLocalSearchParams, router } from "expo-router";
-
-function enrichedToGardenPlant(p: EnrichedPlant): GardenPlant {
-	return {
-		id: p.id,
-		image: p.image ? { uri: p.image } : (0 as unknown as number),
-		warning: p.warning,
-		hasTelemetry: p.hasTelemetry,
-		x: p.x,
-		y: p.y,
-		nickname: p.nickname,
-		type: p.type,
-		stage: p.stage,
-		stages: p.stages,
-		totalDays: p.totalDays,
-		water: p.water,
-		light: p.light,
-		temperature: p.temperature,
-		advice: p.advice,
-		battery: p.battery,
-		probeName: p.probe_name,
-		created_at: p.created_at,
-		last_seen: p.last_seen,
-		last_temp: p.last_temp,
-	};
-}
 
 let vegCache: Record<string, PlantDetail> = {};
 

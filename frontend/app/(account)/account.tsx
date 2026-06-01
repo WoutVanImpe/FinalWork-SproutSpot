@@ -9,7 +9,7 @@ import { advanceStage } from "../../services/garden";
 
 import AccountMain from "../../components/pages/account/main/AccountMain";
 import NotificationsView from "../../components/pages/account/notifications/NotificationsView";
-import type { NotificationItem } from "../../components/pages/account/notifications/NotificationsView";
+import type { NotificationViewItem } from "../../components/pages/account/notifications/NotificationsView";
 import ValidateStep1 from "../../components/pages/account/validate/ValidateStep1";
 import ValidateStep2 from "../../components/pages/account/validate/ValidateStep2";
 import HistoryView from "../../components/pages/account/history/HistoryView";
@@ -17,7 +17,7 @@ import type { HistoryEntry } from "../../components/pages/account/history/Histor
 import ProbesView from "../../components/pages/account/probes/ProbesView";
 import SettingsView from "../../components/pages/account/settings/SettingsView";
 
-function apiNotifToView(n: ApiNotification): NotificationItem {
+function apiNotifToView(n: ApiNotification): NotificationViewItem {
 	return {
 		id: n.id,
 		type: n.type,
@@ -62,7 +62,7 @@ const Account = () => {
 	const { logout: authLogout } = useAuth();
 	const [currentView, setCurrentView] = useState<string>("main");
 
-	const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+	const [notifications, setNotifications] = useState<NotificationViewItem[]>([]);
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [pairingCode, setPairingCode] = useState("");

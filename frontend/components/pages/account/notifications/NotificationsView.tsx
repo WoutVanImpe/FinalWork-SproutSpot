@@ -6,7 +6,7 @@ import StyledText from "../../../style/StyledText";
 import Spacer from "../../../style/Spacer";
 import AccountHeader from "../header/AccountHeader";
 
-export interface NotificationItem {
+export interface NotificationViewItem {
 	id: string;
 	type: "problem" | "milestone";
 	title: string;
@@ -19,14 +19,20 @@ export interface NotificationItem {
 }
 
 interface NotificationsViewProps {
-	notifications: NotificationItem[];
+	notifications: NotificationViewItem[];
 	onBack: () => void;
 	onDismiss: (id: string) => void;
 	onSnooze: (id: string) => void;
 	onValidate: (notificationId: string, userPlantId: number, nextStageOrder: number, plantName?: string) => void;
 }
 
-const NotificationsView = ({ notifications, onBack, onDismiss, onSnooze, onValidate }: NotificationsViewProps) => (
+const NotificationsView = ({ notifications, onBack, onDismiss, onSnooze, onValidate }: NotificationsViewProps) => {
+	const getImageSource = (image: NotificationViewItem["image"]) => {
+		if (image === null || image === undefined) return undefined;
+		if (typeof image === "number") return image;
+		return image;
+	};
+	return (
 	<StyledView>
 		<AccountHeader title="Notificaties" onBack={onBack} />
 		<Spacer space={Styling.Spacing.med}/>
@@ -84,7 +90,8 @@ const NotificationsView = ({ notifications, onBack, onDismiss, onSnooze, onValid
 			)}
 		</ScrollView>
 	</StyledView>
-);
+	);
+};
 
 export default NotificationsView;
 

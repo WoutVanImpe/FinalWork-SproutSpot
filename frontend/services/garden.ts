@@ -76,14 +76,6 @@ export function createUserPlant(data: {
 	});
 }
 
-export function getUserPlants() {
-	return api.get<unknown[]>("/api/user-plants");
-}
-
-export function getCurrentStage(userPlantId: number) {
-	return api.get<{ current: number; max: number; label: string }>(`/api/user-plants/${userPlantId}/stage`);
-}
-
 export function advanceStage(userPlantId: number, new_stage_order: number) {
 	return api.post<void>(`/api/user-plants/${userPlantId}/stage`, { new_stage_order });
 }
@@ -92,12 +84,36 @@ export interface ReadingRecord {
 	id: number;
 	sonde_id: string | null;
 	temp_c: number | null;
-	humidity_pct: number | null;
 	light_lux: number | null;
 	soil_moist_pct: number | null;
 	battery_voltage: number;
 	wifi_rssi: number;
 	created_at: string;
+}
+
+export function enrichedToGardenPlant(p: EnrichedPlant) {
+	return {
+		id: p.id,
+		image: p.image ? { uri: p.image } : (0 as unknown as number),
+		warning: p.warning,
+		hasTelemetry: p.hasTelemetry,
+		x: p.x,
+		y: p.y,
+		nickname: p.nickname,
+		type: p.type,
+		stage: p.stage,
+		stages: p.stages,
+		totalDays: p.totalDays,
+		water: p.water,
+		light: p.light,
+		temperature: p.temperature,
+		advice: p.advice,
+		battery: p.battery,
+		probeName: p.probe_name,
+		created_at: p.created_at,
+		last_seen: p.last_seen,
+		last_temp: p.last_temp,
+	};
 }
 
 export function getPlantById(userPlantId: number) {
