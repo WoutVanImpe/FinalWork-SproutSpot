@@ -2,6 +2,7 @@ import { TelemetryRepository } from "../repositories/telemetry.repository";
 import { NotificationRepository } from "../repositories/notification.repository";
 import { ProbeRepository, StaleProbeResult } from "../repositories/probe.repository";
 import { UserPlantRepository } from "../repositories/userPlant.repository";
+import { batteryPercentage } from "../utils/battery";
 import { PushNotificationService } from "./push-notification.service";
 import { TelemetryBatchUploadDto, TelemetryEntryDto } from "../types/dto";
 import { ActiveIssueRecord, ProbeEntryRecord, StageThresholdsRecord, UserPlantRecord } from "../types/database";
@@ -59,13 +60,6 @@ export class TelemetryService {
 		}
 
 		console.log(`[Telemetry] Charging update for ${hardwareId}: battery=${batteryVoltage}V, rssi=${wifiRssi}`);
-	}
-
-	private batteryPercentage(voltage: number): number {
-		const MIN_VOLTAGE = 3.3;
-		const MAX_VOLTAGE = 4.2;
-		const pct = Math.round(((voltage - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 100);
-		return Math.max(0, Math.min(100, pct));
 	}
 
 	async uploadTelemetry(payload: TelemetryBatchUploadDto): Promise<ProbeEntryRecord[]> {
@@ -250,7 +244,7 @@ export class TelemetryService {
 	): Promise<void> {
 		const BATTERY_WARNING_VOLTAGE = 3.5;
 		const BATTERY_LOW_PCT = 10;
-		const pct = this.batteryPercentage(batteryVoltage);
+		const pct = batteryPercentage(batteryVoltage);
 
 		if (userPlantId == null || userId == null) {
 			if (pct < BATTERY_LOW_PCT) {

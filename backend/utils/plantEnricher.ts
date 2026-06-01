@@ -2,6 +2,7 @@ import { db } from "../db/connection";
 import { ProbeEntryRecord, PlantStageRecord } from "../types/database";
 import { toStageInfo, LIGHT_MAP, WATER_MAP } from "./plantMapper";
 import { buildImageUrl } from "../config";
+import { batteryPercentage } from "./battery";
 
 export interface PlantStatusData {
 	level: number;
@@ -31,13 +32,6 @@ export interface EnrichedGardenPlant {
 	created_at: string;
 	last_seen: string | null;
 	last_temp: number;
-}
-
-function batteryPercentage(voltage: number): number {
-	const MIN_VOLTAGE = 3.3;
-	const MAX_VOLTAGE = 4.2;
-	const pct = Math.round(((voltage - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 100);
-	return Math.max(0, Math.min(100, pct));
 }
 
 function computeWarning(statuses: PlantStatusData[]): boolean {
