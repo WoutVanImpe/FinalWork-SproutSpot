@@ -52,8 +52,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				setTokenState(res.data.token);
 				setApiToken(res.data.token);
 				await SecureStore.setItemAsync(TOKEN_KEY, res.data.token);
-				setUser({ id: res.data.id, name: res.data.name, email: res.data.email, profile_picture: null, push_token: null, push_enabled: true, pairing_code: "", notification_window_start: "", notification_window_end: "", created_at: "" });
-				syncPushToken(null);
+				const profile = await getProfile();
+				if (profile.data) setUser(profile.data);
+				syncPushToken(profile.data?.push_token ?? null);
 			}
 		} finally {
 			setLoading(false);
@@ -68,8 +69,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				setTokenState(res.data.token);
 				setApiToken(res.data.token);
 				await SecureStore.setItemAsync(TOKEN_KEY, res.data.token);
-				setUser({ id: res.data.id, name: res.data.name, email: res.data.email, profile_picture: null, push_token: null, push_enabled: true, pairing_code: res.data.pairing_code, notification_window_start: "", notification_window_end: "", created_at: res.data.created_at });
-				syncPushToken(null);
+				const profile = await getProfile();
+				if (profile.data) setUser(profile.data);
+				syncPushToken(profile.data?.push_token ?? null);
 			}
 		} finally {
 			setLoading(false);
