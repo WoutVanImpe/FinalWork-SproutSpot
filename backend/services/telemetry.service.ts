@@ -255,17 +255,7 @@ export class TelemetryService {
 
 		const openIssues = await this.repository.findOpenIssuesByUserPlant(userPlantId);
 
-		// --- BATTERY_WARNING (3.5V) ---
-		if (batteryVoltage <= BATTERY_WARNING_VOLTAGE && batteryVoltage > 3.3) {
-			const existing = openIssues.find((i) => i.issue_type === "BATTERY_WARNING");
-			if (!existing) {
-				const issue = await this.repository.createIssue(userPlantId, "BATTERY_WARNING");
-				await this.dispatchNotificationForIssue(issue, userId, userPlantId, plantNickname);
-				console.log(`[Telemetry] BATTERY_WARNING — voltage=${batteryVoltage}, pct=${pct}%`);
-			}
-		}
-
-		// --- BATTERY_LOW (10% = 3.39V) ---
+		// --- BATTERY_LOW (10% = 3.39V) takes priority over WARNING ---
 		if (pct < BATTERY_LOW_PCT) {
 			const existing = openIssues.find((i) => i.issue_type === "BATTERY_LOW");
 			if (existing) {
@@ -282,16 +272,25 @@ export class TelemetryService {
 				console.log(`[Telemetry] Auto-resolving BATTERY_LOW (issue #${batteryIssue.id}) — battery recovered to ${pct}%`);
 				await this.repository.resolveIssue(batteryIssue.id);
 			}
-		}
 
-		// Auto-resolve BATTERY_WARNING bij herstel (> 3.5V)
-		if (batteryVoltage > BATTERY_WARNING_VOLTAGE) {
-			const warningIssue = openIssues.find((i) => i.issue_type === "BATTERY_WARNING");
-			if (warningIssue) {
-				console.log(`[Telemetry] Auto-resolving BATTERY_WARNING (issue #${warningIssue.id}) — battery recovered to ${batteryVoltage}V`);
-				await this.repository.resolveIssue(warningIssue.id);
+			// --- BATTERY_WARNING (3.5V) — only fires when LOW is not active ---
+			if (batteryVoltage <= BATTERY_WARNING_VOLTAGE && batteryVoltage > 3.3) {
+				const existing = openIssues.find((i) => i.issue_type === "BATTERY_WARNING");
+				if (!existing) {
+					const issue = await this.repository.createIssue(userPlantId, "BATTERY_WARNING");
+					await this.dispatchNotificationForIssue(issue, userId, userPlantId, plantNickname);
+					console.log(`[Telemetry] BATTERY_WARNING — voltage=${batteryVoltage}, pct=${pct}%`);
+				}
+			} else if (batteryVoltage > BATTERY_WARNING_VOLTAGE) {
+				// Auto-resolve BATTERY_WARNING bij herstel
+				const warningIssue = openIssues.find((i) => i.issue_type === "BATTERY_WARNING");
+				if (warningIssue) {
+					console.log(`[Telemetry] Auto-resolving BATTERY_WARNING (issue #${warningIssue.id}) — voltage recovered to ${batteryVoltage}V`);
+					await this.repository.resolveIssue(warningIssue.id);
+				}
 			}
 		}
+
 	}
 
 	async checkStaleProbes(): Promise<void> {
