@@ -14,6 +14,7 @@ export function startScheduler(): void {
 	telemetryService.checkDailyLightIntegral();
 	telemetryService.checkDailyTemperatureIntegral();
 	telemetryService.processSnoozedNotifications();
+	telemetryService.processSentNotifications();
 	telemetryService.checkStageAdvancement();
 
 	intervalHandle = setInterval(() => {
@@ -21,6 +22,7 @@ export function startScheduler(): void {
 		telemetryService.checkDailyLightIntegral();
 		telemetryService.checkDailyTemperatureIntegral();
 		telemetryService.processSnoozedNotifications();
+		telemetryService.processSentNotifications();
 		telemetryService.checkStageAdvancement();
 	}, CHECK_INTERVAL_MS);
 }

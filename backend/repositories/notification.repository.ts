@@ -106,9 +106,41 @@ export class NotificationRepository {
 				"pn.title",
 				"pn.message",
 				"pn.notification_type",
+				"pn.issue_id",
 				"u.notification_window_start",
 				"u.notification_window_end",
 			);
+	}
+
+	async getPendingReminderNotifications(): Promise<any[]> {
+		return db("pending_notifications as pn")
+			.join("users as u", "pn.user_id", "u.id")
+			.where("pn.notification_state", "sent")
+			.andWhere(function () {
+				this.where("pn.last_reminded_at", "<", db.raw("NOW() - INTERVAL '12 hours'"))
+					.orWhereNull("pn.last_reminded_at");
+			})
+			.andWhere("pn.created_at", "<", db.raw("NOW() - INTERVAL '12 hours'"))
+			.select(
+				"pn.id",
+				"pn.user_id",
+				"pn.user_plant_id",
+				"pn.title",
+				"pn.message",
+				"pn.notification_type",
+				"u.notification_window_start",
+				"u.notification_window_end",
+			);
+	}
+
+	async updateRemindedAt(notificationId: number): Promise<void> {
+		await db("pending_notifications")
+			.where("id", notificationId)
+			.update({ last_reminded_at: db.fn.now() });
+	}
+
+	async findIssueById(issueId: number): Promise<ActiveIssueRecord | undefined> {
+		return db("active_issues").where("id", issueId).first();
 	}
 
 	/**

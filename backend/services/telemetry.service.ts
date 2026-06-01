@@ -397,6 +397,15 @@ export class TelemetryService {
 
 		for (const n of due) {
 			try {
+				if (n.issue_id) {
+					const issue = await this.notificationRepository.findIssueById(n.issue_id);
+					if (issue && issue.resolved_at) {
+						await this.notificationRepository.acknowledgeNotification(n.id);
+						console.log(`[Telemetry] Auto-acknowledged snoozed notification ${n.id} — linked issue ${n.issue_id} already resolved`);
+						continue;
+					}
+				}
+
 				const now = new Date();
 
 				if (n.notification_window_start && this.isWithinWindow(now, n.notification_window_start, n.notification_window_end)) {
@@ -414,6 +423,26 @@ export class TelemetryService {
 				}
 			} catch (err) {
 				console.error(`[Telemetry] Error processing snoozed notification ${n.id}:`, err);
+			}
+		}
+	}
+
+	async processSentNotifications(): Promise<void> {
+		const pending = await this.notificationRepository.getPendingReminderNotifications();
+
+		for (const n of pending) {
+			try {
+				const now = new Date();
+
+				if (n.notification_window_start && !this.isWithinWindow(now, n.notification_window_start, n.notification_window_end)) {
+					continue;
+				}
+
+				await this.pushNotificationService.send(n.user_id, n.title, n.message);
+				await this.notificationRepository.updateRemindedAt(n.id);
+				console.log(`[Telemetry] Reminded user ${n.user_id} about notification ${n.id}`);
+			} catch (err) {
+				console.error(`[Telemetry] Error processing sent notification reminder ${n.id}:`, err);
 			}
 		}
 	}
