@@ -152,7 +152,8 @@ export async function enrichPlants(rawPlants: any[]): Promise<EnrichedGardenPlan
 				allStages,
 				latestTelemetry,
 			);
-		} catch {
+		} catch (err) {
+			console.error("Failed to enrich plant", err);
 			const imageUrl = buildImageUrl(rawPlant.plant_image ?? "");
 
 			return {
