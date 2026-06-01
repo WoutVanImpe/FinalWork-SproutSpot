@@ -34,6 +34,40 @@ export class GardenController {
 	};
 
 	/**
+	 * @description Retrieve a single enriched plant by ID. Verifies the plant belongs to the user's garden.
+	 * @param {AuthenticatedRequest} req - Authenticated request with plant ID in params.
+	 * @param {Response} res - Express response with enriched plant data.
+	 * @returns {void}
+	 */
+	getUserPlantById = async (req: AuthenticatedRequest, res: Response) => {
+		try {
+			const userId = req.user?.id;
+			if (!userId) {
+				res.status(401).json({ error: "Unauthorized", message: "Authentication required" });
+				return;
+			}
+
+			const plantId = parseInt(req.params.id as string, 10);
+			if (isNaN(plantId)) {
+				res.status(400).json({ error: "Bad Request", message: "Invalid plant ID" });
+				return;
+			}
+
+			const plant = await this.service.getUserPlantById(userId, plantId);
+
+			res.status(200).json({ success: true, data: plant });
+		} catch (error) {
+			const msg = (error as Error).message;
+			if (msg === "Plant not found" || msg === "Garden not found") {
+				res.status(404).json({ error: "Not Found", message: msg });
+				return;
+			}
+			console.error("[GardenController] Error:", error);
+			res.status(500).json({ error: "Internal Server Error", message: "Failed to retrieve plant" });
+		}
+	};
+
+	/**
 	 * @description Retrieve the user's garden dashboard with enriched plant data (current stage info) and summary stats.
 	 * @param {AuthenticatedRequest} req - Authenticated request containing user ID.
 	 * @param {Response} res - Express response with dashboard data.

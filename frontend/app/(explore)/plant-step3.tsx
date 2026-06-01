@@ -24,13 +24,13 @@ const PlantStep3 = () => {
       .finally(() => setLoading(false));
   }, [vegId]);
 
-  if (loading) return <FlowLayout title="Geef je plant een naam" onBack={() => router.push(`/(explore)/plant-step2?vegId=${vegId}`)}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></FlowLayout>;
+  if (loading) return <FlowLayout title="Geef je plant een naam" onBack={() => router.back()}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></FlowLayout>;
   if (!veg) return null;
 
   const canContinue = name.trim().length > 0;
 
   return (
-    <FlowLayout title="Geef je plant een naam" onBack={() => router.push(`/(explore)/plant-step2?vegId=${vegId}`)}>
+    <FlowLayout title="Geef je plant een naam" onBack={() => router.back()}>
       <View style={styles.content}>
         <StyledText type="paragh" style={styles.hint}>
           Kies een leuke naam voor je {veg.name.toLowerCase()}

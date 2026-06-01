@@ -89,17 +89,23 @@ export class ProbeController {
 	 * @param {Response} res - Express response with paired probe data.
 	 * @returns {void}
 	 */
-	pairProbe = async (req: Request, res: Response) => {
+	pairProbe = async (req: AuthenticatedRequest, res: Response) => {
 		try {
+			const userId = req.user?.id;
 			const probeId = Number.parseInt(req.params.id as string);
 			const { user_plant_id } = req.body;
+
+			if (!userId) {
+				res.status(401).json({ error: "Unauthorized", message: "Authentication required" });
+				return;
+			}
 
 			if (Number.isNaN(probeId) || !user_plant_id) {
 				res.status(400).json({ error: "Validation Error", message: "probe ID and user_plant_id are required" });
 				return;
 			}
 
-			const probe = await this.service.pairProbe(probeId, user_plant_id);
+			const probe = await this.service.pairProbe(userId, probeId, user_plant_id);
 
 			res.status(200).json({ success: true, message: "Probe paired to plant", data: probe });
 		} catch (error) {
@@ -120,16 +126,22 @@ export class ProbeController {
 	 * @param {Response} res - Express response with success confirmation.
 	 * @returns {void}
 	 */
-	unpairProbe = async (req: Request, res: Response) => {
+	unpairProbe = async (req: AuthenticatedRequest, res: Response) => {
 		try {
+			const userId = req.user?.id;
 			const userPlantId = Number.parseInt(req.params.userPlantId as string);
+
+			if (!userId) {
+				res.status(401).json({ error: "Unauthorized", message: "Authentication required" });
+				return;
+			}
 
 			if (Number.isNaN(userPlantId)) {
 				res.status(400).json({ error: "Validation Error", message: "userPlantId is required" });
 				return;
 			}
 
-			await this.service.unpairProbe(userPlantId);
+			await this.service.unpairProbe(userId, userPlantId);
 
 			res.status(200).json({ success: true, message: "Probe unpaired from plant" });
 		} catch (error) {

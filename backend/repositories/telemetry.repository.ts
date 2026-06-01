@@ -18,11 +18,13 @@ export interface DailyTemperatureSummary {
 	nickname: string | null;
 	tempMin: number;
 	dailyAvgTemp: number;
+	plantingType: string;
 }
 
 export interface LinkedPlantResult {
 	userPlant: UserPlantRecord;
 	thresholds: StageThresholdsRecord;
+	plantingType: string;
 }
 
 export class TelemetryRepository {
@@ -124,11 +126,13 @@ export class TelemetryRepository {
 				this.on("up.plant_id", "=", "ps.plant_id")
 					.andOn("up.current_stage_order", "=", "ps.stage_order");
 			})
+			.join("plants as p", "up.plant_id", "p.id")
 			.where("up.sonde_id", hardwareId)
 			.where("up.is_active", true)
 			.first(
 				"up.*",
-				"ps.thresholds"
+				"ps.thresholds",
+				"p.planting_type"
 			);
 
 		if (!row) return undefined;
@@ -138,9 +142,9 @@ export class TelemetryRepository {
 				? JSON.parse(row.thresholds)
 				: row.thresholds;
 
-		const { thresholds: _t, ...userPlant } = row;
+		const { thresholds: _t, planting_type, ...userPlant } = row;
 
-		return { userPlant: userPlant as UserPlantRecord, thresholds };
+		return { userPlant: userPlant as UserPlantRecord, thresholds, plantingType: planting_type };
 	}
 
 	async getRecentEntriesBefore(hardwareId: string, beforeTimestamp: Date, limit: number): Promise<ProbeEntryRecord[]> {
@@ -199,10 +203,10 @@ export class TelemetryRepository {
 	async createNotification(params: {
 		userId: number;
 		userPlantId: number;
-		issueId: number;
+		issueId: number | null;
 		title: string;
 		message: string;
-		notificationType: "sensor_alert";
+		notificationType: "sensor_alert" | "stage_validation";
 		state: "sent" | "snoozed";
 		snoozedUntil?: Date | null;
 	}): Promise<PendingNotificationRecord> {
@@ -237,6 +241,7 @@ export class TelemetryRepository {
 			.whereNotNull("up.sonde_id")
 			.where("up.created_at", "<", db.raw("CURRENT_DATE"))
 			.groupBy("up.id", "up.user_id", "up.nickname", "ps.thresholds")
+			.having(db.raw("COUNT(pe.id)"), ">", 0)
 			.select(
 				"up.id",
 				"up.user_id",
@@ -262,6 +267,7 @@ export class TelemetryRepository {
 				this.on("up.plant_id", "=", "ps.plant_id")
 					.andOn("up.current_stage_order", "=", "ps.stage_order");
 			})
+			.join("plants as p", "up.plant_id", "p.id")
 			.leftJoin("probe_entries as pe", function () {
 				this.on("pe.sonde_id", "=", "up.sonde_id")
 					.andOn("pe.created_at", ">=", db.raw("CURRENT_DATE"));
@@ -269,13 +275,15 @@ export class TelemetryRepository {
 			.where("up.is_active", true)
 			.whereNotNull("up.sonde_id")
 			.where("up.created_at", "<", db.raw("CURRENT_DATE"))
-			.groupBy("up.id", "up.user_id", "up.nickname", "ps.thresholds")
+			.groupBy("up.id", "up.user_id", "up.nickname", "ps.thresholds", "p.planting_type")
+			.having(db.raw("COUNT(pe.id)"), ">", 0)
 			.select(
 				"up.id",
 				"up.user_id",
 				"up.nickname",
 				db.raw("(ps.thresholds->>'temp_min')::numeric as temp_min"),
 				db.raw("AVG(pe.temp_c) as daily_avg_temp"),
+				"p.planting_type",
 			);
 
 		return rows.map((r: any) => ({
@@ -284,6 +292,7 @@ export class TelemetryRepository {
 			nickname: r.nickname,
 			tempMin: Number(r.temp_min),
 			dailyAvgTemp: Number(r.daily_avg_temp ?? 0),
+			plantingType: r.planting_type,
 		}));
 	}
 

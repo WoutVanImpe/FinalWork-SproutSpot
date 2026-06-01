@@ -1,5 +1,5 @@
 import { Animated, Dimensions, PanResponder, StyleSheet, TouchableOpacity, View, Image } from 'react-native'
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Svg, { Path } from 'react-native-svg'
 import { Styling } from '../../../../constants/Styling';
 import StyledText from '../../../style/StyledText';
@@ -55,7 +55,7 @@ const CenterContent = ({ item }: { item: CarouselItem }) => (
 const StatusHeader = ({ items, onItemPress }: StatusHeaderProps) => {
     const [displayIndex, setDisplayIndex] = useState(0);
     const slideAnim = useRef(new Animated.Value(0)).current;
-    const colorAnim = useRef(new Animated.Value(items[0]?.warning ? 1 : 0)).current;
+    const colorAnim = useRef(new Animated.Value(items.length === 0 ? 0 : items[0]?.warning ? 1 : 0)).current;
     const isAnimating = useRef(false);
     const [transition, setTransition] = useState<{
         leaving: CarouselItem;
@@ -98,6 +98,16 @@ const StatusHeader = ({ items, onItemPress }: StatusHeaderProps) => {
         }
     }, [displayIndex, items, slideAnim, colorAnim]);
 
+    useEffect(() => {
+        if (items.length > 0) {
+            Animated.timing(colorAnim, {
+                toValue: items[displayIndex]?.warning ? 1 : 0,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        }
+    }, [items]);
+
     const nextItem = () => {
         startTransition((displayIndex + 1) % items.length, -1);
     };
@@ -115,9 +125,9 @@ const StatusHeader = ({ items, onItemPress }: StatusHeaderProps) => {
         onPanResponderRelease: (_, gs) => {
             if (isAnimating.current) return;
             if (gs.dx < -swipeThreshold) {
-                startTransition((displayIndex + 1) % items.length, -1);
+        startTransition(items.length === 0 ? 0 : (displayIndex + 1) % items.length, -1);
             } else if (gs.dx > swipeThreshold) {
-                startTransition((displayIndex - 1 + items.length) % items.length, 1);
+        startTransition(items.length === 0 ? 0 : (displayIndex - 1 + items.length) % items.length, 1);
             }
         },
     }), [startTransition, displayIndex, items.length]);
@@ -140,9 +150,11 @@ const StatusHeader = ({ items, onItemPress }: StatusHeaderProps) => {
             </View>
 
             <View style={styles.contentRow}>
-                <TouchableOpacity onPress={prevItem} style={styles.navButton}>
-                    <StyledIcon Icon={ChevronLeft} fill={Styling.Colors.white} size="med" />
-                </TouchableOpacity>
+                {items.length > 1 && (
+                    <TouchableOpacity onPress={prevItem} style={styles.navButton}>
+                        <StyledIcon Icon={ChevronLeft} fill={Styling.Colors.white} size="med" />
+                    </TouchableOpacity>
+                )}
 
                 <View style={styles.centerSlideArea} {...panResponder.panHandlers}>
                     {transition ? (
@@ -201,9 +213,11 @@ const StatusHeader = ({ items, onItemPress }: StatusHeaderProps) => {
                     )}
                 </View>
 
-                <TouchableOpacity onPress={nextItem} style={styles.navButton}>
-                    <StyledIcon Icon={ChevronRight} fill={Styling.Colors.white} size="med" />
-                </TouchableOpacity>
+                {items.length > 1 && (
+                    <TouchableOpacity onPress={nextItem} style={styles.navButton}>
+                        <StyledIcon Icon={ChevronRight} fill={Styling.Colors.white} size="med" />
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     );

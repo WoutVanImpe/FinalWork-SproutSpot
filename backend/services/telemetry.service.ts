@@ -1,10 +1,12 @@
 import { TelemetryRepository } from "../repositories/telemetry.repository";
 import { NotificationRepository } from "../repositories/notification.repository";
 import { ProbeRepository, StaleProbeResult } from "../repositories/probe.repository";
+import { UserPlantRepository } from "../repositories/userPlant.repository";
+import { batteryPercentage } from "../utils/battery";
 import { PushNotificationService } from "./push-notification.service";
 import { TelemetryBatchUploadDto, TelemetryEntryDto } from "../types/dto";
 import { ActiveIssueRecord, ProbeEntryRecord, StageThresholdsRecord, UserPlantRecord } from "../types/database";
-import { STALE_THRESHOLD_MINUTES } from "../config";
+import { STALE_THRESHOLD_MINUTES, IS_DEV } from "../config";
 
 interface Anomaly {
 	type: string;
@@ -24,12 +26,14 @@ export class TelemetryService {
 	private repository: TelemetryRepository;
 	private notificationRepository: NotificationRepository;
 	private probeRepository: ProbeRepository;
+	private userPlantRepository: UserPlantRepository;
 	private pushNotificationService: PushNotificationService;
 
 	constructor() {
 		this.repository = new TelemetryRepository();
 		this.notificationRepository = new NotificationRepository();
 		this.probeRepository = new ProbeRepository();
+		this.userPlantRepository = new UserPlantRepository();
 		this.pushNotificationService = new PushNotificationService();
 	}
 
@@ -56,13 +60,6 @@ export class TelemetryService {
 		}
 
 		console.log(`[Telemetry] Charging update for ${hardwareId}: battery=${batteryVoltage}V, rssi=${wifiRssi}`);
-	}
-
-	private batteryPercentage(voltage: number): number {
-		const MIN_VOLTAGE = 3.3;
-		const MAX_VOLTAGE = 4.2;
-		const pct = Math.round(((voltage - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 100);
-		return Math.max(0, Math.min(100, pct));
 	}
 
 	async uploadTelemetry(payload: TelemetryBatchUploadDto): Promise<ProbeEntryRecord[]> {
@@ -118,10 +115,10 @@ export class TelemetryService {
 
 	private async processAnomalies(
 		batchEntries: TelemetryEntryDto[],
-		linked: { userPlant: UserPlantRecord; thresholds: StageThresholdsRecord },
+		linked: { userPlant: UserPlantRecord; thresholds: StageThresholdsRecord; plantingType: string },
 		hardwareId: string,
 	): Promise<void> {
-		const { thresholds } = linked;
+		const { thresholds, plantingType } = linked;
 		const userPlantId = linked.userPlant.id;
 		const userId = linked.userPlant.user_id;
 		const plantNickname = linked.userPlant.nickname;
@@ -171,8 +168,9 @@ export class TelemetryService {
 		);
 
 		// Temperature — TEMP_TOO_HIGH persistent guard (3 consecutive, prevents overheating)
+		// Skipped for outdoor plants — temperature is not actionable outdoors
 		// TEMP_TOO_LOW is handled by daily average check in scheduler
-		if (latest.temp_c > thresholds.temp_max) {
+		if (plantingType !== "outdoor" && latest.temp_c > thresholds.temp_max) {
 			const required = 3;
 			let consecutive = 0;
 
@@ -246,7 +244,7 @@ export class TelemetryService {
 	): Promise<void> {
 		const BATTERY_WARNING_VOLTAGE = 3.5;
 		const BATTERY_LOW_PCT = 10;
-		const pct = this.batteryPercentage(batteryVoltage);
+		const pct = batteryPercentage(batteryVoltage);
 
 		if (userPlantId == null || userId == null) {
 			if (pct < BATTERY_LOW_PCT) {
@@ -257,17 +255,7 @@ export class TelemetryService {
 
 		const openIssues = await this.repository.findOpenIssuesByUserPlant(userPlantId);
 
-		// --- BATTERY_WARNING (3.5V) ---
-		if (batteryVoltage <= BATTERY_WARNING_VOLTAGE && batteryVoltage > 3.3) {
-			const existing = openIssues.find((i) => i.issue_type === "BATTERY_WARNING");
-			if (!existing) {
-				const issue = await this.repository.createIssue(userPlantId, "BATTERY_WARNING");
-				await this.dispatchNotificationForIssue(issue, userId, userPlantId, plantNickname);
-				console.log(`[Telemetry] BATTERY_WARNING — voltage=${batteryVoltage}, pct=${pct}%`);
-			}
-		}
-
-		// --- BATTERY_LOW (10% = 3.39V) ---
+		// --- BATTERY_LOW (10% = 3.39V) takes priority over WARNING ---
 		if (pct < BATTERY_LOW_PCT) {
 			const existing = openIssues.find((i) => i.issue_type === "BATTERY_LOW");
 			if (existing) {
@@ -284,16 +272,25 @@ export class TelemetryService {
 				console.log(`[Telemetry] Auto-resolving BATTERY_LOW (issue #${batteryIssue.id}) — battery recovered to ${pct}%`);
 				await this.repository.resolveIssue(batteryIssue.id);
 			}
-		}
 
-		// Auto-resolve BATTERY_WARNING bij herstel (> 3.5V)
-		if (batteryVoltage > BATTERY_WARNING_VOLTAGE) {
-			const warningIssue = openIssues.find((i) => i.issue_type === "BATTERY_WARNING");
-			if (warningIssue) {
-				console.log(`[Telemetry] Auto-resolving BATTERY_WARNING (issue #${warningIssue.id}) — battery recovered to ${batteryVoltage}V`);
-				await this.repository.resolveIssue(warningIssue.id);
+			// --- BATTERY_WARNING (3.5V) — only fires when LOW is not active ---
+			if (batteryVoltage <= BATTERY_WARNING_VOLTAGE && batteryVoltage > 3.3) {
+				const existing = openIssues.find((i) => i.issue_type === "BATTERY_WARNING");
+				if (!existing) {
+					const issue = await this.repository.createIssue(userPlantId, "BATTERY_WARNING");
+					await this.dispatchNotificationForIssue(issue, userId, userPlantId, plantNickname);
+					console.log(`[Telemetry] BATTERY_WARNING — voltage=${batteryVoltage}, pct=${pct}%`);
+				}
+			} else if (batteryVoltage > BATTERY_WARNING_VOLTAGE) {
+				// Auto-resolve BATTERY_WARNING bij herstel
+				const warningIssue = openIssues.find((i) => i.issue_type === "BATTERY_WARNING");
+				if (warningIssue) {
+					console.log(`[Telemetry] Auto-resolving BATTERY_WARNING (issue #${warningIssue.id}) — voltage recovered to ${batteryVoltage}V`);
+					await this.repository.resolveIssue(warningIssue.id);
+				}
 			}
 		}
+
 	}
 
 	async checkStaleProbes(): Promise<void> {
@@ -362,6 +359,8 @@ export class TelemetryService {
 		const summaries = await this.repository.getDailyTemperatureSummary();
 
 		for (const s of summaries) {
+			if (s.plantingType === "outdoor") continue;
+
 			if (s.dailyAvgTemp >= s.tempMin) {
 				const openIssues = await this.repository.findOpenIssuesByUserPlant(s.userPlantId);
 				const existing = openIssues.find((i) => i.issue_type === "TEMP_TOO_LOW");
@@ -394,6 +393,15 @@ export class TelemetryService {
 
 		for (const n of due) {
 			try {
+				if (n.issue_id) {
+					const issue = await this.notificationRepository.findIssueById(n.issue_id);
+					if (issue && issue.resolved_at) {
+						await this.notificationRepository.acknowledgeNotification(n.id);
+						console.log(`[Telemetry] Auto-acknowledged snoozed notification ${n.id} — linked issue ${n.issue_id} already resolved`);
+						continue;
+					}
+				}
+
 				const now = new Date();
 
 				if (n.notification_window_start && this.isWithinWindow(now, n.notification_window_start, n.notification_window_end)) {
@@ -412,6 +420,94 @@ export class TelemetryService {
 			} catch (err) {
 				console.error(`[Telemetry] Error processing snoozed notification ${n.id}:`, err);
 			}
+		}
+	}
+
+	async processSentNotifications(): Promise<void> {
+		const pending = await this.notificationRepository.getPendingReminderNotifications();
+
+		for (const n of pending) {
+			try {
+				const now = new Date();
+
+				if (n.notification_window_start && !this.isWithinWindow(now, n.notification_window_start, n.notification_window_end)) {
+					continue;
+				}
+
+				await this.pushNotificationService.send(n.user_id, n.title, n.message);
+				await this.notificationRepository.updateRemindedAt(n.id);
+				console.log(`[Telemetry] Reminded user ${n.user_id} about notification ${n.id}`);
+			} catch (err) {
+				console.error(`[Telemetry] Error processing sent notification reminder ${n.id}:`, err);
+			}
+		}
+	}
+
+	async checkStageAdvancement(): Promise<void> {
+		try {
+			const readyPlants = await this.userPlantRepository.findPlantsReadyForStageAdvancement();
+
+			for (const plant of readyPlants) {
+				try {
+					const window = await this.repository.findUserNotificationWindow(plant.user_id);
+					const now = new Date();
+					const title = "Tijd voor een nieuwe fase!";
+					const message = `${plant.plant_name} is klaar om naar de volgende fase te gaan. Controleer of de plant de kenmerken vertoont.`;
+
+					if (window && this.isWithinWindow(now, window.notification_window_start, window.notification_window_end)) {
+						await this.repository.createNotification({
+							userId: plant.user_id,
+							userPlantId: plant.user_plant_id,
+							issueId: null,
+							title,
+							message,
+							notificationType: "stage_validation",
+							state: "sent",
+						});
+
+						if (!IS_DEV) {
+							await this.pushNotificationService.send(plant.user_id, title, message);
+						}
+
+						console.log(`[Telemetry] Stage validation notification created for plant ${plant.user_plant_id} (user ${plant.user_id})`);
+					} else if (window) {
+						const snoozedUntil = this.computeNextWindowStart(window.notification_window_start);
+
+						await this.repository.createNotification({
+							userId: plant.user_id,
+							userPlantId: plant.user_plant_id,
+							issueId: null,
+							title,
+							message,
+							notificationType: "stage_validation",
+							state: "snoozed",
+							snoozedUntil,
+						});
+
+						console.log(`[Telemetry] Stage validation notification snoozed until ${snoozedUntil.toISOString()} (outside quiet hours) for plant ${plant.user_plant_id}`);
+					} else {
+						await this.repository.createNotification({
+							userId: plant.user_id,
+							userPlantId: plant.user_plant_id,
+							issueId: null,
+							title,
+							message,
+							notificationType: "stage_validation",
+							state: "sent",
+						});
+
+						if (!IS_DEV) {
+							await this.pushNotificationService.send(plant.user_id, title, message);
+						}
+
+						console.log(`[Telemetry] Stage validation notification created for plant ${plant.user_plant_id} (no window set)`);
+					}
+				} catch (err) {
+					console.error(`[Telemetry] Error creating stage validation for plant ${plant.user_plant_id}:`, err);
+				}
+			}
+		} catch (err) {
+			console.error("[Telemetry] Error checking stage advancement:", err);
 		}
 	}
 

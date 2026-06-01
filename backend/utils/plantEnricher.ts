@@ -2,6 +2,7 @@ import { db } from "../db/connection";
 import { ProbeEntryRecord, PlantStageRecord } from "../types/database";
 import { toStageInfo, LIGHT_MAP, WATER_MAP } from "./plantMapper";
 import { buildImageUrl } from "../config";
+import { batteryPercentage } from "./battery";
 
 export interface PlantStatusData {
 	level: number;
@@ -14,6 +15,7 @@ export interface EnrichedGardenPlant {
 	id: string;
 	image: string;
 	warning: boolean;
+	hasTelemetry: boolean;
 	x: number;
 	y: number;
 	nickname: string;
@@ -30,13 +32,6 @@ export interface EnrichedGardenPlant {
 	created_at: string;
 	last_seen: string | null;
 	last_temp: number;
-}
-
-function batteryPercentage(voltage: number): number {
-	const MIN_VOLTAGE = 3.3;
-	const MAX_VOLTAGE = 4.2;
-	const pct = Math.round(((voltage - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 100);
-	return Math.max(0, Math.min(100, pct));
 }
 
 function computeWarning(statuses: PlantStatusData[]): boolean {
@@ -101,10 +96,13 @@ export async function enrichPlant(
 	const stageDefs = allStages.map((s) => toStageInfo(s));
 	const totalDays = stageDefs.reduce((sum, s) => sum + s.durationDays, 0);
 
+	const hasTelemetry = latestTelemetry != null;
+
 	return {
 		id: String(rawPlant.id),
 		image: imageUrl,
-		warning: computeWarning(statuses),
+		warning: hasTelemetry && computeWarning(statuses),
+		hasTelemetry,
 		x: rawPlant.x_pos,
 		y: rawPlant.y_pos,
 		nickname: rawPlant.nickname ?? rawPlant.plant_name ?? "Plant",
@@ -154,13 +152,15 @@ export async function enrichPlants(rawPlants: any[]): Promise<EnrichedGardenPlan
 				allStages,
 				latestTelemetry,
 			);
-		} catch {
+		} catch (err) {
+			console.error("Failed to enrich plant", err);
 			const imageUrl = buildImageUrl(rawPlant.plant_image ?? "");
 
 			return {
 				id: String(rawPlant.id),
 				image: imageUrl,
 				warning: false,
+				hasTelemetry: false,
 				x: rawPlant.x_pos,
 				y: rawPlant.y_pos,
 				nickname: rawPlant.nickname ?? rawPlant.plant_name ?? "Plant",

@@ -60,14 +60,14 @@ export class NotificationService {
 	 * @param {number} notificationId - The notification's database ID.
 	 * @returns {Promise<PendingNotificationRecord>} The updated notification record.
 	 */
-	async resetNotificationState(notificationId: number): Promise<PendingNotificationRecord> {
+	async resetNotificationState(notificationId: number, hours?: number): Promise<PendingNotificationRecord> {
 		const notification = await this.repository.getNotificationById(notificationId);
 
 		if (!notification) {
 			throw new Error("Notification not found");
 		}
 
-		return this.repository.snoozeForHalfDay(notificationId);
+		return this.repository.snoozeForDuration(notificationId, hours);
 	}
 
 	/**

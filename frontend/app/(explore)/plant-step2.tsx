@@ -21,7 +21,7 @@ const PlantStep2 = () => {
       .finally(() => setLoading(false));
   }, [vegId]);
 
-  if (loading) return <FlowLayout title="Zaaien" onBack={() => router.push(`/(explore)/plant-step1?vegId=${vegId}`)}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></FlowLayout>;
+  if (loading) return <FlowLayout title="Zaaien" onBack={() => router.back()}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></FlowLayout>;
   if (!veg) return null;
 
   const steps = [
@@ -31,7 +31,7 @@ const PlantStep2 = () => {
   ];
 
   return (
-    <FlowLayout title={`${veg.name} zaaien`} onBack={() => router.push(`/(explore)/plant-step1?vegId=${vegId}`)}>
+    <FlowLayout title={`${veg.name} zaaien`} onBack={() => router.back()}>
       <View style={styles.content}>
         {steps.map((step, i) => (
           <View key={i} style={styles.stepBlock}>

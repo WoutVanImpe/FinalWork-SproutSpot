@@ -132,6 +132,7 @@ export async function up(knex: Knex): Promise<void> {
 				table.enum("notification_type", ["sensor_alert", "stage_validation", "system_status"]);
 				table.enum("notification_state", ["sent", "acknowledged", "snoozed"]);
 				table.timestamp("snoozed_until").nullable();
+				table.timestamp("last_reminded_at").nullable();
 				table.timestamp("created_at").defaultTo(knex.fn.now());
 			})
 	);

@@ -3,6 +3,14 @@ import { CHECK_INTERVAL_MS } from "../config";
 
 let intervalHandle: ReturnType<typeof setInterval> | null = null;
 
+async function safeRun(fn: () => Promise<void>, name: string): Promise<void> {
+	try {
+		await fn();
+	} catch (err) {
+		console.error(`[Scheduler] ${name} failed:`, err);
+	}
+}
+
 export function startScheduler(): void {
 	if (intervalHandle) return;
 
@@ -10,16 +18,20 @@ export function startScheduler(): void {
 
 	console.log(`[Scheduler] Starting checks every ${CHECK_INTERVAL_MS / 60000} minutes`);
 
-	telemetryService.checkStaleProbes();
-	telemetryService.checkDailyLightIntegral();
-	telemetryService.checkDailyTemperatureIntegral();
-	telemetryService.processSnoozedNotifications();
+	safeRun(() => telemetryService.checkStaleProbes(), "checkStaleProbes");
+	safeRun(() => telemetryService.checkDailyLightIntegral(), "checkDailyLightIntegral");
+	safeRun(() => telemetryService.checkDailyTemperatureIntegral(), "checkDailyTemperatureIntegral");
+	safeRun(() => telemetryService.processSnoozedNotifications(), "processSnoozedNotifications");
+	safeRun(() => telemetryService.processSentNotifications(), "processSentNotifications");
+	safeRun(() => telemetryService.checkStageAdvancement(), "checkStageAdvancement");
 
 	intervalHandle = setInterval(() => {
-		telemetryService.checkStaleProbes();
-		telemetryService.checkDailyLightIntegral();
-		telemetryService.checkDailyTemperatureIntegral();
-		telemetryService.processSnoozedNotifications();
+		safeRun(() => telemetryService.checkStaleProbes(), "checkStaleProbes");
+		safeRun(() => telemetryService.checkDailyLightIntegral(), "checkDailyLightIntegral");
+		safeRun(() => telemetryService.checkDailyTemperatureIntegral(), "checkDailyTemperatureIntegral");
+		safeRun(() => telemetryService.processSnoozedNotifications(), "processSnoozedNotifications");
+		safeRun(() => telemetryService.processSentNotifications(), "processSentNotifications");
+		safeRun(() => telemetryService.checkStageAdvancement(), "checkStageAdvancement");
 	}, CHECK_INTERVAL_MS);
 }
 

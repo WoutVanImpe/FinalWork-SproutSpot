@@ -34,6 +34,7 @@ interface GraphModalProps {
 	visible: boolean;
 	onDismiss: () => void;
 	readings: ReadingRecord[];
+	readingsLoading?: boolean;
 	optimalRanges: {
 		water: { optimalMin: number; optimalMax: number };
 		light: { optimalMin: number; optimalMax: number };
@@ -45,8 +46,9 @@ interface GraphModalProps {
 
 function aggregateData(readings: ReadingRecord[], hours: number): ReadingRecord[] {
   if (readings.length === 0) return [];
-  if (hours <= 24) return readings;
-  const threshold = hours <= 168 ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+  const MAX_RAW = 96;
+  if (hours <= 24 && readings.length <= MAX_RAW) return readings;
+  const threshold = hours <= 24 ? 30 * 60 * 1000 : hours <= 168 ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
   const groups = new Map<number, ReadingRecord[]>();
   for (const r of readings) {
     const t = new Date(r.created_at).getTime();
@@ -61,7 +63,6 @@ function aggregateData(readings: ReadingRecord[], hours: number): ReadingRecord[
       id: bucket[0].id,
       sonde_id: bucket[0].sonde_id,
       temp_c: Math.round(avg("temp_c") * 10) / 10,
-      humidity_pct: Math.round(avg("soil_moist_pct")),
       light_lux: Math.round(avg("light_lux")),
       soil_moist_pct: Math.round(avg("soil_moist_pct")),
       battery_voltage: Math.round(avg("battery_voltage") * 100) / 100,
@@ -80,14 +81,14 @@ const toY = (value: number, yMax: number) => GRAPH_PAD.top + CHART_H - (value / 
 function formatLabel(iso: string, hours: number): string {
 	const d = new Date(iso);
 	const time = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
-	if (hours <= 24) return time;
 	const date = String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0");
-	return hours <= 168 ? date + " " + time : date;
+	if (hours <= 24) return time;
+	return date;
 }
 
 function getDataLabel(iso: string, index: number, total: number, hours: number): string {
 	if (total <= 5) return formatLabel(iso, hours);
-	const step = Math.max(1, Math.floor((total - 1) / 4));
+	const step = Math.max(1, Math.ceil((total - 1) / 4));
 	if (index % step === 0 || index === total - 1) return formatLabel(iso, hours);
 	return "";
 }
@@ -95,17 +96,22 @@ function getDataLabel(iso: string, index: number, total: number, hours: number):
 function buildMetrics(readings: ReadingRecord[], optimalRanges: GraphModalProps["optimalRanges"], hours: number): MetricConfig[] {
 	const aggregated = aggregateData(readings, hours);
 	const sorted = [...aggregated].reverse();
-	const dataMap = sorted.map((r) => ({ label: r.created_at, mo: r.soil_moist_pct ?? 0, te: r.temp_c ?? 0, li: r.light_lux ?? 0 }));
+	const dataMap = sorted.map((r) => ({
+		label: r.created_at,
+		mo: r.soil_moist_pct ?? 0,
+		te: r.temp_c ?? 0,
+		li: Math.round((r.light_lux ?? 0) / 50000 * 100),
+	}));
 	const maxTemp = Math.max(...dataMap.map((d) => d.te), 40);
-	const maxLight = Math.max(...dataMap.map((d) => d.li), 50000);
+	const maxLight = Math.max(...dataMap.map((d) => d.li), 100);
 	return [
 		{ key: "moist", label: "Vocht", unit: "%", optimalMin: optimalRanges.water.optimalMin, optimalMax: optimalRanges.water.optimalMax, yMax: 100, color: "#4A90D9", data: dataMap.map((d) => ({ value: d.mo, label: d.label })) },
 		{ key: "temp", label: "Temperatuur", unit: "°C", optimalMin: optimalRanges.temperature.optimalMin, optimalMax: optimalRanges.temperature.optimalMax, yMax: maxTemp, color: "#C44028", data: dataMap.map((d) => ({ value: d.te, label: d.label })) },
-		{ key: "light", label: "Licht", unit: "lux", optimalMin: optimalRanges.light.optimalMin, optimalMax: optimalRanges.light.optimalMax, yMax: maxLight, color: "#F5A623", data: dataMap.map((d) => ({ value: d.li, label: d.label })) },
+		{ key: "light", label: "Licht", unit: "%", optimalMin: optimalRanges.light.optimalMin, optimalMax: optimalRanges.light.optimalMax, yMax: maxLight, color: "#F5A623", data: dataMap.map((d) => ({ value: d.li, label: d.label })) },
 	];
 }
 
-const GraphModal = ({ visible, onDismiss, readings, optimalRanges, selectedHours, onTimeRangeChange }: GraphModalProps) => {
+const GraphModal = ({ visible, onDismiss, readings, readingsLoading, optimalRanges, selectedHours, onTimeRangeChange }: GraphModalProps) => {
 	const [selectedMetric, setSelectedMetric] = useState(0);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -187,6 +193,13 @@ const GraphModal = ({ visible, onDismiss, readings, optimalRanges, selectedHours
 
 					<Spacer space={8} />
 
+					{readingsLoading || points.length === 0 ? (
+						<View style={styles.loadingContainer}>
+							<StyledText type="paragh" style={styles.loadingText}>
+								{readingsLoading ? "Gegevens laden..." : "Geen meetgegevens beschikbaar."}
+							</StyledText>
+						</View>
+					) : (
 					<View style={styles.chartContainer}>
 						<Svg width={CHART_W + GRAPH_PAD.left + GRAPH_PAD.right} height={CHART_H + GRAPH_PAD.top + GRAPH_PAD.bottom}>
 							<Rect x={GRAPH_PAD.left} y={optimalY1} width={CHART_W} height={optimalY2 - optimalY1} fill={Styling.Colors.green} opacity={0.12} rx={4} />
@@ -203,14 +216,16 @@ const GraphModal = ({ visible, onDismiss, readings, optimalRanges, selectedHours
 								<Circle key={i} cx={toX(i, points.length)} cy={toY(p.value, yMax)} r={3} fill={metric.color} />
 							))}
 							{points
-								.filter((_, i) => i % Math.max(1, Math.floor(points.length / 4)) === 0 || i === points.length - 1)
-								.map((p, i) => (
+								.map((p, i) => ({ p, label: getDataLabel(p.label, i, points.length, selectedHours) }))
+								.filter(({ label }) => label !== "")
+								.map(({ p, label }, i) => (
 									<SvgText key={i} x={toX(points.indexOf(p), points.length)} y={CHART_H + GRAPH_PAD.top + GRAPH_PAD.bottom - 5} fill={Styling.Colors.lightGrey} fontSize={9} textAnchor="middle">
-										{getDataLabel(p.label, points.indexOf(p), points.length, selectedHours)}
+										{label}
 									</SvgText>
 								))}
 						</Svg>
 					</View>
+					)}
 
 					<Spacer space={Styling.Spacing.sml} />
 					<View style={styles.legend}>
@@ -324,6 +339,14 @@ const styles = StyleSheet.create({
 	},
 	chartContainer: {
 		alignItems: "center",
+	},
+	loadingContainer: {
+		alignItems: "center",
+		justifyContent: "center",
+		height: CHART_H + GRAPH_PAD.top + GRAPH_PAD.bottom,
+	},
+	loadingText: {
+		color: Styling.Colors.darkGrey,
 	},
 	legend: {
 		flexDirection: "row",

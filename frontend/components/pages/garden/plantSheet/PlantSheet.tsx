@@ -93,7 +93,7 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 		if (internalVisible && isVisible) {
 			Animated.parallel([Animated.timing(slideAnim, { toValue: 1, duration: 300, useNativeDriver: true }), Animated.timing(opacityAnim, { toValue: 1, duration: 300, useNativeDriver: true })]).start();
 		}
-	}, [internalVisible]);
+	}, [internalVisible, isVisible]);
 
 	if (!plant && !internalVisible) return null;
 
@@ -127,31 +127,39 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 							</StyledText>
 							<Spacer space={Styling.Spacing.sml} />
 
-							<StyledText type="head4" style={styles.sectionTitle}>
-								Hoe gaat het nu:
-							</StyledText>
-							<Spacer space={Styling.Spacing.xsm} />
+							{plant.hasTelemetry ? (
+								<>
+									<StyledText type="head4" style={styles.sectionTitle}>
+										Hoe gaat het nu:
+									</StyledText>
+									<Spacer space={Styling.Spacing.xsm} />
 
-							<Row label="Water" value={plant.water.label}>
-								<StatusBar level={plant.water.level} optimalMin={plant.water.optimalMin} optimalMax={plant.water.optimalMax} />
-							</Row>
-							<Spacer space={Styling.Spacing.sml} />
-							<Row label="Licht" value={plant.light.label}>
-								<StatusBar level={plant.light.level} optimalMin={plant.light.optimalMin} optimalMax={plant.light.optimalMax} />
-							</Row>
-							<Spacer space={Styling.Spacing.sml} />
-							<Row label="Warmte" value={plant.temperature.label}>
-								<StatusBar level={plant.temperature.level} optimalMin={plant.temperature.optimalMin} optimalMax={plant.temperature.optimalMax} />
-							</Row>
-							<Spacer space={Styling.Spacing.sml} />
+									<Row label="Water" value={plant.water.label}>
+										<StatusBar level={plant.water.level} optimalMin={plant.water.optimalMin} optimalMax={plant.water.optimalMax} />
+									</Row>
+									<Spacer space={Styling.Spacing.sml} />
+									<Row label="Licht" value={plant.light.label}>
+										<StatusBar level={plant.light.level} optimalMin={plant.light.optimalMin} optimalMax={plant.light.optimalMax} />
+									</Row>
+									<Spacer space={Styling.Spacing.sml} />
+									<Row label="Warmte" value={plant.temperature.label}>
+										<StatusBar level={plant.temperature.level} optimalMin={plant.temperature.optimalMin} optimalMax={plant.temperature.optimalMax} />
+									</Row>
+									<Spacer space={Styling.Spacing.sml} />
 
-							<StyledText type="head4" style={styles.sectionTitle}>
-								Advies:
-							</StyledText>
-							<Spacer space={Styling.Spacing.xsm} />
-							<StyledText type="paragh" style={styles.bodyText}>
-								{plant.advice}
-							</StyledText>
+									<StyledText type="head4" style={styles.sectionTitle}>
+										Advies:
+									</StyledText>
+									<Spacer space={Styling.Spacing.xsm} />
+									<StyledText type="paragh" style={styles.bodyText}>
+										{plant.advice || "Alles is in orde, er is geen actie nodig."}
+									</StyledText>
+								</>
+							) : (
+								<StyledText type="paragh" style={styles.bodyText}>
+									Nog geen metingen ontvangen.
+								</StyledText>
+							)}
 							<Spacer space={Styling.Spacing.sml} />
 
 							<StyledText type="head4" style={styles.sectionTitle}>
@@ -165,7 +173,7 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 
 							<Spacer space={Styling.Spacing.sml} />
 
-							<TouchableOpacity style={styles.footerBtn} onPress={() => { onClose(); router.push({ pathname: "/(garden)/plant-detail", params: { plantData: JSON.stringify(plant) } }); }}>
+							<TouchableOpacity style={styles.footerBtn} onPress={() => { onClose(); router.push({ pathname: "/(garden)/plant-detail", params: { plantId: plant.id } }); }}>
 								<StyledText type="head4" style={styles.footerBtnText}>
 									Bekijk in detail
 								</StyledText>

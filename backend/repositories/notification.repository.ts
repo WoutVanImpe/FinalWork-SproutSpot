@@ -23,7 +23,10 @@ export class NotificationRepository {
 		return query.select(
 			"pn.*",
 			"pl.image as plant_image",
-			"pl.name as plant_name"
+			"pl.name as plant_name",
+			"up.id as raw_user_plant_id",
+			"up.current_stage_order",
+			db.raw("(SELECT stage_order FROM plant_stages WHERE plant_id = up.plant_id AND stage_order = up.current_stage_order + 1 LIMIT 1) as next_stage_order"),
 		);
 	}
 
@@ -75,12 +78,12 @@ export class NotificationRepository {
 	 * @param {number} notificationId - The notification's database ID.
 	 * @returns {Promise<PendingNotificationRecord>} The updated notification record.
 	 */
-	async snoozeForHalfDay(notificationId: number): Promise<PendingNotificationRecord> {
+	async snoozeForDuration(notificationId: number, hours: number = 6): Promise<PendingNotificationRecord> {
 		const [notification] = await db("pending_notifications")
 			.where("id", notificationId)
 			.update({
 				notification_state: "snoozed",
-				snoozed_until: db.raw("NOW() + INTERVAL '6 hours'"),
+				snoozed_until: db.raw(`NOW() + INTERVAL '${hours} hours'`),
 			})
 			.returning("*");
 
@@ -103,9 +106,41 @@ export class NotificationRepository {
 				"pn.title",
 				"pn.message",
 				"pn.notification_type",
+				"pn.issue_id",
 				"u.notification_window_start",
 				"u.notification_window_end",
 			);
+	}
+
+	async getPendingReminderNotifications(): Promise<any[]> {
+		return db("pending_notifications as pn")
+			.join("users as u", "pn.user_id", "u.id")
+			.where("pn.notification_state", "sent")
+			.andWhere(function () {
+				this.where("pn.last_reminded_at", "<", db.raw("NOW() - INTERVAL '12 hours'"))
+					.orWhereNull("pn.last_reminded_at");
+			})
+			.andWhere("pn.created_at", "<", db.raw("NOW() - INTERVAL '12 hours'"))
+			.select(
+				"pn.id",
+				"pn.user_id",
+				"pn.user_plant_id",
+				"pn.title",
+				"pn.message",
+				"pn.notification_type",
+				"u.notification_window_start",
+				"u.notification_window_end",
+			);
+	}
+
+	async updateRemindedAt(notificationId: number): Promise<void> {
+		await db("pending_notifications")
+			.where("id", notificationId)
+			.update({ last_reminded_at: db.fn.now() });
+	}
+
+	async findIssueById(issueId: number): Promise<ActiveIssueRecord | undefined> {
+		return db("active_issues").where("id", issueId).first();
 	}
 
 	/**

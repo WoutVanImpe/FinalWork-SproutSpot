@@ -126,4 +126,33 @@ export class UserPlantRepository {
 			.select("ps.*")
 			.first();
 	}
+
+	async findPlantsReadyForStageAdvancement(): Promise<{ user_plant_id: number; user_id: number; plant_name: string; current_stage_order: number; next_stage_order: number }[]> {
+		return db("user_plants as up")
+			.join("plant_stages as ps", function () {
+				this.on("up.plant_id", "=", "ps.plant_id")
+					.andOn("up.current_stage_order", "=", "ps.stage_order");
+			})
+			.join("plants as p", "up.plant_id", "p.id")
+			.joinRaw(
+				"INNER JOIN plant_stages AS next ON next.plant_id = up.plant_id AND next.stage_order = up.current_stage_order + 1",
+			)
+			.where("up.is_active", true)
+			.whereRaw("up.last_stage_update + (ps.duration_days || ' days')::INTERVAL <= NOW()")
+			.whereNotExists(function () {
+				this.select("*")
+					.from("pending_notifications")
+					.whereRaw("user_plant_id = up.id")
+					.where("notification_type", "stage_validation")
+					.whereIn("notification_state", ["sent", "snoozed"])
+					.whereRaw("created_at > up.last_stage_update");
+			})
+			.select(
+				"up.id as user_plant_id",
+				"up.user_id",
+				"p.name as plant_name",
+				"up.current_stage_order",
+				db.raw("next.stage_order as next_stage_order"),
+			);
+	}
 }

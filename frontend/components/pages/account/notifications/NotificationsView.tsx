@@ -6,24 +6,33 @@ import StyledText from "../../../style/StyledText";
 import Spacer from "../../../style/Spacer";
 import AccountHeader from "../header/AccountHeader";
 
-export interface NotificationItem {
+export interface NotificationViewItem {
 	id: string;
 	type: "problem" | "milestone";
 	title: string;
 	description: string;
 	image: number | { uri: string } | null;
 	snoozed?: boolean;
+	userPlantId?: number;
+	nextStageOrder?: number;
+	plantName?: string;
 }
 
 interface NotificationsViewProps {
-	notifications: NotificationItem[];
+	notifications: NotificationViewItem[];
 	onBack: () => void;
 	onDismiss: (id: string) => void;
 	onSnooze: (id: string) => void;
-	onValidate: () => void;
+	onValidate: (notificationId: string, userPlantId: number, nextStageOrder: number, plantName?: string) => void;
 }
 
-const NotificationsView = ({ notifications, onBack, onDismiss, onSnooze, onValidate }: NotificationsViewProps) => (
+const NotificationsView = ({ notifications, onBack, onDismiss, onSnooze, onValidate }: NotificationsViewProps) => {
+	const getImageSource = (image: NotificationViewItem["image"]) => {
+		if (image === null || image === undefined) return undefined;
+		if (typeof image === "number") return image;
+		return image;
+	};
+	return (
 	<StyledView>
 		<AccountHeader title="Notificaties" onBack={onBack} />
 		<Spacer space={Styling.Spacing.med}/>
@@ -63,18 +72,26 @@ const NotificationsView = ({ notifications, onBack, onDismiss, onSnooze, onValid
 									</TouchableOpacity>
 								</View>
 							) : (
-								<TouchableOpacity style={styles.notifActionButtonFilled} onPress={onValidate}>
-									<StyledText type="head4" fullCap style={styles.notifActionFilledText}>
-										Valideer
-									</StyledText>
-								</TouchableOpacity>
+								<View style={styles.cardActions}>
+									<TouchableOpacity style={styles.notifActionButton} onPress={() => onSnooze(item.id)}>
+										<StyledText type="head4" fullCap style={styles.notifActionOutlineText}>
+											Herinner mij
+										</StyledText>
+									</TouchableOpacity>
+									<TouchableOpacity style={styles.notifActionButtonFilled} onPress={() => { if (item.userPlantId && item.nextStageOrder) onValidate(item.id, item.userPlantId, item.nextStageOrder, item.plantName); }}>
+										<StyledText type="head4" fullCap style={styles.notifActionFilledText}>
+											Valideer
+										</StyledText>
+									</TouchableOpacity>
+								</View>
 							)}
 						</View>
 					))
 			)}
 		</ScrollView>
 	</StyledView>
-);
+	);
+};
 
 export default NotificationsView;
 

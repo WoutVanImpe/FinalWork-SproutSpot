@@ -9,6 +9,7 @@ router.use(authenticate);
 
 router.get("/", controller.getUserGarden);
 router.get("/status", controller.getDashboard);
+router.get("/:id", controller.getUserPlantById);
 router.put("/", controller.updateGarden);
 
 export default router;

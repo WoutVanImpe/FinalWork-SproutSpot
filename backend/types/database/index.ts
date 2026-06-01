@@ -128,5 +128,6 @@ export interface PendingNotificationRecord {
 	notification_type: "sensor_alert" | "stage_validation" | "system_status";
 	notification_state: "sent" | "acknowledged" | "snoozed";
 	snoozed_until: Date | null;
+	last_reminded_at: Date | null;
 	created_at: Date;
 }

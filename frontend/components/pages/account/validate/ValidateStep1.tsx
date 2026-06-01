@@ -8,11 +8,12 @@ import Spacer from "../../../style/Spacer";
 import AccountHeader from "../header/AccountHeader";
 
 interface ValidateStep1Props {
+	plantName?: string;
 	onBack: () => void;
 	onNext: () => void;
 }
 
-const ValidateStep1 = ({ onBack, onNext }: ValidateStep1Props) => (
+const ValidateStep1 = ({ plantName, onBack, onNext }: ValidateStep1Props) => (
 	<StyledView>
 		<AccountHeader title="Fase herkenning" onBack={onBack} />
 		<Spacer space={Styling.Spacing.med} />
@@ -22,7 +23,7 @@ const ValidateStep1 = ({ onBack, onNext }: ValidateStep1Props) => (
 			</StyledText>
 			<Spacer space={Styling.Spacing.sml} />
 			<StyledText type="paragh" style={styles.bodyText}>
-				Je plant heeft aangegeven dat het een nieuw groeistadium heeft bereikt. Controleer of je plant de volgende kenmerken vertoont:
+				{plantName ? `${plantName} geeft aan dat het een nieuw groeistadium heeft bereikt.` : "Je plant heeft aangegeven dat het een nieuw groeistadium heeft bereikt."} Controleer of je plant de volgende kenmerken vertoont:
 			</StyledText>
 			<Spacer space={Styling.Spacing.reg} />
 			<StyledText type="paragh" style={styles.bodyText}>

@@ -1,6 +1,7 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { useLocalSearchParams, router } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import { Styling } from "../../constants/Styling";
 import StyledView from "../../components/style/StyledView";
 import StyledText from "../../components/style/StyledText";
@@ -12,7 +13,7 @@ import RequirementsSection from "../../components/pages/garden/plantDetail/Requi
 import TechnicalOverview from "../../components/pages/garden/plantDetail/TechnicalOverview";
 import GraphModal from "../../components/pages/garden/plantDetail/GraphModal";
 import { GardenPlant } from "../../components/pages/garden/gardenGrid/GardenGridItem";
-import { getReadings } from "../../services/garden";
+import { getReadings, getPlantById, enrichedToGardenPlant } from "../../services/garden";
 import type { ReadingRecord } from "../../services/garden";
 
 const FALLBACK_STAGES: Record<string, { label: string; dayStart: number; dayEnd: number }[]> = {
@@ -111,27 +112,53 @@ function tempDescription(tempLabel: string): string {
 }
 
 const PlantDetail = () => {
-  const { plantData } = useLocalSearchParams<{ plantData: string }>();
-  const plant: GardenPlant | null = plantData ? JSON.parse(plantData) : null;
+  const { plantId } = useLocalSearchParams<{ plantId: string }>();
+  const plantIdRef = useRef(plantId ? parseInt(plantId.replace("up_", ""), 10) : NaN);
+  const [plant, setPlant] = useState<GardenPlant | null>(null);
+  const [plantLoading, setPlantLoading] = useState(false);
   const [graphVisible, setGraphVisible] = useState(false);
   const [readings, setReadings] = useState<ReadingRecord[]>([]);
   const [hours, setHours] = useState(24);
 
-  useEffect(() => {
-    if (plant && graphVisible) {
-      const plantId = parseInt(plant.id.replace("up_", ""), 10);
-      if (!isNaN(plantId)) {
-        getReadings(plantId, hours)
-          .then((res) => { if (res.data) setReadings(res.data); })
-          .catch(console.error);
-      }
-    }
-  }, [graphVisible, plant, hours]);
+  const [readingsLoading, setReadingsLoading] = useState(false);
 
-  if (!plant) return null;
+  useFocusEffect(useCallback(() => {
+    const pid = plantIdRef.current;
+    if (!isNaN(pid)) {
+      setPlantLoading(true);
+      getPlantById(pid)
+        .then((res) => { if (res.data) setPlant(enrichedToGardenPlant(res.data)); })
+        .catch(console.error)
+        .finally(() => setPlantLoading(false));
+
+      setReadingsLoading(true);
+      getReadings(pid, hours)
+        .then((res) => { if (res.data) setReadings(res.data); })
+        .catch(console.error)
+        .finally(() => setReadingsLoading(false));
+    }
+  }, [hours]));
+
+  if (!plant) {
+    return (
+      <StyledView>
+        <View style={styles.header}>
+          <View style={styles.headerBack}>
+            <TouchableOpacity onPress={() => router.navigate("/(garden)/garden")}>
+              <StyledIcon Icon={BackIcon} size="med" fill={Styling.Colors.white} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <Spacer space={120} />
+        <StyledText type="paragh" style={{ textAlign: "center", color: Styling.Colors.white }}>
+          Plant niet gevonden.
+        </StyledText>
+      </StyledView>
+    );
+  }
 
   const stages = buildStages(plant.stages, plant.type);
-  const currentStageIndex = Math.min(plant.stage.current, stages.length - 1);
+  const currentStageIndex = Math.max(0, Math.min((plant.stage.current || 1) - 1, stages.length - 1));
   const totalDays = plant.totalDays || stages[stages.length - 1]?.dayEnd || 1;
   const currentDay = daysSince(plant.created_at);
 
@@ -166,7 +193,13 @@ const PlantDetail = () => {
 
         <Spacer space={Styling.Spacing.xlg} />
 
-        <RequirementsSection plantName={plant.nickname} requirements={requirements} />
+        {plant.hasTelemetry ? (
+          <RequirementsSection plantName={plant.nickname} requirements={requirements} />
+        ) : (
+          <StyledText type="paragh" style={styles.noDataText}>
+            Nog geen meetgegevens beschikbaar.
+          </StyledText>
+        )}
 
         <Spacer space={Styling.Spacing.xlg} />
 
@@ -191,6 +224,7 @@ const PlantDetail = () => {
         visible={graphVisible}
         onDismiss={() => setGraphVisible(false)}
         readings={readings}
+        readingsLoading={readingsLoading}
         optimalRanges={{
           water: { optimalMin: plant.water.optimalMin, optimalMax: plant.water.optimalMax },
           light: { optimalMin: plant.light.optimalMin, optimalMax: plant.light.optimalMax },
@@ -233,5 +267,9 @@ const styles = StyleSheet.create({
   },
   graphBtnText: {
     color: Styling.Colors.white,
+  },
+  noDataText: {
+    color: Styling.Colors.white,
+    textAlign: "center",
   },
 });
