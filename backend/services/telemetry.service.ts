@@ -121,10 +121,10 @@ export class TelemetryService {
 
 	private async processAnomalies(
 		batchEntries: TelemetryEntryDto[],
-		linked: { userPlant: UserPlantRecord; thresholds: StageThresholdsRecord },
+		linked: { userPlant: UserPlantRecord; thresholds: StageThresholdsRecord; plantingType: string },
 		hardwareId: string,
 	): Promise<void> {
-		const { thresholds } = linked;
+		const { thresholds, plantingType } = linked;
 		const userPlantId = linked.userPlant.id;
 		const userId = linked.userPlant.user_id;
 		const plantNickname = linked.userPlant.nickname;
@@ -174,8 +174,9 @@ export class TelemetryService {
 		);
 
 		// Temperature — TEMP_TOO_HIGH persistent guard (3 consecutive, prevents overheating)
+		// Skipped for outdoor plants — temperature is not actionable outdoors
 		// TEMP_TOO_LOW is handled by daily average check in scheduler
-		if (latest.temp_c > thresholds.temp_max) {
+		if (plantingType !== "outdoor" && latest.temp_c > thresholds.temp_max) {
 			const required = 3;
 			let consecutive = 0;
 
@@ -365,6 +366,8 @@ export class TelemetryService {
 		const summaries = await this.repository.getDailyTemperatureSummary();
 
 		for (const s of summaries) {
+			if (s.plantingType === "outdoor") continue;
+
 			if (s.dailyAvgTemp >= s.tempMin) {
 				const openIssues = await this.repository.findOpenIssuesByUserPlant(s.userPlantId);
 				const existing = openIssues.find((i) => i.issue_type === "TEMP_TOO_LOW");
