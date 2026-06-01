@@ -1,15 +1,18 @@
 import { ProbeRepository, ProbeWithPlant } from "../repositories/probe.repository";
 import { UserRepository } from "../repositories/user.repository";
+import { UserPlantRepository } from "../repositories/userPlant.repository";
 import { ProbeRecord } from "../types/database";
 import { ProbeHealthResponse, ProbeWifiResponse } from "../types/response";
 
 export class ProbeService {
 	private repository: ProbeRepository;
 	private userRepository: UserRepository;
+	private userPlantRepository: UserPlantRepository;
 
 	constructor() {
 		this.repository = new ProbeRepository();
 		this.userRepository = new UserRepository();
+		this.userPlantRepository = new UserPlantRepository();
 	}
 
 	/**
@@ -119,10 +122,10 @@ export class ProbeService {
 		return this.repository.rename(probe.id, name);
 	}
 
-	async pairProbe(probeId: number, userPlantId: number): Promise<ProbeRecord> {
+	async pairProbe(userId: number, probeId: number, userPlantId: number): Promise<ProbeRecord> {
 		const probe = await this.repository.findById(probeId);
 
-		if (!probe) {
+		if (!probe || probe.user_id !== userId) {
 			throw new Error("Probe not found");
 		}
 
@@ -137,7 +140,12 @@ export class ProbeService {
 	 * @param {number} userPlantId - The user plant's database ID to unlink.
 	 * @returns {Promise<void>}
 	 */
-	async unpairProbe(userPlantId: number): Promise<void> {
+	async unpairProbe(userId: number, userPlantId: number): Promise<void> {
+		const plant = await this.userPlantRepository.findByIdWithDetails(userPlantId);
+		if (!plant || plant.user_id !== userId) {
+			throw new Error("User plant not found");
+		}
+
 		const hardwareId = await this.repository.unlinkFromUserPlant(userPlantId);
 
 		if (hardwareId) {
