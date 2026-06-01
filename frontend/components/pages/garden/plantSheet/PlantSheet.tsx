@@ -93,7 +93,7 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 		if (internalVisible && isVisible) {
 			Animated.parallel([Animated.timing(slideAnim, { toValue: 1, duration: 300, useNativeDriver: true }), Animated.timing(opacityAnim, { toValue: 1, duration: 300, useNativeDriver: true })]).start();
 		}
-	}, [internalVisible]);
+	}, [internalVisible, isVisible]);
 
 	if (!plant && !internalVisible) return null;
 
@@ -173,7 +173,7 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 
 							<Spacer space={Styling.Spacing.sml} />
 
-							<TouchableOpacity style={styles.footerBtn} onPress={() => { onClose(); router.push({ pathname: "/(garden)/plant-detail", params: { plantData: JSON.stringify(plant) } }); }}>
+							<TouchableOpacity style={styles.footerBtn} onPress={() => { onClose(); router.push({ pathname: "/(garden)/plant-detail", params: { plantId: plant.id } }); }}>
 								<StyledText type="head4" style={styles.footerBtnText}>
 									Bekijk in detail
 								</StyledText>

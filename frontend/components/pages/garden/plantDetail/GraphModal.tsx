@@ -63,7 +63,6 @@ function aggregateData(readings: ReadingRecord[], hours: number): ReadingRecord[
       id: bucket[0].id,
       sonde_id: bucket[0].sonde_id,
       temp_c: Math.round(avg("temp_c") * 10) / 10,
-      humidity_pct: Math.round(avg("soil_moist_pct")),
       light_lux: Math.round(avg("light_lux")),
       soil_moist_pct: Math.round(avg("soil_moist_pct")),
       battery_voltage: Math.round(avg("battery_voltage") * 100) / 100,

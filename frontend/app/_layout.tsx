@@ -44,8 +44,6 @@ const CustomTabBar = ({ state, navigation }: any) => {
 	const tabAnims = useRef(visibleRoutes.map(() => new Animated.Value(0))).current;
 
 	const visibleIndex = segments[0] === "(garden)" ? 1 : segments[0] === "(explore)" ? 2 : segments[0] === "(account)" ? -1 : 0;
-	const prevVisibleIndex = useRef(visibleIndex);
-
 	useEffect(() => {
 		const listener = animatedCx.addListener(({ value }) => setCx(value));
 		return () => animatedCx.removeListener(listener);
@@ -53,7 +51,6 @@ const CustomTabBar = ({ state, navigation }: any) => {
 
 	useEffect(() => {
 		if (visibleIndex < 0) {
-			prevVisibleIndex.current = visibleIndex;
 			return;
 		}
 		Animated.spring(animatedCx, {
@@ -62,7 +59,6 @@ const CustomTabBar = ({ state, navigation }: any) => {
 			friction: 8,
 			tension: 40,
 		}).start();
-		prevVisibleIndex.current = visibleIndex;
 	}, [visibleIndex]);
 
 	useEffect(() => {
