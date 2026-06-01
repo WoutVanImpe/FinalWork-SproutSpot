@@ -33,7 +33,7 @@ const PlantStep4 = () => {
       .finally(() => setLoading(false));
   }, [vegId]);
 
-  if (loading) return <FlowLayout title="Koppel je sonde" onBack={() => router.push(`/(explore)/plant-step3?vegId=${vegId}`)}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></FlowLayout>;
+  if (loading) return <FlowLayout title="Koppel je sonde" onBack={() => router.back()}><ActivityIndicator color={Styling.Colors.green} style={{ marginTop: 40 }} /></FlowLayout>;
   if (!veg) return null;
 
   const displayName = decodeURIComponent(name || "");
@@ -44,7 +44,7 @@ const PlantStep4 = () => {
   };
 
   return (
-    <FlowLayout title="Koppel je sonde" onBack={() => router.push(`/(explore)/plant-step3?vegId=${vegId}`)}>
+    <FlowLayout title="Koppel je sonde" onBack={() => router.back()}>
       <View style={styles.content}>
         <StyledText type="paragh" style={styles.hint}>
           We hebben een sonde nodig om de groei van je {veg.name.toLowerCase()} te volgen.
