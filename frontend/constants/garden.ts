@@ -1,8 +1,8 @@
 import { scaled } from "./scale";
 
 export const CELL = scaled(80);
-export const MIN_SCALE = 0.5;
-export const MAX_SCALE = 2;
+export const MIN_SCALE = 1;
+export const MAX_SCALE = 2.5;
 export const SCALE_STEP = 0.2;
 
 export function gridDimensions(cols: number, rows: number) {
