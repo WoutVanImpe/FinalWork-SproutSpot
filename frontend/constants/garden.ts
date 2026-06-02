@@ -1,4 +1,6 @@
-export const CELL = 80;
+import { scaled } from "./scale";
+
+export const CELL = scaled(80);
 export const MIN_SCALE = 0.5;
 export const MAX_SCALE = 2;
 export const SCALE_STEP = 0.2;

@@ -1,3 +1,5 @@
+import { scaled } from "./scale";
+
 interface Styling {
 	Colors: {
 		green: string;
@@ -78,12 +80,12 @@ export const Styling: Styling = {
 		},
 
 		Size: {
-			sml: 10,
-			reg: 14,
-			med: 16,
-			lrg: 20,
-			xlg: 24,
-			xxl: 32,
+			sml: scaled(10),
+			reg: scaled(14),
+			med: scaled(16),
+			lrg: scaled(20),
+			xlg: scaled(24),
+			xxl: scaled(32),
 		},
 
 		Weight: {
@@ -93,38 +95,38 @@ export const Styling: Styling = {
 	},
 
 	Spacing: {
-		xsm: 4,
-		sml: 8,
-		reg: 12,
-		med: 16,
-		lrg: 24,
-		xlg: 32,
-		xxl: 40,
+		xsm: scaled(4),
+		sml: scaled(8),
+		reg: scaled(12),
+		med: scaled(16),
+		lrg: scaled(24),
+		xlg: scaled(32),
+		xxl: scaled(40),
 	},
 
 	Padding: {
-		xsm: 4,
-		sml: 8,
-		reg: 12,
-		med: 16,
-		lrg: 24,
-		xlg: 32,
-		xxl: 40,
+		xsm: scaled(4),
+		sml: scaled(8),
+		reg: scaled(12),
+		med: scaled(16),
+		lrg: scaled(24),
+		xlg: scaled(32),
+		xxl: scaled(40),
 	},
 
 	BorderRadius: {
-		sml: 4,
-		reg: 8,
-		med: 32,
+		sml: scaled(4),
+		reg: scaled(8),
+		med: scaled(32),
 		lrg: 999,
 	},
 
 	IconSize: {
-		sml: 16,
-		reg: 24,
-		med: 32,
-		lrg: 48,
-		xlg: 64,
+		sml: scaled(16),
+		reg: scaled(24),
+		med: scaled(32),
+		lrg: scaled(48),
+		xlg: scaled(64),
 	},
 
 	Shadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
