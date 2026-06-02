@@ -1,9 +1,8 @@
-import { Dimensions, StyleSheet, View, ViewStyle } from "react-native";
+import { useWindowDimensions, StyleSheet, View, ViewStyle } from "react-native";
 import React from "react";
 import Svg, { Path } from "react-native-svg";
 import { Styling } from "../../constants/Styling";
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
+import { scaled } from "../../constants/scale";
 
 const WAVE_VIEWBOX = "0 0 1284 256";
 const WAVE_PATH =
@@ -24,13 +23,15 @@ interface Props {
   style?: ViewStyle;
 }
 
-const WaveBackground = ({ leftOffset = -SCREEN_WIDTH - 75, waveHeight = 300, widthMultiplier = 4, style }: Props) => {
+const WaveBackground = ({ leftOffset, waveHeight = scaled(300), widthMultiplier = 4, style }: Props) => {
+  const { width: SCREEN_WIDTH } = useWindowDimensions();
   const WAVE_W = SCREEN_WIDTH * widthMultiplier;
+  const offset = leftOffset ?? -SCREEN_WIDTH - scaled(75);
 
   const svgWrapperStyle: ViewStyle = {
     position: "absolute",
     top: 0,
-    left: leftOffset,
+    left: offset,
     ...style,
   };
 

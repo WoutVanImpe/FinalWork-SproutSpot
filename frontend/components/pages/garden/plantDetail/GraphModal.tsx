@@ -1,18 +1,17 @@
-import { Modal, StyleSheet, TouchableOpacity, View, Dimensions } from "react-native";
+﻿import { Modal, StyleSheet, TouchableOpacity, View, useWindowDimensions } from "react-native";
 import React, { useState, useMemo } from "react";
 import Svg, { Circle, Line, Path, Rect, Text as SvgText } from "react-native-svg";
 import { Styling } from "../../../../constants/Styling";
+import { scaled } from "../../../../constants/scale";
 import StyledText from "../../../style/StyledText";
 import StyledIcon from "../../../style/StyledIcon";
 import CloseIcon from "../../../../assets/icons/close.svg";
 import Spacer from "../../../style/Spacer";
 import type { ReadingRecord } from "../../../../services/garden";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const CHART_PADDING = 40;
-const CHART_W = SCREEN_WIDTH - 80 - CHART_PADDING * 2;
-const CHART_H = 150;
-const GRAPH_PAD = { top: 12, bottom: 20, left: 45, right: 15 };
+const CHART_PADDING = scaled(40);
+const CHART_H = scaled(150);
+const GRAPH_PAD = { top: scaled(12), bottom: scaled(20), left: scaled(45), right: scaled(15) };
 
 interface DataPoint {
 	value: number;
@@ -72,9 +71,9 @@ function aggregateData(readings: ReadingRecord[], hours: number): ReadingRecord[
   });
 }
 
-const toX = (i: number, total: number) => {
-  if (total <= 1) return GRAPH_PAD.left + CHART_W / 2;
-  return GRAPH_PAD.left + (i / (total - 1)) * CHART_W;
+const toX = (i: number, total: number, chartW: number) => {
+  if (total <= 1) return GRAPH_PAD.left + chartW / 2;
+  return GRAPH_PAD.left + (i / (total - 1)) * chartW;
 };
 const toY = (value: number, yMax: number) => GRAPH_PAD.top + CHART_H - (value / yMax) * (CHART_H - GRAPH_PAD.top - GRAPH_PAD.bottom);
 
@@ -106,14 +105,17 @@ function buildMetrics(readings: ReadingRecord[], optimalRanges: GraphModalProps[
 	const maxLight = Math.max(...dataMap.map((d) => d.li), 100);
 	return [
 		{ key: "moist", label: "Vocht", unit: "%", optimalMin: optimalRanges.water.optimalMin, optimalMax: optimalRanges.water.optimalMax, yMax: 100, color: "#4A90D9", data: dataMap.map((d) => ({ value: d.mo, label: d.label })) },
-		{ key: "temp", label: "Temperatuur", unit: "°C", optimalMin: optimalRanges.temperature.optimalMin, optimalMax: optimalRanges.temperature.optimalMax, yMax: maxTemp, color: "#C44028", data: dataMap.map((d) => ({ value: d.te, label: d.label })) },
+		{ key: "temp", label: "Temperatuur", unit: "Â°C", optimalMin: optimalRanges.temperature.optimalMin, optimalMax: optimalRanges.temperature.optimalMax, yMax: maxTemp, color: "#C44028", data: dataMap.map((d) => ({ value: d.te, label: d.label })) },
 		{ key: "light", label: "Licht", unit: "%", optimalMin: optimalRanges.light.optimalMin, optimalMax: optimalRanges.light.optimalMax, yMax: maxLight, color: "#F5A623", data: dataMap.map((d) => ({ value: d.li, label: d.label })) },
 	];
 }
 
 const GraphModal = ({ visible, onDismiss, readings, readingsLoading, optimalRanges, selectedHours, onTimeRangeChange }: GraphModalProps) => {
+	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const [selectedMetric, setSelectedMetric] = useState(0);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
+
+	const CHART_W = SCREEN_WIDTH - scaled(80) - CHART_PADDING * 2;
 
 	const METRICS = useMemo(() => buildMetrics(readings, optimalRanges, selectedHours), [readings, optimalRanges, selectedHours]);
 
@@ -121,7 +123,7 @@ const GraphModal = ({ visible, onDismiss, readings, readingsLoading, optimalRang
 	const yMax = metric?.yMax ?? 100;
 	const points = metric?.data ?? [];
 
-	const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"}${toX(i, points.length)},${toY(p.value, yMax)}`).join(" ");
+	const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"}${toX(i, points.length, CHART_W)},${toY(p.value, yMax)}`).join(" ");
 
 	const optimalY1 = toY(metric.optimalMax, yMax);
 	const optimalY2 = toY(metric.optimalMin, yMax);
@@ -167,7 +169,7 @@ const GraphModal = ({ visible, onDismiss, readings, readingsLoading, optimalRang
 								{metric.label}
 							</StyledText>
 							<StyledText type="paragh" style={styles.dropdownArrow}>
-								{dropdownOpen ? "▲" : "▼"}
+								{dropdownOpen ? "â–²" : "â–¼"}
 							</StyledText>
 						</TouchableOpacity>
 
@@ -191,7 +193,7 @@ const GraphModal = ({ visible, onDismiss, readings, readingsLoading, optimalRang
 						)}
 					</View>
 
-					<Spacer space={8} />
+					<Spacer space={scaled(8)} />
 
 					{readingsLoading || points.length === 0 ? (
 						<View style={styles.loadingContainer}>
@@ -205,21 +207,21 @@ const GraphModal = ({ visible, onDismiss, readings, readingsLoading, optimalRang
 							<Rect x={GRAPH_PAD.left} y={optimalY1} width={CHART_W} height={optimalY2 - optimalY1} fill={Styling.Colors.green} opacity={0.12} rx={4} />
 							<Line x1={GRAPH_PAD.left} y1={optimalY1} x2={GRAPH_PAD.left + CHART_W} y2={optimalY1} stroke={Styling.Colors.green} strokeWidth={1} strokeDasharray="4,4" opacity={0.5} />
 							<Line x1={GRAPH_PAD.left} y1={optimalY2} x2={GRAPH_PAD.left + CHART_W} y2={optimalY2} stroke={Styling.Colors.green} strokeWidth={1} strokeDasharray="4,4" opacity={0.5} />
-							<SvgText x={GRAPH_PAD.left - 8} y={GRAPH_PAD.top + 12} fill={Styling.Colors.lightGrey} fontSize={10} textAnchor="end">
+							<SvgText x={GRAPH_PAD.left - scaled(8)} y={GRAPH_PAD.top + scaled(12)} fill={Styling.Colors.lightGrey} fontSize={scaled(10)} textAnchor="end">
 								{descriptor.high}
 							</SvgText>
-							<SvgText x={GRAPH_PAD.left - 8} y={GRAPH_PAD.top + CHART_H} fill={Styling.Colors.lightGrey} fontSize={10} textAnchor="end">
+							<SvgText x={GRAPH_PAD.left - scaled(8)} y={GRAPH_PAD.top + CHART_H} fill={Styling.Colors.lightGrey} fontSize={scaled(10)} textAnchor="end">
 								{descriptor.low}
 							</SvgText>
 							<Path d={linePath} fill="none" stroke={metric.color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
 							{points.map((p, i) => (
-								<Circle key={i} cx={toX(i, points.length)} cy={toY(p.value, yMax)} r={3} fill={metric.color} />
+								<Circle key={i} cx={toX(i, points.length, CHART_W)} cy={toY(p.value, yMax)} r={3} fill={metric.color} />
 							))}
 							{points
 								.map((p, i) => ({ p, label: getDataLabel(p.label, i, points.length, selectedHours) }))
 								.filter(({ label }) => label !== "")
 								.map(({ p, label }, i) => (
-									<SvgText key={i} x={toX(points.indexOf(p), points.length)} y={CHART_H + GRAPH_PAD.top + GRAPH_PAD.bottom - 5} fill={Styling.Colors.lightGrey} fontSize={9} textAnchor="middle">
+									<SvgText key={i} x={toX(points.indexOf(p), points.length, CHART_W)} y={CHART_H + GRAPH_PAD.top + GRAPH_PAD.bottom - scaled(5)} fill={Styling.Colors.lightGrey} fontSize={scaled(9)} textAnchor="middle">
 										{label}
 									</SvgText>
 								))}
@@ -256,12 +258,12 @@ const styles = StyleSheet.create({
 		backgroundColor: "rgba(0,0,0,0.45)",
 		justifyContent: "center",
 		alignItems: "center",
-		paddingHorizontal: 40,
+		paddingHorizontal: scaled(40),
 	},
 	card: {
 		backgroundColor: Styling.Colors.white,
-		borderRadius: 20,
-		paddingHorizontal: 25,
+		borderRadius: scaled(20),
+		paddingHorizontal: scaled(25),
 		paddingVertical: Styling.Padding.lrg,
 		width: "100%",
 		shadowColor: "#000",
@@ -275,9 +277,9 @@ const styles = StyleSheet.create({
 		top: Styling.Padding.reg,
 		right: Styling.Padding.reg,
 		zIndex: 1,
-		width: 32,
-		height: 32,
-		borderRadius: 16,
+		width: scaled(32),
+		height: scaled(32),
+		borderRadius: scaled(16),
 		backgroundColor: Styling.Colors.green,
 		justifyContent: "center",
 		alignItems: "center",
@@ -299,7 +301,7 @@ const styles = StyleSheet.create({
 		borderRadius: Styling.BorderRadius.reg,
 		paddingHorizontal: Styling.Padding.reg,
 		paddingVertical: Styling.Padding.sml,
-		minHeight: 40,
+		minHeight: scaled(40),
 	},
 	dropdownText: {
 		color: Styling.Colors.darkGrey,
@@ -360,14 +362,14 @@ const styles = StyleSheet.create({
 		gap: Styling.Spacing.xsm,
 	},
 	legendDot: {
-		width: 8,
-		height: 8,
-		borderRadius: 4,
+		width: scaled(8),
+		height: scaled(8),
+		borderRadius: scaled(4),
 	},
 	legendBar: {
-		width: 16,
-		height: 8,
-		borderRadius: 2,
+		width: scaled(16),
+		height: scaled(8),
+		borderRadius: scaled(2),
 	},
 	legendText: {
 		color: Styling.Colors.darkGrey,
@@ -395,3 +397,5 @@ const styles = StyleSheet.create({
 		color: Styling.Colors.white,
 	},
 });
+
+

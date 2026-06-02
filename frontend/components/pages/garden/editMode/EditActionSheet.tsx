@@ -1,14 +1,13 @@
-import { Animated, Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+﻿import { Animated, useWindowDimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useRef } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Styling } from "../../../../constants/Styling";
+import { scaled } from "../../../../constants/scale";
 import Spacer from "../../../style/Spacer";
 import StyledIcon from "../../../style/StyledIcon";
 import StyledText from "../../../style/StyledText";
 import CloseIcon from "../../../../assets/icons/close.svg";
 import { GardenPlant } from "../gardenGrid/GardenGridItem";
-
-const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const EditActionSheet = ({
 	plant,
@@ -23,6 +22,7 @@ const EditActionSheet = ({
 	onMove: () => void;
 	onDelete: () => void;
 }) => {
+	const { height: SCREEN_HEIGHT } = useWindowDimensions();
 	const insets = useSafeAreaInsets();
 	const slideAnim = useRef(new Animated.Value(0)).current;
 	const prevVisible = useRef(false);
@@ -46,7 +46,7 @@ const EditActionSheet = ({
 
 	return (
 		<View style={styles.wrapper} pointerEvents="box-none">
-			<Animated.View style={[styles.sheet, { transform: [{ translateY: sheetTranslateY }], paddingBottom: Styling.Padding.xlg + insets.bottom + 30 }]}>
+			<Animated.View style={[styles.sheet, { transform: [{ translateY: sheetTranslateY }], paddingBottom: Styling.Padding.xlg + insets.bottom + scaled(30) }]}>
 				<View style={styles.handle} />
 				{plant && (
 					<>
@@ -90,15 +90,15 @@ const styles = StyleSheet.create({
 	},
 	sheet: {
 		backgroundColor: Styling.Colors.white,
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		paddingHorizontal: 25,
+		borderTopLeftRadius: scaled(30),
+		borderTopRightRadius: scaled(30),
+		paddingHorizontal: scaled(25),
 		paddingBottom: Styling.Padding.xlg,
 	},
 	handle: {
-		width: 40,
-		height: 4,
-		borderRadius: 5,
+		width: scaled(40),
+		height: scaled(4),
+		borderRadius: scaled(5),
 		backgroundColor: Styling.Colors.darkGrey,
 		alignSelf: "center",
 		marginTop: Styling.Spacing.sml,
@@ -115,9 +115,9 @@ const styles = StyleSheet.create({
 		marginRight: Styling.Spacing.sml,
 	},
 	closeBtn: {
-		width: 32,
-		height: 32,
-		borderRadius: 16,
+		width: scaled(32),
+		height: scaled(32),
+		borderRadius: scaled(16),
 		backgroundColor: Styling.Colors.green,
 		alignItems: "center",
 		justifyContent: "center",
@@ -141,3 +141,5 @@ const styles = StyleSheet.create({
 		color: Styling.Colors.white,
 	},
 });
+
+

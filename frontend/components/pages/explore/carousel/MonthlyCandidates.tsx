@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, StyleSheet, View } from "react-native";
+import { useWindowDimensions, FlatList, StyleSheet, View } from "react-native";
 import React from "react";
 import StyledText from "../../../style/StyledText";
 import VegetableCard from "../../../shared/vegetableCard/VegetableCard";
@@ -7,9 +7,7 @@ import { BAR_MARGIN } from "../../../../constants/tabConfig";
 import Spacer from "../../../style/Spacer";
 import type { VegetableInfo } from "../../../../data/vegetables";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_GAP = Styling.Spacing.lrg;
-const CARD_WIDTH = (SCREEN_WIDTH - BAR_MARGIN - 1.1 * CARD_GAP) / 3.5;
 
 const MONTHS = [
     "januari", "februari", "maart", "april", "mei", "juni",
@@ -22,6 +20,8 @@ interface MonthlyCandidatesProps {
 }
 
 const MonthlyCandidates = ({ data, onItemPress }: MonthlyCandidatesProps) => {
+    const { width: SCREEN_WIDTH } = useWindowDimensions();
+    const CARD_WIDTH = (SCREEN_WIDTH - BAR_MARGIN - 1.1 * CARD_GAP) / 3.5;
     const currentMonth = new Date().getMonth() + 1;
 
     const candidates = data
@@ -43,7 +43,7 @@ const MonthlyCandidates = ({ data, onItemPress }: MonthlyCandidatesProps) => {
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.scrollContent}
                     renderItem={({ item }) => (
-                        <View style={styles.cardWrapper}>
+                        <View style={[styles.cardWrapper, { width: CARD_WIDTH }]}>
                             <VegetableCard vegetable={onItemPress ? { ...item, onPress: () => onItemPress(item.id) } : item} />
                         </View>
                     )}
@@ -67,6 +67,5 @@ const styles = StyleSheet.create({
         gap: CARD_GAP,
     },
     cardWrapper: {
-        width: CARD_WIDTH,
     },
 });

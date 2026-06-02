@@ -1,21 +1,15 @@
-import { Animated, Dimensions, PanResponder, StyleSheet, TouchableOpacity, View, Image } from 'react-native'
+import { Animated, PanResponder, StyleSheet, TouchableOpacity, View, Image, useWindowDimensions } from 'react-native'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Svg, { Path } from 'react-native-svg'
 import { Styling } from '../../../../constants/Styling';
+import { scaled } from '../../../../constants/scale';
 import StyledText from '../../../style/StyledText';
 import StyledIcon from '../../../style/StyledIcon';
 import ChevronLeft from '../../../../assets/icons/arrow_left.svg'
 import ChevronRight from '../../../../assets/icons/arrow_right.svg'
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window')
-const CONTENT_HEIGHT = 230;
-
-const WAVE_W = SCREEN_WIDTH * 4;
-const WAVE_H = 270;
 const WAVE_VIEWBOX = '0 0 1284 256';
-
-const WAVE_REST =
-  'M235 40.7409 C150.17 18.6112 46.1667 39.7409 4 55.7409 L15.5 216.241 C61.8333 199.741 136 168.241 235 203.741 C318.396 233.646 512 243.241 627 198.741 C722.933 161.619 871.5 157.741 948.5 192.241 C1076 249.367 1193.5 249.741 1276 229.241 C1282.17 161.407 1285.5 33.0405 1249.5 62.2409 C1204.5 98.7413 1046.5 85.2411 946.5 37.7413 C832.781 -16.2753 705.832 -9.66491 602.5 40.7409 C520.5 80.7408 373 76.7409 235 40.7409 Z';
+const WAVE_REST = 'M235 40.7409 C150.17 18.6112 46.1667 39.7409 4 55.7409 L15.5 216.241 C61.8333 199.741 136 168.241 235 203.741 C318.396 233.646 512 243.241 627 198.741 C722.933 161.619 871.5 157.741 948.5 192.241 C1076 249.367 1193.5 249.741 1276 229.241 C1282.17 161.407 1285.5 33.0405 1249.5 62.2409 C1204.5 98.7413 1046.5 85.2411 946.5 37.7413 C832.781 -16.2753 705.832 -9.66491 602.5 40.7409 C520.5 80.7408 373 76.7409 235 40.7409 Z';
 
 interface CarouselItem {
     id: string;
@@ -31,28 +25,8 @@ interface StatusHeaderProps {
     onItemPress?: (id: string) => void;
 }
 
-const WaveShape = ({ fill, d, style }: { fill: string; d: string; style?: any }) => (
-    <View style={style}>
-        <Svg width={WAVE_W} height={WAVE_H} viewBox={WAVE_VIEWBOX} preserveAspectRatio="none">
-            <Path d={d} fill={fill} />
-        </Svg>
-    </View>
-);
-
-const CenterContent = ({ item }: { item: CarouselItem }) => (
-    <>
-        <View style={styles.imageContainer}>
-            <Image source={item.image} style={styles.plantImage} resizeMode="contain" />
-        </View>
-        <View style={styles.textContainer}>
-            <StyledText type="head2" style={styles.statusText}>
-                {item.type} {item.name} heeft {item.message}!
-            </StyledText>
-        </View>
-    </>
-);
-
 const StatusHeader = ({ items, onItemPress }: StatusHeaderProps) => {
+    const { width: SCREEN_WIDTH } = useWindowDimensions();
     const [displayIndex, setDisplayIndex] = useState(0);
     const slideAnim = useRef(new Animated.Value(0)).current;
     const colorAnim = useRef(new Animated.Value(items.length === 0 ? 0 : items[0]?.warning ? 1 : 0)).current;
@@ -64,6 +38,30 @@ const StatusHeader = ({ items, onItemPress }: StatusHeaderProps) => {
     } | null>(null);
 
     const currentItem = items[displayIndex];
+    const WAVE_W = SCREEN_WIDTH * 4;
+    const WAVE_H = scaled(270);
+    const CONTENT_HEIGHT = scaled(230);
+
+    const WaveShape = ({ fill, d, style }: { fill: string; d: string; style?: any }) => (
+        <View style={style}>
+            <Svg width={WAVE_W} height={WAVE_H} viewBox={WAVE_VIEWBOX} preserveAspectRatio="none">
+                <Path d={d} fill={fill} />
+            </Svg>
+        </View>
+    );
+
+    const CenterContent = ({ item }: { item: CarouselItem }) => (
+        <>
+            <View style={styles.imageContainer}>
+                <Image source={item.image} style={styles.plantImage} resizeMode="contain" />
+            </View>
+            <View style={styles.textContainer}>
+                <StyledText type="head2" style={styles.statusText}>
+                    {item.type} {item.name} heeft {item.message}!
+                </StyledText>
+            </View>
+        </>
+    );
 
     const startTransition = useCallback((targetIndex: number, direction: number) => {
         if (isAnimating.current || targetIndex === displayIndex) return;
@@ -136,7 +134,7 @@ const StatusHeader = ({ items, onItemPress }: StatusHeaderProps) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.svgWrapper}>
+            <View style={[styles.svgWrapper, { left: -SCREEN_WIDTH + scaled(60) }]}>
                 <View style={styles.shadowLayer2}>
                     <WaveShape fill="#000" d={WAVE_REST} />
                 </View>
@@ -156,7 +154,7 @@ const StatusHeader = ({ items, onItemPress }: StatusHeaderProps) => {
                     </TouchableOpacity>
                 )}
 
-                <View style={styles.centerSlideArea} {...panResponder.panHandlers}>
+                <View style={[styles.centerSlideArea, { height: CONTENT_HEIGHT }]} {...panResponder.panHandlers}>
                     {transition ? (
                         <>
                             <Animated.View
@@ -227,7 +225,7 @@ export default StatusHeader
 
 const styles = StyleSheet.create({
     container: {
-        height: 260,
+        height: scaled(260),
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'transparent',
@@ -240,19 +238,18 @@ const styles = StyleSheet.create({
     },
     svgWrapper: {
         position: 'absolute',
-        top: 10,
-        left: -SCREEN_WIDTH + 60,
+        top: scaled(10),
         zIndex: 1,
     },
     shadowLayer1: {
         position: 'absolute',
-        top: 3,
+        top: scaled(3),
         left: 0,
         opacity: 0.15,
     },
     shadowLayer2: {
         position: 'absolute',
-        top: 5,
+        top: scaled(5),
         left: 0,
         opacity: 0.08,
     },
@@ -262,11 +259,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '100%',
         zIndex: 2,
-        marginTop:-30,
+        marginTop: scaled(-30),
     },
     centerSlideArea: {
         flex: 1,
-        height: CONTENT_HEIGHT,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -281,13 +277,13 @@ const styles = StyleSheet.create({
         
     },
     navButton: {
-        marginTop: 80,
+        marginTop: scaled(80),
         zIndex: 10,
-        borderRadius: 20,
+        borderRadius: scaled(20),
     },
     imageContainer: {
-        width: 180,
-        height: 180,
+        width: scaled(180),
+        height: scaled(180),
         justifyContent: 'center',
         alignItems: 'center',
         marginHorizontal: "auto",
@@ -295,18 +291,18 @@ const styles = StyleSheet.create({
     plantImage: {
         width: '100%',
         height: '100%',
-        marginTop: -40,
+        marginTop: scaled(-40),
     },
     textContainer: {
-        marginTop: -20,
-        paddingHorizontal: 40,
+        marginTop: scaled(-20),
+        paddingHorizontal: scaled(40),
         zIndex: 2,
     },
     statusText: {
         fontFamily: Styling.Fonts.Family.bold,
-        fontSize: 22,
+        fontSize: scaled(22),
         color: 'white',
         textAlign: 'center',
-        lineHeight: 28,
+        lineHeight: scaled(28),
     }
 })

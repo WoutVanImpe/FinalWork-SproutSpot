@@ -1,7 +1,8 @@
-import { View, Dimensions, StyleSheet, ViewStyle } from "react-native";
+import { View, useWindowDimensions, StyleSheet, ViewStyle } from "react-native";
 import React from "react";
 import VegetableCard, { VegetableCardProps } from "./VegetableCard";
 import { Styling } from "../../../constants/Styling";
+import { scaled } from "../../../constants/scale";
 
 interface CardContainerProps {
 	data: VegetableCardProps[];
@@ -11,9 +12,9 @@ interface CardContainerProps {
 }
 
 const CardContainer = ({ data, columns = 3, style, onItemPress }: CardContainerProps) => {
-	const screenWidth = Dimensions.get("window").width;
+	const { width: screenWidth } = useWindowDimensions();
 	const gap = Styling.Spacing.reg;
-	const padding = 40;
+	const padding = scaled(40);
 	const availableWidth = screenWidth - gap * (columns - 1) - padding;
 	const cardWidth = availableWidth / columns;
 
