@@ -75,7 +75,7 @@ const VegetableInfo = () => {
 
 			{/* Row 2: Image + General Info */}
 			<View style={styles.infoRow}>
-				<WaveBackground waveHeight={scaled(310)} leftOffset={scaled(-770)} widthMultiplier={6} style={{marginTop: 15}} />
+				<WaveBackground waveHeight={scaled(310)} visibleStart={372} widthMultiplier={6} style={{marginTop: 15}} />
 				<View style={styles.infoRowContent}>
 					<View style={styles.imageContainer}>
 						<Image source={{ uri: veg.image }} style={styles.image} resizeMode="contain" />

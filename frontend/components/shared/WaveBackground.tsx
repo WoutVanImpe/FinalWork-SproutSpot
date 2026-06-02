@@ -16,17 +16,22 @@ const WaveShape = ({ fill, style, waveHeight, waveWidth }: { fill: string; style
   </View>
 );
 
+const VIEWBOX_W = 1284;
+
 interface Props {
   leftOffset?: number;
+  visibleStart?: number;
   waveHeight?: number;
   widthMultiplier?: number;
   style?: ViewStyle;
 }
 
-const WaveBackground = ({ leftOffset, waveHeight = scaled(300), widthMultiplier = 4, style }: Props) => {
+const WaveBackground = ({ leftOffset, visibleStart, waveHeight = scaled(300), widthMultiplier = 4, style }: Props) => {
   const { width: SCREEN_WIDTH } = useWindowDimensions();
   const WAVE_W = SCREEN_WIDTH * widthMultiplier;
-  const offset = leftOffset ?? -SCREEN_WIDTH - scaled(75);
+  const offset = visibleStart != null
+    ? -(visibleStart / VIEWBOX_W) * WAVE_W
+    : (leftOffset ?? -SCREEN_WIDTH - scaled(75));
 
   const svgWrapperStyle: ViewStyle = {
     position: "absolute",
