@@ -34,7 +34,9 @@ async function fetchPlantDetail(vegId: string): Promise<PlantDetail | null> {
 			vegCache[vegId] = res.data;
 			return res.data;
 		}
-	} catch { /* ignore */ }
+	} catch {
+		/* ignore */
+	}
 	return null;
 }
 
@@ -53,20 +55,22 @@ const Garden = () => {
 	const [selectedPlant, setSelectedPlant] = useState<GardenPlant | null>(null);
 	const [alertConfig, setAlertConfig] = useState<{ title: string; message: string; buttons?: AlertButton[] } | null>(null);
 
-	useFocusEffect(useCallback(() => {
-		setLoading(true);
-		getGarden()
-			.then((res) => {
-				if (res.data) {
-					setPlants(res.data.plants.map(enrichedToGardenPlant));
-					setGardenId(res.data.garden.id);
-					setCols(res.data.garden.width);
-					setRows(res.data.garden.height);
-				}
-			})
-			.catch(console.error)
-			.finally(() => setLoading(false));
-	}, []));
+	useFocusEffect(
+		useCallback(() => {
+			setLoading(true);
+			getGarden()
+				.then((res) => {
+					if (res.data) {
+						setPlants(res.data.plants.map(enrichedToGardenPlant));
+						setGardenId(res.data.garden.id);
+						setCols(res.data.garden.width);
+						setRows(res.data.garden.height);
+					}
+				})
+				.catch(console.error)
+				.finally(() => setLoading(false));
+		}, []),
+	);
 
 	useEffect(() => {
 		if (params.selectedPlantId) {
@@ -163,9 +167,9 @@ const Garden = () => {
 		const { w, h } = gridSizeRef.current;
 		const cx = w / 2;
 		const cy = h / 2;
-		const ratio = newScale / prevScale;
-		setOffset((prevOffset) =>
-			clampOffset(
+		setOffset((prevOffset) => {
+			const ratio = newScale / prevScale;
+			return clampOffset(
 				{
 					x: prevOffset.x * ratio + (vw / 2 - cx) * (1 - ratio),
 					y: prevOffset.y * ratio + (vh / 2 - cy) * (1 - ratio),
@@ -175,8 +179,8 @@ const Garden = () => {
 				vh,
 				w,
 				h,
-			),
-		);
+			);
+		});
 	};
 
 	const enterEditMode = () => {
@@ -403,8 +407,15 @@ const Garden = () => {
 							<StyledText type="head3" style={styles.placementTitle}>
 								Kies een plek voor {decodeURIComponent(params.name || "")}
 							</StyledText>
-							<TouchableOpacity onPress={() => { setIsPlacing(false); router.setParams({ placementMode: undefined, vegId: undefined, name: undefined }); }}>
-								<StyledText type="paragh" style={{ color: Styling.Colors.green }}>Annuleren</StyledText>
+							<TouchableOpacity
+								onPress={() => {
+									setIsPlacing(false);
+									router.setParams({ placementMode: undefined, vegId: undefined, name: undefined });
+								}}
+							>
+								<StyledText type="paragh" style={{ color: Styling.Colors.green }}>
+									Annuleren
+								</StyledText>
 							</TouchableOpacity>
 						</View>
 						<Spacer space={Styling.Spacing.reg} />
@@ -427,14 +438,10 @@ const Garden = () => {
 								const { w, h } = gridDimensions(cols, rows);
 								const fitScale = Math.max(MIN_SCALE, Math.min(1, Math.min(width / w, height / h)));
 								setScale(fitScale);
-								const cx = w / 2,
-									cy = h / 2;
-								const desiredTop = (height - h * fitScale) / 2;
-								const desiredLeft = (width - w * fitScale) / 2;
-								setOffset({
-									x: desiredLeft - cx * (1 - fitScale),
-									y: desiredTop - cy * (1 - fitScale),
-								});
+							setOffset({
+								x: (width - w) / 2,
+								y: (height - h) / 2,
+							});
 							}
 						}
 					}}
@@ -444,7 +451,9 @@ const Garden = () => {
 						style={[
 							styles.gridTransform,
 							{
-								transform: [{ scale }, { translateX: offset.x }, { translateY: offset.y }],
+								width: GRID_W,
+								height: GRID_H,
+								transform: [{ translateX: offset.x }, { translateY: offset.y }, { scale }],
 							},
 						]}
 					>
@@ -457,36 +466,36 @@ const Garden = () => {
 									<TouchableOpacity
 										key={key}
 										style={[styles.cell, { left: cx * CELL, top: cy * CELL }, selected && styles.cellSelected]}
-									onPress={async () => {
-										if (isEditing) {
-											selectCell(cx, cy);
-										} else if (isPlacing) {
-											if (!plant && params.vegId) {
-												const veg = await fetchPlantDetail(params.vegId);
-												const numericId = params.vegId.replace("veg_", "");
-												try {
-													const created = await createUserPlant({ plant_id: numericId, nickname: decodeURIComponent(params.name || veg?.name || ""), x_pos: cx, y_pos: cy, garden_id: gardenId ?? undefined });
-													if (params.probeId && created.data?.id) {
-														await pairProbe(Number(params.probeId), created.data.id).catch(console.error);
-														setAlertConfig({
-															title: "Sonde gekoppeld",
-															message: "Druk nu kort op de knop van de sonde om te synchroniseren.",
-														});
+										onPress={async () => {
+											if (isEditing) {
+												selectCell(cx, cy);
+											} else if (isPlacing) {
+												if (!plant && params.vegId) {
+													const veg = await fetchPlantDetail(params.vegId);
+													const numericId = params.vegId.replace("veg_", "");
+													try {
+														const created = await createUserPlant({ plant_id: numericId, nickname: decodeURIComponent(params.name || veg?.name || ""), x_pos: cx, y_pos: cy, garden_id: gardenId ?? undefined });
+														if (params.probeId && created.data?.id) {
+															await pairProbe(Number(params.probeId), created.data.id).catch(console.error);
+															setAlertConfig({
+																title: "Sonde gekoppeld",
+																message: "Druk nu kort op de knop van de sonde om te synchroniseren.",
+															});
+														}
+														const res = await getGarden();
+														if (res.data) {
+															setPlants(res.data.plants.map(enrichedToGardenPlant));
+														}
+													} catch (err) {
+														console.error(err);
 													}
-													const res = await getGarden();
-													if (res.data) {
-														setPlants(res.data.plants.map(enrichedToGardenPlant));
-													}
-												} catch (err) {
-													console.error(err);
+													setIsPlacing(false);
+													router.setParams({ placementMode: undefined, vegId: undefined, name: undefined, probeId: undefined });
 												}
-												setIsPlacing(false);
-												router.setParams({ placementMode: undefined, vegId: undefined, name: undefined, probeId: undefined });
+											} else if (plant) {
+												setSelectedPlant(plant);
 											}
-										} else if (plant) {
-											setSelectedPlant(plant);
-										}
-									}}
+										}}
 										activeOpacity={0.7}
 									>
 										{plant && <GardenGridItem plant={plant} />}
@@ -502,7 +511,14 @@ const Garden = () => {
 
 				<Spacer space={BAR_HEIGHT + Styling.Spacing.xlg * 3} />
 			</View>
-			<PlantSheet plant={selectedPlant} isVisible={selectedPlant !== null} onClose={() => { setSelectedPlant(null); router.setParams({ selectedPlantId: undefined }); }} />
+			<PlantSheet
+				plant={selectedPlant}
+				isVisible={selectedPlant !== null}
+				onClose={() => {
+					setSelectedPlant(null);
+					router.setParams({ selectedPlantId: undefined });
+				}}
+			/>
 			<StyledAlert visible={alertConfig !== null} title={alertConfig?.title ?? ""} message={alertConfig?.message ?? ""} buttons={alertConfig?.buttons} onDismiss={() => setAlertConfig(null)} />
 		</>
 	);
@@ -559,5 +575,3 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 	},
 });
-
-

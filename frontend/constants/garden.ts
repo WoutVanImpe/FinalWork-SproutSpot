@@ -19,16 +19,13 @@ export function clampOffset(
 ): { x: number; y: number } {
 	const cx = gw / 2;
 	const cy = gh / 2;
-	const centerX = vw / 2 - cx;
-	const centerY = vh / 2 - cy;
-
-	const minX = Math.min(vw - gw * scale, centerX);
-	const maxX = Math.max(0, centerX);
-	const minY = Math.min(vh - gh * scale, centerY);
-	const maxY = Math.max(0, centerY);
 
 	return {
-		x: Math.min(maxX, Math.max(minX, desired.x)),
-		y: Math.min(maxY, Math.max(minY, desired.y)),
+		x: gw * scale <= vw
+			? vw / 2 - cx
+			: Math.min(cx * (scale - 1), Math.max(vw - cx * (1 + scale), desired.x)),
+		y: gh * scale <= vh
+			? vh / 2 - cy
+			: Math.min(cy * (scale - 1), Math.max(vh - cy * (1 + scale), desired.y)),
 	};
 }
