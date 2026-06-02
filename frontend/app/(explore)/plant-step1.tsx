@@ -7,6 +7,7 @@ import Spacer from "../../components/style/Spacer";
 import { getPlantById } from "../../services/plants";
 import type { PlantDetail } from "../../services/plants";
 import FlowLayout from "../../components/pages/explore/plantFlow/FlowLayout";
+import { scaled } from "../../constants/scale";
 
 const PlantStep1 = () => {
   const { vegId } = useLocalSearchParams<{ vegId: string }>();
@@ -85,3 +86,4 @@ const styles = StyleSheet.create({
 });
 
 export default PlantStep1;
+

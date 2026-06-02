@@ -1,6 +1,7 @@
 import { StyleSheet, View } from "react-native";
 import React from "react";
 import { Styling } from "../../constants/Styling";
+import { scaled } from "../../constants/scale";
 
 const Dot = ({ active }: { active: boolean }) => (
 	<View style={[styles.dot, { backgroundColor: active ? Styling.Colors.green : "rgba(255,255,255,0.4)" }]} />
@@ -20,11 +21,13 @@ const styles = StyleSheet.create({
 	container: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 8,
+		gap: Styling.Spacing.sml,
 	},
 	dot: {
-		width: 8,
-		height: 8,
-		borderRadius: 4,
+		width: scaled(8),
+		height: scaled(8),
+		borderRadius: scaled(4),
 	},
 });
+
+

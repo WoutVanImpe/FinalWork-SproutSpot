@@ -4,6 +4,7 @@ import { Styling } from "../../../../constants/Styling";
 import StyledText from "../../../style/StyledText";
 import StyledButton from "../../../style/StyledButton";
 import WaveBackground from "../../../shared/WaveBackground";
+import { scaled } from "../../../../constants/scale";
 
 interface ExploreHeaderProps {
 	onButtonPress: () => void;
@@ -12,7 +13,7 @@ interface ExploreHeaderProps {
 const ExploreHeader = ({ onButtonPress }: ExploreHeaderProps) => {
 	return (
 		<View style={styles.container}>
-			<WaveBackground leftOffset={-430}/>
+			<WaveBackground leftOffset={scaled(-430)}/>
 
 			<View style={styles.content}>
 				<StyledText type="head1" style={styles.title}>
@@ -30,7 +31,7 @@ export default ExploreHeader;
 
 const styles = StyleSheet.create({
 	container: {
-		height: 260,
+		height: scaled(260),
 		alignItems: "center",
 		justifyContent: "center",
 		backgroundColor: "transparent",
@@ -46,12 +47,14 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		zIndex: 2,
 		gap: Styling.Spacing.reg,
-		marginTop: -25,
+		marginTop: scaled(-25),
 	},
 	title: {
 		color: Styling.Colors.white,
 		textAlign: "center",
-		width: 300,
-		lineHeight: 40,
+		width: scaled(300),
+		lineHeight: scaled(40),
 	},
 });
+
+

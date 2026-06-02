@@ -10,6 +10,7 @@ import StatusHeader from "../components/pages/home/statusHeader/StatusHeader";
 import { getDashboard } from "../services/garden";
 import type { EnrichedPlant } from "../services/garden";
 import { useRouter, useFocusEffect } from "expo-router";
+import { scaled } from "../constants/scale";
 
 interface HomePlant {
 	id: string;
@@ -70,7 +71,7 @@ const Index = () => {
 	if (plants.length === 0) {
 		return (
 			<StyledView>
-				<Spacer space={120} />
+				<Spacer space={scaled(120)} />
 				<StyledText type="head3" style={{ textAlign: "center" }}>
 					Je hebt nog geen planten
 				</StyledText>
@@ -105,3 +106,5 @@ const styles = StyleSheet.create({
 		alignSelf: "flex-start",
 	},
 });
+
+

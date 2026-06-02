@@ -1,6 +1,7 @@
-import { ActivityIndicator, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+﻿import { ActivityIndicator, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Styling } from "../../constants/Styling";
+import { scaled } from "../../constants/scale";
 import StyledText from "../style/StyledText";
 import StyledIcon from "../style/StyledIcon";
 import Spacer from "../style/Spacer";
@@ -68,7 +69,7 @@ const QUESTIONS = [
 	},
 	{
 		title: "Hoeveel tijd heb je?",
-		explanation: "Sommige planten hebben elke dag aandacht nodig, andere kunnen een weekje zonder. Bedenk wat jij écht kunt geven.",
+		explanation: "Sommige planten hebben elke dag aandacht nodig, andere kunnen een weekje zonder. Bedenk wat jij Ã©cht kunt geven.",
 		options: [
 			{ label: "Dagelijks", value: "daily" },
 			{ label: "Wekelijks", value: "weekly" },
@@ -218,7 +219,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 					<View style={styles.centeredContent}>
 						<StyledText type="head1" style={{ color: Styling.Colors.white, textAlign: "center" }}>We gaan de beste plant voor je zoeken!</StyledText>
 						<Spacer space={Styling.Spacing.reg} />
-						<StyledText type="paragh" style={{ color: Styling.Colors.white, textAlign: "center", lineHeight: 22, paddingHorizontal: 16 }}>
+						<StyledText type="paragh" style={{ color: Styling.Colors.white, textAlign: "center", lineHeight: scaled(22), paddingHorizontal: 16 }}>
 							Beantwoord een paar vragen en we vinden een plant die perfect bij jou past.
 						</StyledText>
 						<Spacer space={Styling.Spacing.xlg} />
@@ -246,7 +247,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 						) : (
 							<StyledText type="paragh" style={{ color: Styling.Colors.white, textAlign: "center" }}>Probeer andere antwoorden.</StyledText>
 						)}
-						<Spacer space={170} />
+						<Spacer space={scaled(170)} />
 					</View>
 				);
 			}
@@ -264,7 +265,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 						</View>
 
 						<View style={detailStyles.infoRow}>
-							<WaveBackground waveHeight={280} leftOffset={-770} widthMultiplier={6} style={{ marginTop: 25 }} />
+							<WaveBackground waveHeight={scaled(280)} leftOffset={scaled(-770)} widthMultiplier={6} style={{ marginTop: 25 }} />
 							<View style={detailStyles.infoRowContent}>
 								<View style={detailStyles.imageContainer}>
 									<Image source={{ uri: veg.image }} style={detailStyles.image} resizeMode="contain" />
@@ -339,14 +340,14 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 								))}
 							</View>
 							<StyledText type="smParagh" style={detailStyles.totalTime}>
-								Totale tijd: ±{veg.totalDays} dagen
+								Totale tijd: Â±{veg.totalDays} dagen
 							</StyledText>
 
 							<Spacer space={Styling.Spacing.reg} />
 							<TouchableOpacity style={styles.greenBtn} onPress={() => setStep("step1")} activeOpacity={0.7}>
 								<StyledText type="head4" style={{ color: Styling.Colors.white }}>Starten</StyledText>
 							</TouchableOpacity>
-							<Spacer space={150} />
+							<Spacer space={scaled(150)} />
 						</ScrollView>
 					</View>
 				);
@@ -470,7 +471,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 							{sub === 0 && (
 								<>
 									<StyledText type="head3" style={styles.stepTitle}>Stap 1: Sonde opladen</StyledText>
-									<StyledText type="paragh" style={{ color: Styling.Colors.white, lineHeight: 22, marginTop: 8 }}>
+									<StyledText type="paragh" style={{ color: Styling.Colors.white, lineHeight: scaled(22), marginTop: 8 }}>
 										Sluit je sonde via USB aan op de oplader. Zodra hij stroom krijgt, kun je hem straks instellen.
 									</StyledText>
 									<Spacer space={Styling.Spacing.xlg} />
@@ -500,7 +501,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 									<GuideRow num="4." text="Vul daar je WiFi-naam, wachtwoord en onderstaande koppelcode in." />
 									<TouchableOpacity style={styles.codeBox} onPress={handleCopyCode} activeOpacity={0.7}>
 										<StyledText type="smParagh" style={{ color: Styling.Colors.lightGrey, marginBottom: 4 }}>
-											{copied ? "Gekopieerd!" : "Klik hier om je koppelcode te kopiëren"}
+											{copied ? "Gekopieerd!" : "Klik hier om je koppelcode te kopiÃ«ren"}
 										</StyledText>
 										<StyledText type="head3" style={{ color: Styling.Colors.green, letterSpacing: 2 }}>{pairingCode}</StyledText>
 									</TouchableOpacity>
@@ -514,7 +515,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 							{sub === 2 && (
 								<>
 									<StyledText type="head3" style={styles.stepTitle}>Stap 3: Terug naar je eigen WiFi</StyledText>
-									<StyledText type="paragh" style={{ color: Styling.Colors.white, lineHeight: 22, marginTop: 8 }}>
+									<StyledText type="paragh" style={{ color: Styling.Colors.white, lineHeight: scaled(22), marginTop: 8 }}>
 										Ga terug naar je WiFi-instellingen en verbind weer met je thuisnetwerk. De sonde is nu ingesteld en zal vanzelf verbinding maken.
 									</StyledText>
 									<Spacer space={Styling.Spacing.xlg} />
@@ -527,7 +528,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 							{sub === 3 && (
 								<>
 									<StyledText type="head3" style={styles.stepTitle}>Stap 4: Geef je sonde een naam</StyledText>
-									<StyledText type="paragh" style={{ color: Styling.Colors.white, lineHeight: 22, marginTop: 8 }}>
+									<StyledText type="paragh" style={{ color: Styling.Colors.white, lineHeight: scaled(22), marginTop: 8 }}>
 										Kies een herkenbare naam voor je sonde.
 									</StyledText>
 									<Spacer space={Styling.Spacing.reg} />
@@ -606,7 +607,7 @@ const styles = StyleSheet.create({
 	content: {
 		flex: 1,
 		alignItems: "center",
-		marginTop: -25,
+		marginTop: scaled(-25),
 	},
 	centeredContent: {
 		flex: 1,
@@ -623,7 +624,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "center",
-		minHeight: 56,
+		minHeight: scaled(56),
 		paddingVertical: 12,
 	},
 	finderTitle: {
@@ -631,7 +632,7 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		textAlignVertical: "center",
 		flexShrink: 1,
-		paddingHorizontal: 50,
+		paddingHorizontal: scaled(50),
 	},
 	greenBtn: {
 		backgroundColor: Styling.Colors.green,
@@ -657,7 +658,7 @@ const styles = StyleSheet.create({
 	explanation: {
 		color: Styling.Colors.white,
 		textAlign: "center",
-		lineHeight: 22,
+		lineHeight: scaled(22),
 	},
 	optionList: {
 		width: "100%",
@@ -697,8 +698,8 @@ const styles = StyleSheet.create({
 		marginTop: 24,
 	},
 	vegImage: {
-		width: 120,
-		height: 120,
+		width: scaled(120),
+		height: scaled(120),
 	},
 	checklistItems: {
 		justifyContent: "center",
@@ -748,7 +749,7 @@ const detailStyles = StyleSheet.create({
 	value: { color: Styling.Colors.white },
 	infoRow: {
 		position: "relative",
-		height: 260,
+		height: scaled(260),
 		marginTop: -10,
 		width: "100%",
 	},
@@ -821,3 +822,5 @@ const detailStyles = StyleSheet.create({
 		alignItems: "center",
 	},
 });
+
+

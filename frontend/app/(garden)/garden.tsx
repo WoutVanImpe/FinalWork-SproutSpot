@@ -22,6 +22,7 @@ import GardenGridItem, { GardenPlant } from "../../components/pages/garden/garde
 import { useOverlay } from "../../context/OverlayContext";
 import StyledAlert, { AlertButton } from "../../components/style/StyledAlert";
 import { useLocalSearchParams, router } from "expo-router";
+import { scaled } from "../../constants/scale";
 
 let vegCache: Record<string, PlantDetail> = {};
 
@@ -359,7 +360,7 @@ const Garden = () => {
 	if (plants.length === 0 && !isPlacing) {
 		return (
 			<View style={[styles.page, { alignItems: "center" }]}>
-				<Spacer space={230} />
+				<Spacer space={scaled(230)} />
 				<StyledText type="head3" style={{ textAlign: "center" }}>
 					Je tuin is nog leeg
 				</StyledText>
@@ -378,7 +379,7 @@ const Garden = () => {
 	return (
 		<>
 			<View style={styles.page}>
-				<Spacer space={110} />
+				<Spacer space={scaled(110)} />
 
 				{isEditing ? (
 					<>
@@ -558,3 +559,5 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 	},
 });
+
+

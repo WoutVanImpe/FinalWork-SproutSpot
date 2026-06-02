@@ -6,6 +6,7 @@ import StyledText from "../../../style/StyledText";
 import StyledButton from "../../../style/StyledButton";
 import Spacer from "../../../style/Spacer";
 import AccountHeader from "../header/AccountHeader";
+import { scaled } from "../../../../constants/scale";
 
 interface ValidateStep1Props {
 	plantName?: string;
@@ -49,14 +50,14 @@ const styles = StyleSheet.create({
 		paddingTop: Styling.Padding.sml,
 		width: "100%",
 		padding: 0,
-		paddingBottom: 120,
+		paddingBottom: scaled(120),
 	},
 	subheader: {
 		color: Styling.Colors.white,
 	},
 	bodyText: {
 		color: Styling.Colors.white,
-		lineHeight: 22,
+		lineHeight: scaled(22),
 	},
 	validateFooter: {
 		flexDirection: "row",
@@ -76,3 +77,5 @@ const styles = StyleSheet.create({
 		alignSelf: "stretch",
 	},
 });
+
+

@@ -12,6 +12,7 @@ import { getPlantById } from "../../services/plants";
 import type { PlantDetail } from "../../services/plants";
 import { formatSowingPeriod, formatTemperature } from "../../data/vegetables";
 import WaveBackground from "../../components/shared/WaveBackground";
+import { scaled } from "../../constants/scale";
 
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
 	<View style={detailStyles.row}>
@@ -74,7 +75,7 @@ const VegetableInfo = () => {
 
 			{/* Row 2: Image + General Info */}
 			<View style={styles.infoRow}>
-				<WaveBackground waveHeight={310} leftOffset={-770} widthMultiplier={6} style={{marginTop: 15}} />
+				<WaveBackground waveHeight={scaled(310)} leftOffset={scaled(-770)} widthMultiplier={6} style={{marginTop: 15}} />
 				<View style={styles.infoRowContent}>
 					<View style={styles.imageContainer}>
 						<Image source={{ uri: veg.image }} style={styles.image} resizeMode="contain" />
@@ -159,7 +160,7 @@ const VegetableInfo = () => {
 			<TouchableOpacity onPress={() => router.push(`/(explore)/plant-step1?vegId=${id}`)} activeOpacity={0.7}>
 				<StyledButton>{"Deze " + veg.name.toLowerCase() + " planten"}</StyledButton>
 			</TouchableOpacity>
-			<Spacer space={175} />
+			<Spacer space={scaled(175)} />
 		</StyledView>
 	);
 };
@@ -185,7 +186,7 @@ const styles = StyleSheet.create({
 	},
 	infoRow: {
 		position: "relative",
-		height: 260,
+		height: scaled(260),
     marginTop: -10,
 	},
 	infoRowContent: {
@@ -250,3 +251,5 @@ const styles = StyleSheet.create({
 		textAlign: "right",
 	},
 });
+
+

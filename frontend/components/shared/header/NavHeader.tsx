@@ -8,6 +8,7 @@ import AccountIcon from "../../../assets/icons/account.svg";
 import StyledIcon from "../../style/StyledIcon";
 import StyledText from "../../style/StyledText";
 import { getNotificationCount } from "../../../services/notifications";
+import { scaled } from "../../../constants/scale";
 
 const NavHeader = ({ style, ...props }: { style?: ViewStyle }) => {
 	const insets = useSafeAreaInsets();
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
 		alignItems: "stretch",
 
 		paddingHorizontal: BAR_MARGIN,
-        paddingTop: 20,
+        paddingTop: scaled(20),
 	},
 	logo: {
 		color: Styling.Colors.white,
@@ -66,20 +67,22 @@ const styles = StyleSheet.create({
 	},
 	badge: {
 		position: "absolute",
-		top: -4,
-		right: -6,
-		minWidth: 18,
-		height: 18,
-		borderRadius: 9,
+		top: scaled(-4),
+		right: scaled(-6),
+		minWidth: scaled(18),
+		height: scaled(18),
+		borderRadius: scaled(9),
 		backgroundColor: Styling.Colors.red,
 		justifyContent: "center",
 		alignItems: "center",
-		paddingHorizontal: 4,
+		paddingHorizontal: scaled(4),
 	},
 	badgeText: {
 		color: Styling.Colors.white,
 		fontSize: 10,
 		fontFamily: Styling.Fonts.Family.bold,
-		lineHeight: 12,
+		lineHeight: scaled(12),
 	},
 });
+
+
