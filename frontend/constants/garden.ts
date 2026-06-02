@@ -22,10 +22,10 @@ export function clampOffset(
 	const scaledW = gw * scale;
 	const scaledH = gh * scale;
 
-	const minX = scaledW <= vw ? vw / 2 - cx : vw - cx * (1 - scale) - gw * scale;
-	const maxX = scaledW <= vw ? vw / 2 - cx : cx * (scale - 1);
-	const minY = scaledH <= vh ? vh / 2 - cy : vh - cy * (1 - scale) - gh * scale;
-	const maxY = scaledH <= vh ? vh / 2 - cy : cy * (scale - 1);
+	const minX = scaledW <= vw ? vw / 2 - cx : vw - gw * scale;
+	const maxX = scaledW <= vw ? vw / 2 - cx : 0;
+	const minY = scaledH <= vh ? vh / 2 - cy : vh - gh * scale;
+	const maxY = scaledH <= vh ? vh / 2 - cy : 0;
 
 	return {
 		x: Math.min(maxX, Math.max(minX, desired.x)),
