@@ -54,7 +54,7 @@ const Index = () => {
 			.finally(() => setLoading(false));
 	}, []));
 
-	const homePlants = plants.map(toHomePlant);
+	const homePlants = plants.map(toHomePlant).sort((a, b) => (a.warning === b.warning ? 0 : a.warning ? -1 : 1));
 
 	const handleItemPress = (id: string) => {
 		router.push(`/(garden)/garden?selectedPlantId=${id}`);
