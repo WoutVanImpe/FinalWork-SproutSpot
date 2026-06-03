@@ -133,15 +133,15 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 									</StyledText>
 									<Spacer space={Styling.Spacing.xsm} />
 
-									<Row label="Water" value={`${plant.water.level}%`}>
+									<Row label="Water" value={plant.water.level < 20 ? "droog" : plant.water.level < 50 ? "licht vochtig" : plant.water.level < 80 ? "vochtig" : "nat"}>
 										<StatusBar level={plant.water.level} optimalMin={plant.water.optimalMin} optimalMax={plant.water.optimalMax} />
 									</Row>
 									<Spacer space={Styling.Spacing.sml} />
-									<Row label="Licht" value={`${plant.light.level}%`}>
+									<Row label="Licht" value={plant.light.level < plant.light.optimalMin * 0.5 ? "donker" : plant.light.level < plant.light.optimalMin ? "halfschaduw" : "volle zon"}>
 										<StatusBar level={plant.light.level} optimalMin={plant.light.optimalMin} optimalMax={plant.light.optimalMax} />
 									</Row>
 									<Spacer space={Styling.Spacing.sml} />
-									<Row label="Warmte" value={`${plant.temperature.level}°C`}>
+									<Row label="Warmte" value={`${Math.round(plant.temperature.level)}°C`}>
 										<StatusBar level={plant.temperature.level} optimalMin={plant.temperature.optimalMin} optimalMax={plant.temperature.optimalMax} />
 									</Row>
 									<Spacer space={Styling.Spacing.sml} />
@@ -256,6 +256,7 @@ const styles = StyleSheet.create({
 		color: Styling.Colors.white,
 	},
 });
+
 
 
 
