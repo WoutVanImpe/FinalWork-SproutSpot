@@ -16,7 +16,7 @@ const BAR_FILL_MIN_H = scaled(6);
 const StatusBar = ({ level, optimalMin, optimalMax }: { level: number; optimalMin: number; optimalMax: number }) => {
 	return (
 		<View style={statusBarStyles.track}>
-			<View style={[statusBarStyles.fill, { width: `${level}%`, left: 1 }]} />
+			<View style={[statusBarStyles.fill, { width: `${Math.max(level, 5)}%`, left: 1 }]} />
 			<View style={[statusBarStyles.optimalMark, { left: `${optimalMin}%` }]} />
 			<View style={[statusBarStyles.optimalMark, { left: `${optimalMax}%` }]} />
 		</View>
@@ -133,15 +133,15 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 									</StyledText>
 									<Spacer space={Styling.Spacing.xsm} />
 
-									<Row label="Water" value={plant.water.label}>
+									<Row label="Water" value={`${plant.water.level}%`}>
 										<StatusBar level={plant.water.level} optimalMin={plant.water.optimalMin} optimalMax={plant.water.optimalMax} />
 									</Row>
 									<Spacer space={Styling.Spacing.sml} />
-									<Row label="Licht" value={plant.light.label}>
+									<Row label="Licht" value={`${plant.light.level}%`}>
 										<StatusBar level={plant.light.level} optimalMin={plant.light.optimalMin} optimalMax={plant.light.optimalMax} />
 									</Row>
 									<Spacer space={Styling.Spacing.sml} />
-									<Row label="Warmte" value={plant.temperature.label}>
+									<Row label="Warmte" value={`${plant.temperature.level}°C`}>
 										<StatusBar level={plant.temperature.level} optimalMin={plant.temperature.optimalMin} optimalMax={plant.temperature.optimalMax} />
 									</Row>
 									<Spacer space={Styling.Spacing.sml} />
@@ -256,5 +256,6 @@ const styles = StyleSheet.create({
 		color: Styling.Colors.white,
 	},
 });
+
 
 

@@ -11,7 +11,7 @@ const BAR_FILL_MIN_H = scaled(8);
 const StatusBar = ({ level, optimalMin, optimalMax }: { level: number; optimalMin: number; optimalMax: number }) => {
   return (
     <View style={styles.track}>
-      <View style={[styles.fill, { width: `${level}%` }]} />
+      <View style={[styles.fill, { width: `${Math.max(level, 5)}%` }]} />
       <View style={[styles.optimalMark, { left: `${optimalMin}%` }]} />
       <View style={[styles.optimalMark, { left: `${optimalMax}%` }]} />
     </View>
