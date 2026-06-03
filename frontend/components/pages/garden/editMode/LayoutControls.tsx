@@ -8,8 +8,9 @@ import ZoomInIcon from "../../../../assets/icons/zoom_in.svg";
 import ZoomOutIcon from "../../../../assets/icons/zoom_out.svg";
 import { Styling } from "../../../../constants/Styling";
 import { BAR_MARGIN } from "../../../../constants/tabConfig";
+import { scaled } from "../../../../constants/scale";
 
-const BTN_SIZE = 32;
+const BTN_SIZE = scaled(32);
 
 const BtnGroup = ({
 	label,
@@ -147,3 +148,5 @@ const zoomStyles = StyleSheet.create({
 		borderRadius: Styling.BorderRadius.reg,
 	},
 });
+
+

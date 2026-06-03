@@ -3,9 +3,10 @@ import React from "react";
 import { Styling } from "../../../../constants/Styling";
 import StyledText from "../../../style/StyledText";
 import Spacer from "../../../style/Spacer";
+import { scaled } from "../../../../constants/scale";
 
-const BAR_TRACK_H = 10;
-const BAR_FILL_MIN_H = 8;
+const BAR_TRACK_H = scaled(10);
+const BAR_FILL_MIN_H = scaled(8);
 
 const StatusBar = ({ level, optimalMin, optimalMax }: { level: number; optimalMin: number; optimalMax: number }) => {
   return (
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
   description: {
     color: Styling.Colors.white,
     fontStyle: "italic",
-    marginTop: 4,
+    marginTop: Styling.Spacing.xsm,
     lineHeight: 18,
   },
   track: {
@@ -111,3 +112,5 @@ const styles = StyleSheet.create({
     borderRadius: 1,
   },
 });
+
+

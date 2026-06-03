@@ -3,9 +3,10 @@ import React from "react";
 import { Styling } from "../../../../constants/Styling";
 import StyledText from "../../../style/StyledText";
 import Spacer from "../../../style/Spacer";
+import { scaled } from "../../../../constants/scale";
 
-const BAR_TRACK_H = 8;
-const BAR_FILL_MIN_H = 6;
+const BAR_TRACK_H = scaled(8);
+const BAR_FILL_MIN_H = scaled(6);
 
 interface Stage {
   label: string;
@@ -136,13 +137,15 @@ const styles = StyleSheet.create({
   },
   dayLabel: {
     color: Styling.Colors.white,
-    width: 80,
+    width: scaled(80),
     textAlign: "right",
     lineHeight: 14,
   },
   description: {
     color: Styling.Colors.white,
-    lineHeight: 22,
+    lineHeight: scaled(22),
     fontFamily: Styling.Fonts.Family.reg,
   },
 });
+
+

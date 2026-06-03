@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { BAR_MARGIN } from "../../constants/tabConfig";
 import { ScrollContext } from "../../context/ScrollContext";
+import { scaled } from "../../constants/scale";
 
 const StyledView = ({ style, children, ...props }: { style?: ViewStyle | ViewStyle[]; safe?: boolean; children?: ReactNode }) => {
 	const insets = useSafeAreaInsets();
@@ -50,7 +51,9 @@ const styles = StyleSheet.create({
 		justifyContent: "flex-start",
 	},
 	contentPadding: {
-		paddingTop: 110,
+		paddingTop: scaled(110),
 		paddingHorizontal: BAR_MARGIN,
 	},
 });
+
+

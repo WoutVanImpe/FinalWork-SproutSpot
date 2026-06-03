@@ -8,6 +8,7 @@ import AccountHeader from "../header/AccountHeader";
 import NameEditModal from "./NameEditModal";
 import PasswordEditModal from "./PasswordEditModal";
 import TimeSlotsModal, { formatActiveHours } from "./TimeSlotsModal";
+import { scaled } from "../../../../constants/scale";
 
 interface SettingsViewProps {
 	onBack: () => void;
@@ -135,7 +136,7 @@ const styles = StyleSheet.create({
 		paddingTop: Styling.Padding.sml,
 		width: "100%",
 		padding: 0,
-		paddingBottom: 120,
+		paddingBottom: scaled(120),
 	},
 	subheader: {
 		color: Styling.Colors.white,
@@ -165,3 +166,5 @@ const styles = StyleSheet.create({
 		color: Styling.Colors.green,
 	},
 });
+
+

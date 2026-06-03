@@ -5,6 +5,7 @@ import StyledView from "../../../style/StyledView";
 import StyledText from "../../../style/StyledText";
 import AccountHeader from "../header/AccountHeader";
 import Spacer from "../../../style/Spacer";
+import { scaled } from "../../../../constants/scale";
 
 export interface HistoryEntry {
 	id: string;
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
 		paddingTop: Styling.Padding.sml,
 		width: "100%",
 		padding: 0,
-		paddingBottom: 120,
+		paddingBottom: scaled(120),
 	},
 	dateHeader: {
 		color: Styling.Colors.white,
@@ -96,17 +97,19 @@ const styles = StyleSheet.create({
 		gap: Styling.Spacing.sml,
 	},
 	plantThumb: {
-		width: 36,
-		height: 36,
+		width: scaled(36),
+		height: scaled(36),
 		borderRadius: Styling.BorderRadius.sml,
 		marginRight: Styling.Spacing.sml,
 	},
 	historyTime: {
 		color: Styling.Colors.green,
-		width: 50,
+		width: scaled(50),
 	},
 	historyEvent: {
 		color: Styling.Colors.white,
 		flex: 1,
 	},
 });
+
+

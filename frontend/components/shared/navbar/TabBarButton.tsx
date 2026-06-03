@@ -3,6 +3,7 @@ import React from "react";
 import { Styling } from "../../../constants/Styling";
 import StyledIcon from "../../style/StyledIcon";
 import { TAB_WIDTH, BAR_HEIGHT } from "../../../constants/tabConfig";
+import { scaled } from "../../../constants/scale";
 
 const TabBarButton = ({
 	icon: Icon,
@@ -21,7 +22,7 @@ const TabBarButton = ({
 
 	const translateY = anim.interpolate({
 		inputRange: [0, 1],
-		outputRange: [0, -40],
+		outputRange: [0, scaled(-40)],
 	});
 	const circleScale = anim.interpolate({
 		inputRange: [0, 1],
@@ -56,16 +57,16 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	iconWrapper: {
-		width: 60,
-		height: 60,
+		width: scaled(60),
+		height: scaled(60),
 		justifyContent: "center",
 		alignItems: "center",
 	},
 	focusedCircle: {
 		position: "absolute",
-		width: 60,
-		height: 60,
-		borderRadius: 30,
+		width: scaled(60),
+		height: scaled(60),
+		borderRadius: scaled(30),
 		backgroundColor: Styling.Colors.green,
 		elevation: 8,
 		shadowColor: Styling.Colors.green,
@@ -74,3 +75,4 @@ const styles = StyleSheet.create({
 		shadowRadius: 5,
 	},
 });
+

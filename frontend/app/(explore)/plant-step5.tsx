@@ -8,6 +8,7 @@ import Spacer from "../../components/style/Spacer";
 import { useAuth } from "../../context/AuthContext";
 import { renameProbeByCode } from "../../services/probes";
 import FlowLayout from "../../components/pages/explore/plantFlow/FlowLayout";
+import { scaled } from "../../constants/scale";
 
 const PlantStep5 = () => {
   const { vegId, name } = useLocalSearchParams<{ vegId: string; name: string }>();
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
   },
   stepDesc: {
     color: Styling.Colors.white,
-    lineHeight: 22,
+    lineHeight: scaled(22),
   },
   guideStep: {
     flexDirection: "row",
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
   guideText: {
     color: Styling.Colors.white,
     flex: 1,
-    lineHeight: 22,
+    lineHeight: scaled(22),
   },
   codeBox: {
     width: "100%",
@@ -271,3 +272,5 @@ const styles = StyleSheet.create({
 });
 
 export default PlantStep5;
+
+

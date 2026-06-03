@@ -5,6 +5,7 @@ import StyledView from "../../../style/StyledView";
 import StyledText from "../../../style/StyledText";
 import Spacer from "../../../style/Spacer";
 import AccountHeader from "../header/AccountHeader";
+import { scaled } from "../../../../constants/scale";
 
 export interface NotificationViewItem {
 	id: string;
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
 		paddingTop: Styling.Padding.sml,
 		width: "100%",
 		padding: 0,
-		paddingBottom: 120,
+		paddingBottom: scaled(120),
 	},
 	emptyText: {
 		color: Styling.Colors.lightGrey,
@@ -120,8 +121,8 @@ const styles = StyleSheet.create({
 		gap: Styling.Spacing.sml,
 	},
 	plantThumb: {
-		width: 64,
-		height: 64,
+		width: scaled(64),
+		height: scaled(64),
 		borderRadius: Styling.BorderRadius.sml,
 		marginRight: Styling.Spacing.sml,
 	},
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
 	cardDescription: {
 		color: Styling.Colors.darkGrey,
 		marginTop: Styling.Spacing.xsm,
-		lineHeight: 20,
+		lineHeight: scaled(20),
 	},
 	cardActions: {
 		flexDirection: "row",
@@ -163,3 +164,5 @@ const styles = StyleSheet.create({
 		color: Styling.Colors.white,
 	},
 });
+
+

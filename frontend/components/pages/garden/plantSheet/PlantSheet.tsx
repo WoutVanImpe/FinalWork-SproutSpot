@@ -1,19 +1,17 @@
-import { Animated, Dimensions, Modal, ScrollView, StyleSheet, TouchableOpacity, View, ViewStyle } from "react-native";
+﻿import { Animated, useWindowDimensions, Modal, ScrollView, StyleSheet, TouchableOpacity, View, ViewStyle } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Styling } from "../../../../constants/Styling";
+import { scaled } from "../../../../constants/scale";
 import Spacer from "../../../style/Spacer";
 import StyledIcon from "../../../style/StyledIcon";
 import StyledText from "../../../style/StyledText";
 import CloseIcon from "../../../../assets/icons/close.svg"
 import { GardenPlant } from "../gardenGrid/GardenGridItem";
 
-
-const { height: SCREEN_HEIGHT } = Dimensions.get("window");
-
-const BAR_TRACK_H = 8;
-const BAR_FILL_MIN_H = 6;
+const BAR_TRACK_H = scaled(8);
+const BAR_FILL_MIN_H = scaled(6);
 
 const StatusBar = ({ level, optimalMin, optimalMax }: { level: number; optimalMin: number; optimalMax: number }) => {
 	return (
@@ -76,6 +74,7 @@ const rowStyles = StyleSheet.create({
 });
 
 const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; isVisible: boolean; onClose: () => void }) => {
+	const { height: SCREEN_HEIGHT } = useWindowDimensions();
 	const insets = useSafeAreaInsets();
 	const [internalVisible, setInternalVisible] = useState(false);
 	const slideAnim = useRef(new Animated.Value(0)).current;
@@ -108,7 +107,7 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 				<Animated.View style={[styles.backdrop, { opacity: opacityAnim }]}>
 					<TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
 				</Animated.View>
-				<Animated.View style={[styles.sheet, { transform: [{ translateY: sheetTranslateY }], paddingBottom: Styling.Padding.xlg + insets.bottom }]}>
+				<Animated.View style={[styles.sheet, { transform: [{ translateY: sheetTranslateY }], paddingBottom: Styling.Padding.xlg + insets.bottom, maxHeight: SCREEN_HEIGHT * 0.75 }]}>				
 					<View style={styles.handle} />
 					{plant && (
 						<ScrollView bounces={false} showsVerticalScrollIndicator={false}>
@@ -199,10 +198,9 @@ const styles = StyleSheet.create({
 	},
 	sheet: {
 		backgroundColor: Styling.Colors.white,
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		paddingHorizontal: 25,
-		maxHeight: SCREEN_HEIGHT * 0.75,
+		borderTopLeftRadius: scaled(30),
+		borderTopRightRadius: scaled(30),
+		paddingHorizontal: scaled(25),
 		shadowColor: "#000",
 		shadowOffset: { width: 0, height: -3 },
 		shadowOpacity: 0.12,
@@ -210,9 +208,9 @@ const styles = StyleSheet.create({
 		elevation: 10,
 	},
 	handle: {
-		width: 40,
-		height: 4,
-		borderRadius: 5,
+		width: scaled(40),
+		height: scaled(4),
+		borderRadius: scaled(5),
 		backgroundColor: Styling.Colors.darkGrey,
 		alignSelf: "center",
 		marginTop: Styling.Spacing.sml,
@@ -229,9 +227,9 @@ const styles = StyleSheet.create({
 		marginRight: Styling.Spacing.sml,
 	},
 	closeBtn: {
-		width: 32,
-		height: 32,
-		borderRadius: 16,
+		width: scaled(32),
+		height: scaled(32),
+		borderRadius: scaled(16),
 		backgroundColor: Styling.Colors.green,
 		alignItems: "center",
 		justifyContent: "center",
@@ -258,3 +256,5 @@ const styles = StyleSheet.create({
 		color: Styling.Colors.white,
 	},
 });
+
+

@@ -8,6 +8,7 @@ import StyledIcon from "../../../style/StyledIcon";
 import Spacer from "../../../style/Spacer";
 import AccountSvg from "../../../../assets/icons/account.svg";
 import { BAR_MARGIN } from "../../../../constants/tabConfig";
+import { scaled } from "../../../../constants/scale";
 
 interface AccountMainProps {
 	onNavigate: (view: string) => void;
@@ -19,7 +20,7 @@ const AccountMain = ({ onNavigate, onLogout, notificationCount }: AccountMainPro
 	<StyledView>
 		<View style={styles.mainContent}>
 			<View style={styles.profileCircle}>
-				<StyledIcon Icon={AccountSvg} size={150} fill={Styling.Colors.white} />
+				<StyledIcon Icon={AccountSvg} size={scaled(150)} fill={Styling.Colors.white} />
 			</View>
 			<Spacer space={Styling.Spacing.xxl} />
 			<View style={styles.buttonStack}>
@@ -94,21 +95,23 @@ const styles = StyleSheet.create({
 	},
 	notifBadge: {
 		position: "absolute",
-		right: 10,
-		top: 17,
+		right: scaled(10),
+		top: scaled(17),
 		transform: [{ translateY: -9 }],
-		minWidth: 24,
-		height: 24,
-		borderRadius: 9,
+		minWidth: scaled(24),
+		height: scaled(24),
+		borderRadius: scaled(9),
 		backgroundColor: Styling.Colors.white,
 		justifyContent: "center",
 		alignItems: "center",
-		paddingHorizontal: 4,
+		paddingHorizontal: scaled(4),
 	},
 	notifBadgeText: {
 		color: Styling.Colors.darkGrey,
-		fontSize: 12,
+		fontSize: scaled(12),
 		fontFamily: Styling.Fonts.Family.bold,
-		lineHeight: 12,
+		lineHeight: scaled(12),
 	},
 });
+
+

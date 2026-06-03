@@ -6,6 +6,7 @@ import CloseIcon from "../../assets/icons/close.svg";
 import StyledIcon from "./StyledIcon";
 import Spacer from "./Spacer";
 import StyledText from "./StyledText";
+import { scaled } from "../../constants/scale";
 
 export interface AlertButton {
 	text: string;
@@ -74,12 +75,12 @@ const styles = StyleSheet.create({
 		backgroundColor: "rgba(0,0,0,0.45)",
 		justifyContent: "center",
 		alignItems: "center",
-		paddingHorizontal: 40,
+		paddingHorizontal: scaled(40),
 	},
 	card: {
 		backgroundColor: Styling.Colors.white,
-		borderRadius: 20,
-		paddingHorizontal: 25,
+		borderRadius: scaled(20),
+		paddingHorizontal: scaled(25),
 		paddingVertical: Styling.Padding.lrg,
 		width: "100%",
 		shadowColor: "#000",
@@ -93,9 +94,9 @@ const styles = StyleSheet.create({
 		top: Styling.Padding.reg,
 		right: Styling.Padding.reg,
 		zIndex: 1,
-		width: 32,
-		height: 32,
-		borderRadius: 16,
+		width: scaled(32),
+		height: scaled(32),
+		borderRadius: scaled(16),
 		backgroundColor: Styling.Colors.green,
 		justifyContent: "center",
 		alignItems: "center",
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
 	message: {
 		color: Styling.Colors.darkGrey,
 		textAlign: "center",
-		lineHeight: 20,
+		lineHeight: scaled(20),
 	},
 	childrenContainer: {
 		marginTop: Styling.Spacing.sml,
@@ -141,3 +142,5 @@ const styles = StyleSheet.create({
 		color: Styling.Colors.green,
 	},
 });
+
+
