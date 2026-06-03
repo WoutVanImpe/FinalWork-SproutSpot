@@ -69,7 +69,7 @@ const QUESTIONS = [
 	},
 	{
 		title: "Hoeveel tijd heb je?",
-		explanation: "Sommige planten hebben elke dag aandacht nodig, andere kunnen een weekje zonder. Bedenk wat jij Ã©cht kunt geven.",
+		explanation: "Sommige planten hebben elke dag aandacht nodig, andere kunnen een weekje zonder. Bedenk wat jij écht kunt geven.",
 		options: [
 			{ label: "Dagelijks", value: "daily" },
 			{ label: "Wekelijks", value: "weekly" },
@@ -340,7 +340,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 								))}
 							</View>
 							<StyledText type="smParagh" style={detailStyles.totalTime}>
-								Totale tijd: Â±{veg.totalDays} dagen
+								Totale tijd: ±{veg.totalDays} dagen
 							</StyledText>
 
 							<Spacer space={Styling.Spacing.reg} />
@@ -501,7 +501,7 @@ const RegisterFlow = ({ onComplete }: RegisterFlowProps) => {
 									<GuideRow num="4." text="Vul daar je WiFi-naam, wachtwoord en onderstaande koppelcode in." />
 									<TouchableOpacity style={styles.codeBox} onPress={handleCopyCode} activeOpacity={0.7}>
 										<StyledText type="smParagh" style={{ color: Styling.Colors.lightGrey, marginBottom: 4 }}>
-											{copied ? "Gekopieerd!" : "Klik hier om je koppelcode te kopiÃ«ren"}
+											{copied ? "Gekopieerd!" : "Klik hier om je koppelcode te kopiëren"}
 										</StyledText>
 										<StyledText type="head3" style={{ color: Styling.Colors.green, letterSpacing: 2 }}>{pairingCode}</StyledText>
 									</TouchableOpacity>

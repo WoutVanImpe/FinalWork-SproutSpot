@@ -24,12 +24,12 @@ interface HomePlant {
 const toHomePlant = (p: EnrichedPlant): HomePlant => {
 	const alerts: string[] = [];
 	if (p.warning) {
-		if (p.water.level < p.water.optimalMin) alerts.push("DORST");
-		else if (p.water.level > p.water.optimalMax) alerts.push("te nat");
-		if (p.light.level < p.light.optimalMin) alerts.push("te donker");
-		else if (p.light.level > p.light.optimalMax) alerts.push("te licht");
-		if (p.temperature.level < p.temperature.optimalMin) alerts.push("te koud");
-		else if (p.temperature.level > p.temperature.optimalMax) alerts.push("te warm");
+		if (p.water.level < p.water.optimalMin) alerts.push("dorst");
+		else if (p.water.level > p.water.optimalMax) alerts.push("het te nat");
+		if (p.light.level < p.light.optimalMin) alerts.push("het te donker");
+		else if (p.light.level > p.light.optimalMax) alerts.push("het te licht");
+		if (p.temperature.level < p.temperature.optimalMin) alerts.push("het te koud");
+		else if (p.temperature.level > p.temperature.optimalMax) alerts.push("het te warm");
 	}
 	return {
 		id: p.id,
