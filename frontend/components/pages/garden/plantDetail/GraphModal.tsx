@@ -105,7 +105,7 @@ function buildMetrics(readings: ReadingRecord[], optimalRanges: GraphModalProps[
 	const maxLight = Math.max(...dataMap.map((d) => d.li), 100);
 	return [
 		{ key: "moist", label: "Vocht", unit: "%", optimalMin: optimalRanges.water.optimalMin, optimalMax: optimalRanges.water.optimalMax, yMax: 100, color: "#4A90D9", data: dataMap.map((d) => ({ value: d.mo, label: d.label })) },
-		{ key: "temp", label: "Temperatuur", unit: "Â°C", optimalMin: optimalRanges.temperature.optimalMin, optimalMax: optimalRanges.temperature.optimalMax, yMax: maxTemp, color: "#C44028", data: dataMap.map((d) => ({ value: d.te, label: d.label })) },
+		{ key: "temp", label: "Temperatuur", unit: "°C", optimalMin: optimalRanges.temperature.optimalMin, optimalMax: optimalRanges.temperature.optimalMax, yMax: maxTemp, color: "#C44028", data: dataMap.map((d) => ({ value: d.te, label: d.label })) },
 		{ key: "light", label: "Licht", unit: "%", optimalMin: optimalRanges.light.optimalMin, optimalMax: optimalRanges.light.optimalMax, yMax: maxLight, color: "#F5A623", data: dataMap.map((d) => ({ value: d.li, label: d.label })) },
 	];
 }
@@ -169,7 +169,7 @@ const GraphModal = ({ visible, onDismiss, readings, readingsLoading, optimalRang
 								{metric.label}
 							</StyledText>
 							<StyledText type="paragh" style={styles.dropdownArrow}>
-								{dropdownOpen ? "â–²" : "â–¼"}
+								{dropdownOpen ? "▲" : "▼"}
 							</StyledText>
 						</TouchableOpacity>
 
