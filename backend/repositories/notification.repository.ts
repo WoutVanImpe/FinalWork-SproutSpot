@@ -27,6 +27,7 @@ export class NotificationRepository {
 			"up.id as raw_user_plant_id",
 			"up.current_stage_order",
 			db.raw("(SELECT stage_order FROM plant_stages WHERE plant_id = up.plant_id AND stage_order = up.current_stage_order + 1 LIMIT 1) as next_stage_order"),
+			db.raw("(SELECT validation_description FROM plant_stages WHERE plant_id = up.plant_id AND stage_order = up.current_stage_order + 1 LIMIT 1) as validation_description"),
 		);
 	}
 

@@ -28,6 +28,7 @@ function apiNotifToView(n: ApiNotification): NotificationViewItem {
 		userPlantId: n.userPlantId ?? undefined,
 		nextStageOrder: n.nextStageOrder ?? undefined,
 		plantName: n.plantName ?? undefined,
+		validationDescription: n.validationDescription ?? undefined,
 	};
 }
 
@@ -69,7 +70,7 @@ const Account = () => {
 	const [pushEnabled, setPushEnabled] = useState(true);
 	const [activeHours, setActiveHours] = useState<number[]>([8, 9, 10]);
 	const [historyEntries, setHistoryEntries] = useState<HistoryEntry[]>([]);
-	const [validatingNotif, setValidatingNotif] = useState<{ id: string; userPlantId: number; nextStageOrder: number; plantName?: string } | null>(null);
+	const [validatingNotif, setValidatingNotif] = useState<{ id: string; userPlantId: number; nextStageOrder: number; plantName?: string; validationDescription?: string } | null>(null);
 	const isValidatingRef = useRef(false);
 	const unacknowledgedCount = notifications.filter((n) => !n.snoozed).length;
 
@@ -187,9 +188,9 @@ const Account = () => {
 		case "main":
 			return <AccountMain onNavigate={setCurrentView} onLogout={handleLogout} notificationCount={unacknowledgedCount} />;
 		case "notifications":
-			return <NotificationsView notifications={notifications} onBack={() => setCurrentView("main")} onDismiss={handleDismiss} onSnooze={handleSnooze} onValidate={(notifId, userPlantId, nextStageOrder, plantName) => { isValidatingRef.current = true; setValidatingNotif({ id: notifId, userPlantId, nextStageOrder, plantName }); setCurrentView("validate_step1"); }} />;
+			return <NotificationsView notifications={notifications} onBack={() => setCurrentView("main")} onDismiss={handleDismiss} onSnooze={handleSnooze} onValidate={(notifId, userPlantId, nextStageOrder, plantName, validationDescription) => { isValidatingRef.current = true; setValidatingNotif({ id: notifId, userPlantId, nextStageOrder, plantName, validationDescription }); setCurrentView("validate_step1"); }} />;
 		case "validate_step1":
-			return <ValidateStep1 plantName={validatingNotif?.plantName} onBack={() => { isValidatingRef.current = false; if (validatingNotif) { resetNotification(validatingNotif.id, 48); setValidatingNotif(null); } setCurrentView("main"); }} onNext={() => setCurrentView("validate_step2")} />;
+			return <ValidateStep1 plantName={validatingNotif?.plantName} validationDescription={validatingNotif?.validationDescription} onBack={() => { isValidatingRef.current = false; setValidatingNotif(null); setCurrentView("main"); }} onNext={() => setCurrentView("validate_step2")} />;
 		case "validate_step2":
 			return <ValidateStep2 plantName={validatingNotif?.plantName} onBack={() => setCurrentView("validate_step1")} onConfirm={handleConfirmPhaseUpdate} />;
 		case "history":

@@ -11,6 +11,7 @@ export interface NotificationItem {
 	userPlantId: number | null;
 	nextStageOrder: number | null;
 	plantName: string | null;
+	validationDescription: string | null;
 }
 
 export function getNotifications(all = false) {
