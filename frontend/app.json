@@ -19,7 +19,7 @@
 		"android": {
 			"package": "com.sproutspot.app",
 			"adaptiveIcon": {
-				"foregroundImage": "./assets/icon.png",
+				"foregroundImage": "./assets/adaptive-foreground.png",
 				"backgroundColor": "#ffffff"
 			},
 			"edgeToEdgeEnabled": true,
