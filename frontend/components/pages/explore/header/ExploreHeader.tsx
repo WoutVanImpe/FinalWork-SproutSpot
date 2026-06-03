@@ -13,7 +13,7 @@ interface ExploreHeaderProps {
 const ExploreHeader = ({ onButtonPress }: ExploreHeaderProps) => {
 	return (
 		<View style={styles.container}>
-			<WaveBackground visibleStart={311}/>
+			<WaveBackground visibleStart={scaled(430)}/>
 
 			<View style={styles.content}>
 				<StyledText type="head1" style={styles.title}>
