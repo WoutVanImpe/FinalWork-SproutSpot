@@ -117,10 +117,10 @@ export class NotificationRepository {
 			.join("users as u", "pn.user_id", "u.id")
 			.where("pn.notification_state", "sent")
 			.andWhere(function () {
-				this.where("pn.last_reminded_at", "<", db.raw("NOW() - INTERVAL '12 hours'"))
+				this.where("pn.last_reminded_at", "<", db.raw("NOW() - INTERVAL '8 hours'"))
 					.orWhereNull("pn.last_reminded_at");
 			})
-			.andWhere("pn.created_at", "<", db.raw("NOW() - INTERVAL '12 hours'"))
+			.andWhere("pn.created_at", "<", db.raw("NOW() - INTERVAL '8 hours'"))
 			.select(
 				"pn.id",
 				"pn.user_id",
