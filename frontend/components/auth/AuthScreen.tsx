@@ -5,6 +5,7 @@ import StyledText from "../style/StyledText";
 import StyledButton from "../style/StyledButton";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../context/AuthContext";
+import { scaled } from "../../constants/scale";
 
 interface AuthScreenProps {
 	onComplete: (mode: "login" | "register") => void;
@@ -267,7 +268,7 @@ export default AuthScreen;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		paddingHorizontal: 24,
+		paddingHorizontal: scaled(24),
 		backgroundColor: Styling.Colors.gradGrey,
 	},
 	scrollContent: {
@@ -275,7 +276,7 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		alignItems: "center",
-		marginTop: 40,
+		marginTop: scaled(40),
 		marginBottom: 32,
 	},
 	toggleRow: {
@@ -295,7 +296,7 @@ const styles = StyleSheet.create({
 		backgroundColor: Styling.Colors.green,
 	},
 	form: {
-		gap: 16,
+		gap: Styling.Spacing.med,
 	},
 	input: {
 		width: "100%",
@@ -327,3 +328,5 @@ const styles = StyleSheet.create({
 		marginTop: 32,
 	},
 });
+
+

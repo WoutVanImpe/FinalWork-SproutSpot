@@ -23,6 +23,7 @@ function mapNotification(n: any) {
 		userPlantId: n.raw_user_plant_id ?? null,
 		nextStageOrder: n.next_stage_order ?? null,
 		plantName: n.plant_name ?? null,
+		validationDescription: n.validation_description ?? null,
 	};
 }
 

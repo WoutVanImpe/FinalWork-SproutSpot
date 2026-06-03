@@ -6,14 +6,16 @@ import StyledText from "../../../style/StyledText";
 import StyledButton from "../../../style/StyledButton";
 import Spacer from "../../../style/Spacer";
 import AccountHeader from "../header/AccountHeader";
+import { scaled } from "../../../../constants/scale";
 
 interface ValidateStep1Props {
 	plantName?: string;
+	validationDescription?: string;
 	onBack: () => void;
 	onNext: () => void;
 }
 
-const ValidateStep1 = ({ plantName, onBack, onNext }: ValidateStep1Props) => (
+const ValidateStep1 = ({ plantName, validationDescription, onBack, onNext }: ValidateStep1Props) => (
 	<StyledView>
 		<AccountHeader title="Fase herkenning" onBack={onBack} />
 		<Spacer space={Styling.Spacing.med} />
@@ -26,9 +28,15 @@ const ValidateStep1 = ({ plantName, onBack, onNext }: ValidateStep1Props) => (
 				{plantName ? `${plantName} geeft aan dat het een nieuw groeistadium heeft bereikt.` : "Je plant heeft aangegeven dat het een nieuw groeistadium heeft bereikt."} Controleer of je plant de volgende kenmerken vertoont:
 			</StyledText>
 			<Spacer space={Styling.Spacing.reg} />
-			<StyledText type="paragh" style={styles.bodyText}>
-				In dit stadium beginnen zich bloemknoppen te vormen aan de toppen van de stengels. De bladeren worden groter en krijgen een diepere groene kleur. Dit is een teken dat de plant klaar is voor de volgende fase van groei.
-			</StyledText>
+			{validationDescription ? (
+				<StyledText type="paragh" style={styles.bodyText}>
+					{validationDescription}
+				</StyledText>
+			) : (
+				<StyledText type="paragh" style={styles.bodyText}>
+					In dit stadium beginnen zich bloemknoppen te vormen aan de toppen van de stengels. De bladeren worden groter en krijgen een diepere groene kleur. Dit is een teken dat de plant klaar is voor de volgende fase van groei.
+				</StyledText>
+			)}
 			<Spacer space={Styling.Spacing.lrg} />
 			<View style={styles.validateFooter}>
 				<TouchableOpacity style={styles.flexButton} onPress={onBack}>
@@ -49,14 +57,14 @@ const styles = StyleSheet.create({
 		paddingTop: Styling.Padding.sml,
 		width: "100%",
 		padding: 0,
-		paddingBottom: 120,
+		paddingBottom: scaled(120),
 	},
 	subheader: {
 		color: Styling.Colors.white,
 	},
 	bodyText: {
 		color: Styling.Colors.white,
-		lineHeight: 22,
+		lineHeight: scaled(22),
 	},
 	validateFooter: {
 		flexDirection: "row",
@@ -76,3 +84,5 @@ const styles = StyleSheet.create({
 		alignSelf: "stretch",
 	},
 });
+
+

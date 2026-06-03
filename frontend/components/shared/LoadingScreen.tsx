@@ -1,6 +1,7 @@
 import { StyleSheet, View, Animated, useWindowDimensions } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
 import Svg, { Path, Defs, LinearGradient, Stop, Rect } from "react-native-svg";
+import { scaled } from "../../constants/scale";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -130,3 +131,4 @@ const styles = StyleSheet.create({
 		elevation: 999,
 	},
 });
+

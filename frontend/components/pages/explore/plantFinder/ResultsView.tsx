@@ -8,6 +8,7 @@ import Spacer from "../../../style/Spacer";
 import BackIcon from "../../../../assets/icons/undo.svg";
 import { VegetableInfo } from "../../../../data/vegetables";
 import CardContainer from "../../../shared/vegetableCard/CardContainer";
+import { scaled } from "../../../../constants/scale";
 
 interface Props {
 	results: VegetableInfo[];
@@ -42,7 +43,7 @@ const ResultsView = ({ results, onRestart }: Props) => (
 				Opnieuw beginnen
 			</StyledText>
 		</TouchableOpacity>
-		<Spacer space={175} />
+		<Spacer space={scaled(175)} />
 	</StyledView>
 );
 
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
 	},
 	resultCount: {
 		color: Styling.Colors.white,
-		lineHeight: 22,
+		lineHeight: scaled(22),
 		textAlign: "center",
 		paddingHorizontal: Styling.Padding.reg,
 	},
@@ -78,3 +79,5 @@ const styles = StyleSheet.create({
 });
 
 export default ResultsView;
+
+

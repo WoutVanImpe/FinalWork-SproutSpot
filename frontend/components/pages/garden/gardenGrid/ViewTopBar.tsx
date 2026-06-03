@@ -6,6 +6,7 @@ import ZoomInIcon from "../../../../assets/icons/zoom_in.svg";
 import ZoomOutIcon from "../../../../assets/icons/zoom_out.svg";
 import { Styling } from "../../../../constants/Styling";
 import { BAR_MARGIN } from "../../../../constants/tabConfig";
+import { scaled } from "../../../../constants/scale";
 
 const ViewTopBar = ({
 	onEdit,
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
 		width: "100%",
 	},
 	editBtn: {
-		width: 150,
+		width: scaled(150),
 		backgroundColor: Styling.Colors.green,
 		paddingVertical: Styling.Padding.sml,
 		paddingHorizontal: Styling.Padding.lrg,
@@ -63,3 +64,5 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 });
+
+

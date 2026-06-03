@@ -11,6 +11,7 @@ import type { PlantDetail } from "../../services/plants";
 import type { ProbeInfo } from "../../services/probes";
 import FlowLayout from "../../components/pages/explore/plantFlow/FlowLayout";
 import ProbeIcon from "../../assets/icons/probe.svg";
+import { scaled } from "../../constants/scale";
 
 const PlantStep4 = () => {
   const { vegId, name } = useLocalSearchParams<{ vegId: string; name: string }>();
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
   hint: {
     color: Styling.Colors.white,
     textAlign: "center",
-    lineHeight: 22,
+    lineHeight: scaled(22),
   },
   choiceBtn: {
     flexDirection: "row",
@@ -149,3 +150,5 @@ const styles = StyleSheet.create({
 });
 
 export default PlantStep4;
+
+

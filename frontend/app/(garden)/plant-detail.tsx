@@ -15,6 +15,7 @@ import GraphModal from "../../components/pages/garden/plantDetail/GraphModal";
 import { GardenPlant } from "../../components/pages/garden/gardenGrid/GardenGridItem";
 import { getReadings, getPlantById, enrichedToGardenPlant } from "../../services/garden";
 import type { ReadingRecord } from "../../services/garden";
+import { scaled } from "../../constants/scale";
 
 const FALLBACK_STAGES: Record<string, { label: string; dayStart: number; dayEnd: number }[]> = {
   Tomaat: [
@@ -149,7 +150,7 @@ const PlantDetail = () => {
             </TouchableOpacity>
           </View>
         </View>
-        <Spacer space={120} />
+        <Spacer space={scaled(120)} />
         <StyledText type="paragh" style={{ textAlign: "center", color: Styling.Colors.white }}>
           Plant niet gevonden.
         </StyledText>
@@ -218,7 +219,7 @@ const PlantDetail = () => {
             Bekijk grafieken
           </StyledText>
         </TouchableOpacity>
-        <Spacer space={175} />
+        <Spacer space={scaled(175)} />
       </StyledView>
       <GraphModal
         visible={graphVisible}
@@ -273,3 +274,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+
+

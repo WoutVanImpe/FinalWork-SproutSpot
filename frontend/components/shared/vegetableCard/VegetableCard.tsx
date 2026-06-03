@@ -4,6 +4,7 @@ import StyledText from "../../style/StyledText";
 import WarningIcon from "../../../assets/icons/warning.svg";
 import { Styling } from "../../../constants/Styling";
 import StyledIcon from "../../style/StyledIcon";
+import { scaled } from "../../../constants/scale";
 
 export interface VegetableCardProps {
 	id: string;
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
 	},
 	image: {
 		width: "100%",
-		height: 100,
+		height: scaled(100),
 		marginBottom: Styling.Spacing.xsm,
 	},
 	name: {
@@ -55,7 +56,9 @@ const styles = StyleSheet.create({
 		borderRadius: Styling.BorderRadius.lrg,
 		position: "absolute",
 		top: 0,
-		right: -10,
+		right: scaled(-10),
 		zIndex: 1,
 	},
 });
+
+

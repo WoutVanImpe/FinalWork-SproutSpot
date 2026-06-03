@@ -1,4 +1,4 @@
-import type { Knex } from "knex";
+﻿import type { Knex } from "knex";
 
 export async function seed(knex: Knex): Promise<void> {
 	await knex("plant_stages").del();
@@ -10,7 +10,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 25, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De eerste groene puntjes van de muntplant komen boven de grond uit.",
 			requirements: JSON.stringify({ light: "Indirect zonlicht", water: "Licht vochtig houden" }),
 			instructions: JSON.stringify([
@@ -23,7 +23,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 25, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing heeft nu meerdere kleine, gekartelde muntblaadjes ontwikkeld.",
 			requirements: JSON.stringify({ light: "Halfschaduw", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -36,7 +36,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 25, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant is veranderd in een bossig struikje met een sterke muntgeur.",
 			requirements: JSON.stringify({ light: "Halfschaduw tot zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -49,7 +49,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 16,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 25, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De munttakken zijn lang genoeg en klaar om doorlopend geknipt te worden.",
 			requirements: JSON.stringify({ light: "Halfschaduw", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -63,7 +63,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Zeer fijne, kleine groene kiemblaadjes worden zichtbaar.",
 			requirements: JSON.stringify({ light: "Licht en warm", water: "Licht vochtig" }),
 			instructions: JSON.stringify([
@@ -76,7 +76,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 21,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De dunne zaailingen beginnen stevigere, houtachtige mini-takjes te vormen.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig" }),
 			instructions: JSON.stringify([
@@ -89,7 +89,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 30, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De tijm vormt een compact, klein struikje vol met aromatische naaldblaadjes.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Weinig" }),
 			instructions: JSON.stringify([
@@ -102,7 +102,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 30, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Het struikje is volwassen en de takjes kunnen geoogst worden.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Weinig" }),
 			instructions: JSON.stringify([
@@ -116,12 +116,12 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 28, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Na een lange periode komen de eerste naaldachtige kiemen tevoorschijn.",
 			requirements: JSON.stringify({ light: "Indirect licht", water: "Licht vochtig" }),
 			instructions: JSON.stringify([
 				"Wees geduldig! Rozemarijn heeft tijd nodig om te ontkiemen, het kan wel een maand duren voordat je iets ziet. Geef niet op.",
-				"Zorg dat de temperatuur rond de 20�C blijft en dat de aarde niet uitdroogt. Een warme, lichte plek binnenshuis werkt het beste."
+				"Zorg dat de temperatuur rond de 20ï¿½C blijft en dat de aarde niet uitdroogt. Een warme, lichte plek binnenshuis werkt het beste."
 			]),
 		},
 		{
@@ -129,7 +129,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 30, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing ontwikkelt duidelijke, stevige, opgaande naaldblaadjes.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig" }),
 			instructions: JSON.stringify([
@@ -142,7 +142,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 30,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 30, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Er heeft zich een klein, houtachtig mediterraan struikje gevormd.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Weinig" }),
 			instructions: JSON.stringify([
@@ -155,7 +155,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 30, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De rozemarijntakken zijn stevig en klaar om geplukt te worden.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Weinig" }),
 			instructions: JSON.stringify([
@@ -169,7 +169,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 25, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De bieslook komt op als dunne, dubbelgevouwen groene grassprietjes.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -182,7 +182,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 25, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De sprieten richten zich op en beginnen plukjes te vormen.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -195,7 +195,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 25, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Er staat een mooie, dichte pol met holle, stevige bieslooksprieten.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -208,7 +208,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 25, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De bieslookpol is volgroeid en klaar voor consumptie.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -222,12 +222,12 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 7,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Kleine ronde kiemblaadjes vouwen zich open.",
 			requirements: JSON.stringify({ light: "Indirect zonlicht", water: "Vochtig houden" }),
 			instructions: JSON.stringify([
 				"Dek de zaadjes niet of nauwelijks af met aarde. Basilicum heeft licht nodig om te ontkiemen, dus een heel fijn laagje is genoeg.",
-				"Houd de aarde warm en goed vochtig. Basilicum komt uit warme landen en houdt van een temperatuur rond de 22�C. Een dekentje van plasticfolie over de pot helpt om de warmte vast te houden."
+				"Houd de aarde warm en goed vochtig. Basilicum komt uit warme landen en houdt van een temperatuur rond de 22ï¿½C. Een dekentje van plasticfolie over de pot helpt om de warmte vast te houden."
 			]),
 		},
 		{
@@ -235,7 +235,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 28, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De eerste set echte, glanzende basilicumblaadjes is gevormd.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig water" }),
 			instructions: JSON.stringify([
@@ -248,7 +248,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant groeit uit tot een bossige plant met grote, geurende bladeren.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -261,7 +261,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 16, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 16, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Er kan doorlopend geoogst worden van deze volle basilicumplant.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -275,11 +275,11 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 7,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Kleine tomatenkiemen met langwerpige blaadjes zijn opgekomen.",
 			requirements: JSON.stringify({ light: "Indirect licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
-				"Houd de aarde warm (rond 20-22�C) en vochtig. Tomaten houden van warmte, dus een plekje boven de verwarming of in een warme kamer is ideaal.",
+				"Houd de aarde warm (rond 20-22ï¿½C) en vochtig. Tomaten houden van warmte, dus een plekje boven de verwarming of in een warme kamer is ideaal.",
 				"Zodra de eerste groene puntjes boven de grond komen, hebben ze meteen licht nodig. Zet ze dan direct op een lichte plek."
 			]),
 		},
@@ -288,7 +288,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 28, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing heeft stevige, diep ingesneden echte tomatenbladeren.",
 			requirements: JSON.stringify({ light: "Gedeeltelijke zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -301,7 +301,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De tomatenplant groeit krachtig omhoog met veel bladstengels.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -314,12 +314,12 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant schiet omhoog en de eerste trossen bloemknoppen vormen zich.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
 				"Geef elke dag een beetje water, liever elke dag een klein beetje dan af en toe heel veel. Als de plant plotseling veel water krijgt, kunnen de tomaatjes later barsten.",
-				"Begin nu met het geven van speciale tomatenvoeding (te koop bij het tuincentrum). E�n keer per week is genoeg."
+				"Begin nu met het geven van speciale tomatenvoeding (te koop bij het tuincentrum). Eï¿½n keer per week is genoeg."
 			]),
 		},
 		{
@@ -327,7 +327,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Bloei",
 			stage_order: 5,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Kleine gele bloemetjes hebben zich geopend aan de trossen.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -339,7 +339,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 6,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De eerste trossen met felrode, sappige kerstomaatjes zijn rijp.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -353,11 +353,11 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 5,
-			thresholds: JSON.stringify({ temp_min: 20, temp_max: 30, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 20, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Grote, krachtige kiembladen breken razendsnel door de grond.",
 			requirements: JSON.stringify({ light: "Indirect licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
-				"Komkommers hebben veel warmte nodig om te ontkiemen, rond de 22�C is ideaal. Een warme vensterbank boven de verwarming werkt goed.",
+				"Komkommers hebben veel warmte nodig om te ontkiemen, rond de 22ï¿½C is ideaal. Een warme vensterbank boven de verwarming werkt goed.",
 				"Houd de aarde constant een beetje vochtig, maar zorg dat er geen laagje water onder in de pot blijft staan."
 			]),
 		},
@@ -366,7 +366,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 20, temp_max: 30, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 20, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing maakt grote, ruwe, hartvormige bladeren aan.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -379,7 +379,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant ontwikkelt ranken en zoekt naar klimsteun.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -392,7 +392,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant groeit meterslang en maakt overal bloemknoppen aan.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -405,7 +405,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Bloei",
 			stage_order: 5,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Gele bloemen verschijnen, met daarachter al een mini-komkommertje.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -417,7 +417,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 6,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 28, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Mooie, egale, groen glanzende komkommers zijn klaar om geplukt te worden.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -431,7 +431,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 7,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Smal uitgerekte kiemblaadjes verschijnen in rijen.",
 			requirements: JSON.stringify({ light: "Licht", water: "Goed vochtig" }),
 			instructions: JSON.stringify([
@@ -444,7 +444,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De kenmerkende, malse, driehoekige spinaziebladeren worden gevormd.",
 			requirements: JSON.stringify({ light: "Halfschaduw", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -456,7 +456,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 18, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Een volle rozet met malse, donkergroene bladeren staat klaar.",
 			requirements: JSON.stringify({ light: "Halfschaduw", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -468,7 +468,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 13,
-			thresholds: JSON.stringify({ temp_min: 5, temp_max: 18, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 5, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De bladeren zijn groot genoeg om gegeten te worden.",
 			requirements: JSON.stringify({ light: "Halfschaduw", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -482,12 +482,12 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 7,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 28, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Enorme, dikke kiembladen komen krachtig opzetten.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
 				"Leg de grote zaden op hun zijkant in de aarde. Als je ze plat legt, kunnen ze gaan rotten voordat ze ontkiemen.",
-				"Houd de aarde lekker warm. Courgettes komen uit warme gebieden en ontkiemen het beste bij temperaturen rond de 22�C."
+				"Houd de aarde lekker warm. Courgettes komen uit warme gebieden en ontkiemen het beste bij temperaturen rond de 22ï¿½C."
 			]),
 		},
 		{
@@ -495,7 +495,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 28, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing krijgt grote, behaarde bladeren met gekartelde randen.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -507,7 +507,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 13,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 28, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant is veranderd in een gigantische, uitwaaierende bladplant.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -519,7 +519,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Bloei",
 			stage_order: 4,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 28, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Grote, felle oranje-gele bloemen openen zich onder het blad.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -531,7 +531,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 26, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De eerste jonge, glanzende courgettes liggen klaar onder de bladeren.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -545,7 +545,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 12,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Fijne sprietjes met vederlichte miniblaadjes komen op.",
 			requirements: JSON.stringify({ light: "Licht", water: "Constant vochtig" }),
 			instructions: JSON.stringify([
@@ -558,7 +558,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 18,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Het loof begint nu flink te groeien en lijkt op peterselie.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -570,11 +570,11 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Er staat een weelderige bos groen loof; ondergronds zwelt de wortel aan.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig" }),
 			instructions: JSON.stringify([
-				"Geef liever ��n keer per week veel water dan elke dag een beetje. Diep water geven zorgt dat de wortel diep de grond in groeit op zoek naar water."
+				"Geef liever ï¿½ï¿½n keer per week veel water dan elke dag een beetje. Diep water geven zorgt dat de wortel diep de grond in groeit op zoek naar water."
 			]),
 		},
 		{
@@ -582,7 +582,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 20, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De bovenkant van de oranje wortel steekt net boven de grond uit.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig" }),
 			instructions: JSON.stringify([
@@ -597,7 +597,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 4,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Binnen een paar dagen staan de hartvormige kiemblaadjes al fier overeind.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -610,7 +610,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 6,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailingen maken hun eerste echte ruwe bladeren aan.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -622,7 +622,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Onder de bladeren zwelt een felrood bolletje razendsnel op.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -634,7 +634,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 18, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Prachtige, ronde rode radijsknolletjes zijn perfect ontwikkeld.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -648,7 +648,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 7,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 20, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Stevige koolkiemen komen gelijkmatig op.",
 			requirements: JSON.stringify({ light: "Indirect licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -660,7 +660,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 20, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing heeft nu een aantal grote, grijsgroene bladeren.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -672,7 +672,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 24,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Er heeft zich een grote, krachtige koolplant gevormd met een dikke steel.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -684,7 +684,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "In het absolute centrum van de bladeren verschijnt de compacte groene bloemknop.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -696,7 +696,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 18, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De broccoliknop is groot, stevig en gesloten.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Minder water" }),
 			instructions: JSON.stringify([
@@ -710,7 +710,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 25, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Kleine ovale kiemblaadjes verschijnen langzaam boven de grond.",
 			requirements: JSON.stringify({ light: "Indirect licht", water: "Licht vochtig houden" }),
 			instructions: JSON.stringify([
@@ -723,7 +723,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 16,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 25, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De bladeren krijgen hun kenmerkende zachte, fluweelachtige textuur.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig water" }),
 			instructions: JSON.stringify([
@@ -736,7 +736,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 28, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant groeit uit tot een stevig, grijsgroen kruidenstruikje.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Weinig water" }),
 			instructions: JSON.stringify([
@@ -749,7 +749,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 28, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De saliebladeren zijn dik, aromatisch en oogstklaar.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Weinig water" }),
 			instructions: JSON.stringify([
@@ -763,7 +763,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 25, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Piepkleine, ronde kiemblaadjes vormen zich aan het oppervlak.",
 			requirements: JSON.stringify({ light: "Licht en warm", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -776,7 +776,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 25, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing ontwikkelt plukjes van kleine, ovale, behaarde blaadjes.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig" }),
 			instructions: JSON.stringify([
@@ -789,7 +789,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 25, soil_min: 30, soil_max: 65, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 30, soil_max: 65, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Een compacte, geurende bodembedekker van oregano is ontstaan.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Weinig" }),
 			instructions: JSON.stringify([
@@ -802,8 +802,8 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 25, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
-			validation_description: "De oregano zit boordevol etherische oli�n en is klaar voor gebruik.",
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			validation_description: "De oregano zit boordevol etherische oliï¿½n en is klaar voor gebruik.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Weinig" }),
 			instructions: JSON.stringify([
 				"Knip takjes af vlak boven de grond. De smaak is het sterkst vlak voordat de plant gaat bloeien. Dat is het perfecte moment om te oogsten."
@@ -816,7 +816,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De ronde zaden barsten open en de eerste kiemen verschijnen.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig houden" }),
 			instructions: JSON.stringify([
@@ -829,7 +829,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 12,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De eerste gekartelde blaadjes, die erg lijken op peterselie, groeien uit.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -841,7 +841,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 18,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant vormt een weelderige rozet vol met frisse korianderbladeren.",
 			requirements: JSON.stringify({ light: "Volle zon tot halfschaduw", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -854,7 +854,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 20, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De bladeren zijn volgroeid en klaar om vers geoogst te worden.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -868,7 +868,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 18,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Na een lange periode komen de fijne peterseliekiemen tevoorschijn.",
 			requirements: JSON.stringify({ light: "Indirect licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -880,7 +880,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De karakteristieke platte, diep ingesneden peterselieblaadjes openen zich.",
 			requirements: JSON.stringify({ light: "Halfschaduw", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -893,7 +893,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 28,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Er staat een stevige, volle bos gezonde bladpeterselie.",
 			requirements: JSON.stringify({ light: "Halfschaduw", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -906,7 +906,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 5, temp_max: 20, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 5, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De peterseliestengels zijn lang en stevig genoeg voor de oogst.",
 			requirements: JSON.stringify({ light: "Halfschaduw", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -920,7 +920,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 12,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 25, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Fijne, draadachtige groene sprietjes breken door het grondoppervlak.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -932,7 +932,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 13,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 25, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing ontwikkelt de kenmerkende vederlichte, zachte dille-naaldjes.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -944,7 +944,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 25, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De dilleplant groeit flink de hoogte in met weelderig, fijn loof.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig water" }),
 			instructions: JSON.stringify([
@@ -956,7 +956,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Het fijne dille-groen is klaar om geplukt en verwerkt te worden.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig water" }),
 			instructions: JSON.stringify([
@@ -970,11 +970,11 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 7,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De tomatenkiemen met langwerpige blaadjes staan boven de grond.",
 			requirements: JSON.stringify({ light: "Indirect licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
-				"Houd de aarde warm, rond 20 tot 22�C. Tomaten houden van warmte, dus een plekje boven de verwarming of in een warme kamer is ideaal.",
+				"Houd de aarde warm, rond 20 tot 22ï¿½C. Tomaten houden van warmte, dus een plekje boven de verwarming of in een warme kamer is ideaal.",
 				"Zodra de eerste groene puntjes te zien zijn, zet je de pot op een lichte plek."
 			]),
 		},
@@ -983,7 +983,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 28, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Eerste set gekartelde, echte bladeren is goed gevormd.",
 			requirements: JSON.stringify({ light: "Licht", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -995,7 +995,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 21,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De hoofdstengel wordt dikker en maakt veel zijbladeren aan.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1008,7 +1008,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 21,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant schiet omhoog. Okselscheuten (dieven) zijn zichtbaar.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1021,7 +1021,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Bloei",
 			stage_order: 5,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Trossen met kleine gele bloemen sieren de tomatenplant.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1033,7 +1033,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 6,
 			duration_days: 13,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Grote, volle tomaten zijn dieprood en plukklaar.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1047,7 +1047,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Koolkiemen met hartvormige blaadjes komen gelijkmatig op.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -1059,7 +1059,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Stevige jonge koolplantjes met blauwgroen blad hebben zich gevormd.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1071,7 +1071,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 35,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant vormt een metershoge, dikke opgaande stam met grote bladeren.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1083,7 +1083,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 40,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 20, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "In de bladoksels langs de stam ontwikkelen zich kleine, harde knopjes.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1095,7 +1095,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 30,
-			thresholds: JSON.stringify({ temp_min: 2, temp_max: 15, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 2, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De spruitjes onderaan de stam zijn compact, stevig en volgroeid.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Minder water" }),
 			instructions: JSON.stringify([
@@ -1109,7 +1109,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Kiemen verschijnen vlot boven de grond.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -1121,7 +1121,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plantjes hebben 4 echte, gladde koolbladeren ontwikkeld.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1133,7 +1133,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De grote buitenste bladeren beginnen zich naar binnen te vouwen.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1145,7 +1145,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 30,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Er vormt zich een loeiharde, dichte, gladde koolmassa in het centrum.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1157,7 +1157,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 5, temp_max: 18, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 5, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De witte koolkop is zwaar en keihard.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Minder water" }),
 			instructions: JSON.stringify([
@@ -1171,7 +1171,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De kiemblaadjes tonen direct een paars-rode gloed op de steeltjes.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -1183,7 +1183,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Mooie, dieppaarse koolplantjes zijn klaar om uitgeplant te worden.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1195,7 +1195,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De bladeren groeien breed uit met een prachtige waslaag.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1207,7 +1207,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 35,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Een compacte, donkerpaarse ronde kool sluit zich in het hart.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1219,7 +1219,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 5, temp_max: 18, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 5, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De dieppaarse rode kool is compact en volgroeid.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Minder water" }),
 			instructions: JSON.stringify([
@@ -1233,7 +1233,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 5,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Kleine kiempjes schieten vliegensvlug uit de grond.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -1246,7 +1246,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 7,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailingen vormen snel de eerste getande, pittig geurende blaadjes.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1258,7 +1258,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 13,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Een vol, mals bed van rucolablaadjes staat klaar.",
 			requirements: JSON.stringify({ light: "Volle zon tot halfschaduw", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1270,7 +1270,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 18, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De rucola is perfect van formaat en heerlijk pittig.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1283,7 +1283,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 7,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 28, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Grote, vlezige kiembladen duwen de grond krachtig opzij.",
 			requirements: JSON.stringify({ light: "Licht en warm", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -1295,7 +1295,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 13,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 28, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing ontwikkelt enorme, ruwe bladeren en begint te ranken.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1307,7 +1307,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 28, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Lange ranken kruipen alle kanten op met reusachtige bladeren.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1319,7 +1319,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Bloei",
 			stage_order: 4,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 28, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Grote gele bloemen openen zich; bij de vrouwelijke bloemen groeit een bolletje.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1331,7 +1331,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 35,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 25, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De pompoen is intens gekleurd en de steel is kurkachtig en droog.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Minder water" }),
 			instructions: JSON.stringify([
@@ -1345,11 +1345,11 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 12,
-			thresholds: JSON.stringify({ temp_min: 20, temp_max: 30, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 20, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Kleine auberginekiemen komen langzaam boven.",
 			requirements: JSON.stringify({ light: "Indirect licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
-				"Aubergines hebben veel warmte nodig om te ontkiemen. Een warmtematje of een plek boven de verwarming is ideaal, 22 tot 25�C is perfect."
+				"Aubergines hebben veel warmte nodig om te ontkiemen. Een warmtematje of een plek boven de verwarming is ideaal, 22 tot 25ï¿½C is perfect."
 			]),
 		},
 		{
@@ -1357,7 +1357,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 18,
-			thresholds: JSON.stringify({ temp_min: 20, temp_max: 30, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 20, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing ontwikkelt grote, zachte, lichtbehaarde bladeren.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1369,7 +1369,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant vormt een stevige, paarsachtige opgaande struik.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1382,7 +1382,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Bloei",
 			stage_order: 4,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Prachtige paarse bloemen met een geel hart openen zich.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1394,7 +1394,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 28, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De aubergines zijn dieppaars, glanzen mooi en geven licht mee.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1408,11 +1408,11 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De eerste paprika-kiempjes breken door de grond heen.",
 			requirements: JSON.stringify({ light: "Indirect licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
-				"Zorg voor warmte (minimaal 20�C) en houd de aarde vochtig. Paprika's houden van een lekker warm plekje."
+				"Zorg voor warmte (minimaal 20ï¿½C) en houd de aarde vochtig. Paprika's houden van een lekker warm plekje."
 			]),
 		},
 		{
@@ -1420,7 +1420,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 28, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing ontwikkelt de eerste sets puntige, glanzende bladeren.",
 			requirements: JSON.stringify({ light: "Licht", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1432,7 +1432,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 21,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De paprikaplant is nu een stevig, rechtopstaand struikje geworden.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1445,7 +1445,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant vertakt zich in de top en maakt overal bloemknopjes aan.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1457,7 +1457,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Bloei",
 			stage_order: 5,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Mooie, stervormige witte bloemetjes sieren de plant.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1469,7 +1469,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 6,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 16, temp_max: 30, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 16, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De paprika's zijn stevig, glanzen en zijn volledig helderrood gekleurd.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1483,7 +1483,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 7,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 20, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De ronde koolzaadjes kiemen vlot uit.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -1495,7 +1495,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 20, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Grote, grijsblauwe koolbladeren sieren de jonge zaailing.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1507,7 +1507,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 24,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De bloemkoolplant vormt een weelderig, groot rozet van opgaande bladeren.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1519,7 +1519,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "In het verborgen hart verschijnt een spierwitte, compacte bloemknop.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1531,7 +1531,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 18, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De bloemkool is groot, spierwit en de structuur is nog volledig gesloten.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Minder water" }),
 			instructions: JSON.stringify([
@@ -1545,7 +1545,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De eerste dikke, donkergroene scheuten breken door de aangeaarde grondrug.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Licht vochtig" }),
 			instructions: JSON.stringify([
@@ -1557,7 +1557,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Er groeit een stevige bos met ruwe, samengestelde bladeren.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1569,7 +1569,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 30,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Het loof staat weelderig volwassen; ondergronds groeien de knollen.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1581,7 +1581,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Het loof begint nu geel te kleuren en langzaam af te sterven.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Minder water" }),
 			instructions: JSON.stringify([
@@ -1593,7 +1593,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 18, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Het loof is volledig dood; de aardappels ondergronds hebben een stevige schil.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Droog" }),
 			instructions: JSON.stringify([
@@ -1607,7 +1607,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 22, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Piepkleine, delicate kiemblaadjes komen traag boven.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig houden" }),
 			instructions: JSON.stringify([
@@ -1620,7 +1620,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailingen vormen fijne selderijblaadjes en ruiken al kruidig.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1632,7 +1632,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 45,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Een flinke bos met donkergroen loof staat fier; de knolbasis zwelt.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1644,7 +1644,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 40,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De robuuste, karakteristieke knol zit nu voor de helft boven de grond.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1656,7 +1656,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 5, temp_max: 18, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 5, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De knol is massief en groot genoeg om te oogsten.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig water" }),
 			instructions: JSON.stringify([
@@ -1669,7 +1669,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 7,
-			thresholds: JSON.stringify({ temp_min: 16, temp_max: 26, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 16, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Dikke, grasachtige kokerkiemen schieten snel omhoog.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -1681,7 +1681,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 16, temp_max: 26, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 16, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant vormt brede, rietachtige bladeren en een krachtige stengel.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1693,7 +1693,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 24,
-			thresholds: JSON.stringify({ temp_min: 14, temp_max: 26, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 14, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De maisstengels zijn manshoog geworden met brede uitwaaiende bladeren.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1705,7 +1705,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 14, temp_max: 26, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 14, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "In de bladoksels verschijnen kolven, met aan de top een pluim.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1717,7 +1717,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Bloei",
 			stage_order: 5,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 14, temp_max: 26, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 14, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De pluimen strooien stuifmeel; de maA?skolven krijgen lange, harige kwasten.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1729,7 +1729,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 6,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 24, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De kwasten zijn donkerbruin en verdroogd. De kolf staat schuin van de stengel.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig" }),
 			instructions: JSON.stringify([
@@ -1743,7 +1743,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Fijne groene speldenprikjes buigen zich recht uit de grond.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -1756,7 +1756,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailingen vormen dunne, holle, rechtopstaande sprieten.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1768,7 +1768,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De stengelbasis kleurt helderwit en de sprieten worden stevig en dik.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1780,7 +1780,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 20, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De bosuitjes zijn potlooddik en de bladeren frisgroen.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1794,7 +1794,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De eerste pittige kiemblaadjes vouwen open.",
 			requirements: JSON.stringify({ light: "Indirect licht", water: "Vochtig houden" }),
 			instructions: JSON.stringify([
@@ -1806,7 +1806,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 28, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Eerste set echte bladeren staat krachtig op de zaailing.",
 			requirements: JSON.stringify({ light: "Licht", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1818,7 +1818,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 21,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De jalapenoplant is een bossig, stevig struikje met donkergroen blad.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1830,7 +1830,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Kleine knopjes vormen zich in de splitsingen van de takken.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1842,7 +1842,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Bloei",
 			stage_order: 5,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Witte bloemetjes hangen omlaag; de bloembladeren vallen langzaam af.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1854,7 +1854,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 6,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 16, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 16, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De jalapeno's zijn stevig, donkergroen en tonen soms lichte groeilijntjes.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1868,7 +1868,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaadjes kiemen en dunne kiemblaadjes verschijnen.",
 			requirements: JSON.stringify({ light: "Indirect licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -1880,7 +1880,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 28, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing krijgt z'n eerste typische peperblaadjes.",
 			requirements: JSON.stringify({ light: "Licht", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1892,7 +1892,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 21,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant groeit uit tot een vertakt, opgaand groen struikje.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1904,7 +1904,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Talloze bloemknoppen hangen klaar aan de stengels.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1916,7 +1916,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Bloei",
 			stage_order: 5,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Bloemetjes bloeien en de basis van de eerste pepers zwelt op.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -1928,7 +1928,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 6,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 16, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 16, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Lange chilipepers zijn volledig glanzend dieprood gekleurd.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1942,7 +1942,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 12,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Dunne, donkere uienlusjes richten zich langzaam op.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -1954,7 +1954,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 18,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Het uienloof groeit gestaag omhoog in strakke blauwgroene pijpen.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -1966,7 +1966,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 30,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De basis van de ui zwelt op en de paars-rode rokken worden zichtbaar.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig water" }),
 			instructions: JSON.stringify([
@@ -1978,7 +1978,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Het loof knikt vanzelf om en begint bruin en droog te worden.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Weinig water" }),
 			instructions: JSON.stringify([
@@ -1990,7 +1990,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 18, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De uienbollen liggen stevig droog in de grond met een papierachtige schil.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Droog" }),
 			instructions: JSON.stringify([
@@ -2004,7 +2004,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 12,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De fijne uiensprietjes komen gelijkmatig op uit de grond.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -2016,7 +2016,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 18,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Stevige uienpijpen groeien recht omhoog.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2028,7 +2028,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 30,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Ondergronds vormt zich een mooie, dikke, goudgele uienbol.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig water" }),
 			instructions: JSON.stringify([
@@ -2040,7 +2040,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Het loof van de gele ui valt om en droogt geelbruin in.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Weinig water" }),
 			instructions: JSON.stringify([
@@ -2052,7 +2052,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 18, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 30, soil_max: 60, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De gele uien zijn volgroeid en klaar voor langdurige bewaring.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Droog" }),
 			instructions: JSON.stringify([
@@ -2066,7 +2066,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Fijne preisprietjes komen in rijen op.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -2078,7 +2078,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 21,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De preiplantjes zijn potlooddik en klaar om diep uitgeplant te worden.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2090,7 +2090,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 35,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De prei vormt stevige waaierbladeren en de schacht groeit.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -2102,7 +2102,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 30,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 20, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 60, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De preistammen zijn dik, zwaar en robuust ontwikkeld.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -2114,7 +2114,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 4, temp_max: 18, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 4, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De prei is dik genoeg en klaar voor consumptie.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2128,7 +2128,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 18, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Krachtige, gekrulde kiemscheuten breken door de grond.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -2140,7 +2140,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 12,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 18, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing ontwikkelt fijne grijpgraten (ranken) om te klimmen.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2152,7 +2152,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 18,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 18, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De doperwt klimt flink omhoog en vormt een dichte, groene wand.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2164,7 +2164,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Bloei",
 			stage_order: 4,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 18, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Prachtige witte, vlinderachtige bloemetjes sieren de klimplant.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2176,7 +2176,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 18, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De peulen zijn dik, rond en de doperwten binnenin zijn duidelijk voelbaar.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2190,7 +2190,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Fijne geveerde kiemblaadjes komen langzaam op.",
 			requirements: JSON.stringify({ light: "Licht", water: "Constant vochtig" }),
 			instructions: JSON.stringify([
@@ -2203,7 +2203,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 21,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Het weelderige loof groeit stevig uit en lijkt op peterselie.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2215,7 +2215,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 35,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 20, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Een volle, grote bos groen loof bedekt de bodem; de lange wortel groeit diep.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Matig water" }),
 			instructions: JSON.stringify([
@@ -2227,7 +2227,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 50,
-			thresholds: JSON.stringify({ temp_min: 2, temp_max: 18, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 2, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De witte wortelkop is dik en de pastinaak is volgroeid.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Minder water" }),
 			instructions: JSON.stringify([
@@ -2241,7 +2241,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 5,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Grote, hartvormige kiembladeren schieten vliegensvlug omhoog.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -2253,7 +2253,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Ruwe, diep ingesneden bladeren vormen een rozet.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2265,7 +2265,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 22, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De lange, spierwitte wortel zwelt op en duwt zichzelf iets boven de grond.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2277,7 +2277,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 6, temp_max: 20, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 6, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De rettich is lang, stevig en klaar om geoogst te worden.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2291,7 +2291,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 7,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 20, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Koolkiemen met blauwgroene steeltjes komen vlot op.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -2303,7 +2303,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 20, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailingen hebben stevige bladeren; de stengelbasis begint iets dikker te worden.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2315,7 +2315,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 24,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De stengel net boven de grond zwelt prachtig op tot een bovengrondse, lichtgroene knol.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -2327,7 +2327,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 18, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De koolrabiknol heeft de grootte van een kleine tennisbal en is heerlijk mals.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2341,7 +2341,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Kleine, glanzende peperkiempjes breken door de grond.",
 			requirements: JSON.stringify({ light: "Indirect licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -2353,7 +2353,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 14,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 28, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing maakt puntige, gezonde peperbladeren aan.",
 			requirements: JSON.stringify({ light: "Licht", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2365,7 +2365,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 21,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De plant is veranderd in een stevig, vertakt en compact struikje.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2377,7 +2377,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Kleine witte bloemknopjes hangen klaar in de vertakkingen.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2389,7 +2389,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Bloei",
 			stage_order: 5,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De stervormige bloemetjes bloeien; de eerste mini-pepers worden gevormd.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -2401,7 +2401,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 6,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 16, temp_max: 30, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 16, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De chilipepers zijn lang, glanzend groen, stevig en klaar voor gebruik.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2415,7 +2415,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 20, temp_max: 30, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 20, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De jonge stekken tonen de eerste paarsgroene groeipuntjes.",
 			requirements: JSON.stringify({ light: "Licht en warm", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -2427,7 +2427,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 20, temp_max: 30, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 20, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Prachtige, hartvormige bladeren beginnen lange ranken te vormen.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2439,7 +2439,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 35,
-			thresholds: JSON.stringify({ temp_min: 18, temp_max: 30, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 18, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De ranken kruipen weelderig over de grond; ondergronds zwellen de knollen aan.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2451,7 +2451,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 40,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 26, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 40, soil_max: 70, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De bladeren beginnen in de herfst geel te verkleuren.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Weinig water" }),
 			instructions: JSON.stringify([
@@ -2465,7 +2465,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 8,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 20, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Kleine kiempjes met opvallend rood-paarse steeltjes verschijnen.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -2477,7 +2477,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 12,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 20, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailingen vormen langwerpige bladeren met felrode nerven.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2489,7 +2489,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 20, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Onder de weelderige rode bladbos zwelt een mooi rond knolletje op.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2501,7 +2501,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 25,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 18, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De rode knollen steken deels boven de grond uit en zijn klaar voor de oogst.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2515,7 +2515,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 22, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Hele fijne, kleine kiempjes komen zeer traag boven de grond tevoorschijn.",
 			requirements: JSON.stringify({ light: "Licht", water: "Constant vochtig" }),
 			instructions: JSON.stringify([
@@ -2527,7 +2527,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 15, temp_max: 22, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 15, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De fragiele zaailingen krijgen hun eerste echte, herkenbare selderijblaadjes.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2539,7 +2539,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 45,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 22, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De stelen groeien compact, recht omhoog en vormen een dichte cluster.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -2551,7 +2551,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Groeispurt",
 			stage_order: 4,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 12, temp_max: 20, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 12, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De stelen worden dik, vlezig, sappig en schieten omhoog.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Veel water" }),
 			instructions: JSON.stringify([
@@ -2563,7 +2563,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 5,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 18, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De volledige bleekselderijstruik is dik, knapperig en klaar voor consumptie.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2577,7 +2577,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Zaaien",
 			stage_order: 1,
 			duration_days: 5,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 18, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 60, soil_max: 90, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "Kloeke kiemblaadjes staan binnen enkele dagen al boven de aarde.",
 			requirements: JSON.stringify({ light: "Licht", water: "Vochtig" }),
 			instructions: JSON.stringify([
@@ -2589,7 +2589,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Kiem",
 			stage_order: 2,
 			duration_days: 10,
-			thresholds: JSON.stringify({ temp_min: 10, temp_max: 18, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 10, temp_max: 35, soil_min: 50, soil_max: 80, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De zaailing ontwikkelt snel een rozet van heldergroene bladeren.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2601,7 +2601,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Blad",
 			stage_order: 3,
 			duration_days: 15,
-			thresholds: JSON.stringify({ temp_min: 8, temp_max: 18, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 8, temp_max: 35, soil_min: 50, soil_max: 85, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De paars-witte, ronde knolletjes zwellen vlak onder het oppervlak vlot aan.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2613,7 +2613,7 @@ export async function seed(knex: Knex): Promise<void> {
 			stage_name: "Oogst",
 			stage_order: 4,
 			duration_days: 20,
-			thresholds: JSON.stringify({ temp_min: 6, temp_max: 16, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
+			thresholds: JSON.stringify({ temp_min: 6, temp_max: 35, soil_min: 40, soil_max: 75, light_min: 10000, light_max: 80000, required_daily_sun_hours: 6 }),
 			validation_description: "De tweekleurige knolletjes zijn prachtig van formaat en perfect oogstklaar.",
 			requirements: JSON.stringify({ light: "Volle zon", water: "Regelmatig" }),
 			instructions: JSON.stringify([
@@ -2624,3 +2624,4 @@ export async function seed(knex: Knex): Promise<void> {
 
 	await knex("plant_stages").insert(stages);
 }
+

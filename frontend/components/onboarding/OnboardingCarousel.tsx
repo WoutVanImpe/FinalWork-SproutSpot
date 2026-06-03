@@ -1,6 +1,7 @@
-import { Animated, Dimensions, PanResponder, StyleSheet, TouchableOpacity, View } from "react-native";
+﻿import { Animated, PanResponder, StyleSheet, TouchableOpacity, View, useWindowDimensions } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Styling } from "../../constants/Styling";
+import { scaled } from "../../constants/scale";
 import StyledText from "../style/StyledText";
 import StyledIcon from "../style/StyledIcon";
 import { StatusBar } from "expo-status-bar";
@@ -10,13 +11,12 @@ import OnboardingSlideContent from "./OnboardingSlide";
 import DotIndicator from "../shared/DotIndicator";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
 interface OnboardingCarouselProps {
 	onComplete: () => void;
 }
 
 const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
+	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const insets = useSafeAreaInsets();
 	const [displayIndex, setDisplayIndex] = useState(0);
 	const slideAnim = useRef(new Animated.Value(0)).current;
@@ -78,7 +78,7 @@ const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
 		return () => clearTimeout(timeout);
 	}, [displayIndex, arrowAnim]);
 
-	const swipeThreshold = 50;
+	const swipeThreshold = scaled(50);
 	const panResponder = useMemo(
 		() =>
 			PanResponder.create({
@@ -164,7 +164,7 @@ const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
 				</View>
 			)}
 
-			<View style={[styles.bottomBar, { bottom: insets.bottom + 20 }]}>
+			<View style={[styles.bottomBar, { bottom: insets.bottom + scaled(20) }]}>
 				<DotIndicator count={slides.length} activeIndex={displayIndex} />
 			</View>
 			{showArrow && (
@@ -199,12 +199,12 @@ const styles = StyleSheet.create({
 		right: 0,
 		flexDirection: "row",
 		justifyContent: "flex-end",
-		paddingTop: 60,
-		paddingHorizontal: 24,
+		paddingTop: scaled(60),
+		paddingHorizontal: scaled(24),
 	},
 	skipButton: {
-		paddingVertical: 4,
-		paddingHorizontal: 8,
+		paddingVertical: scaled(4),
+		paddingHorizontal: scaled(8),
 	},
 	bottomBar: {
 		position: "absolute",
@@ -222,6 +222,8 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		justifyContent: "center",
 		alignItems: "flex-end",
-		paddingRight: 24,
+		paddingRight: scaled(24),
 	},
 });
+
+

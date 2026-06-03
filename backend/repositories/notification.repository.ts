@@ -27,6 +27,7 @@ export class NotificationRepository {
 			"up.id as raw_user_plant_id",
 			"up.current_stage_order",
 			db.raw("(SELECT stage_order FROM plant_stages WHERE plant_id = up.plant_id AND stage_order = up.current_stage_order + 1 LIMIT 1) as next_stage_order"),
+			db.raw("(SELECT validation_description FROM plant_stages WHERE plant_id = up.plant_id AND stage_order = up.current_stage_order + 1 LIMIT 1) as validation_description"),
 		);
 	}
 
@@ -117,10 +118,10 @@ export class NotificationRepository {
 			.join("users as u", "pn.user_id", "u.id")
 			.where("pn.notification_state", "sent")
 			.andWhere(function () {
-				this.where("pn.last_reminded_at", "<", db.raw("NOW() - INTERVAL '12 hours'"))
+				this.where("pn.last_reminded_at", "<", db.raw("NOW() - INTERVAL '8 hours'"))
 					.orWhereNull("pn.last_reminded_at");
 			})
-			.andWhere("pn.created_at", "<", db.raw("NOW() - INTERVAL '12 hours'"))
+			.andWhere("pn.created_at", "<", db.raw("NOW() - INTERVAL '8 hours'"))
 			.select(
 				"pn.id",
 				"pn.user_id",

@@ -14,6 +14,7 @@ import { BAR_MARGIN } from "../../constants/tabConfig";
 import { getAllPlants } from "../../services/plants";
 import type { PlantListItem } from "../../services/plants";
 import type { VegetableInfo } from "../../data/vegetables";
+import { scaled } from "../../constants/scale";
 
 const CARD_GAP = Styling.Spacing.reg;
 
@@ -65,7 +66,7 @@ const Explore = () => {
 				data={filteredData}
 				numColumns={3}
 				keyExtractor={(item) => item.id}
-				contentContainerStyle={{ paddingTop: insets.top + 60, paddingBottom: 175, paddingHorizontal: BAR_MARGIN }}
+				contentContainerStyle={{ paddingTop: insets.top + 60, paddingBottom: scaled(175), paddingHorizontal: BAR_MARGIN }}
 				columnWrapperStyle={styles.row}
 				keyboardShouldPersistTaps="handled"
 				showsVerticalScrollIndicator={false}
@@ -162,3 +163,5 @@ const styles = StyleSheet.create({
 		opacity: 0.6,
 	},
 });
+
+

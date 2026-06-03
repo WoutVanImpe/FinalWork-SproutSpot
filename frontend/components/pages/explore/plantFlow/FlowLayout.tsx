@@ -6,6 +6,7 @@ import StyledText from "../../../style/StyledText";
 import StyledIcon from "../../../style/StyledIcon";
 import Spacer from "../../../style/Spacer";
 import BackIcon from "../../../../assets/icons/undo.svg";
+import { scaled } from "../../../../constants/scale";
 
 interface Props {
   title: string;
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 56,
+    minHeight: scaled(56),
     paddingVertical: Styling.Padding.reg,
   },
   headerTitle: {
@@ -50,3 +51,5 @@ const styles = StyleSheet.create({
 });
 
 export default FlowLayout;
+
+

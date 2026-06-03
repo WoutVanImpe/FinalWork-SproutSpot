@@ -10,6 +10,7 @@ import StatusHeader from "../components/pages/home/statusHeader/StatusHeader";
 import { getDashboard } from "../services/garden";
 import type { EnrichedPlant } from "../services/garden";
 import { useRouter, useFocusEffect } from "expo-router";
+import { scaled } from "../constants/scale";
 
 interface HomePlant {
 	id: string;
@@ -23,12 +24,12 @@ interface HomePlant {
 const toHomePlant = (p: EnrichedPlant): HomePlant => {
 	const alerts: string[] = [];
 	if (p.warning) {
-		if (p.water.level < p.water.optimalMin) alerts.push("DORST");
-		else if (p.water.level > p.water.optimalMax) alerts.push("te nat");
-		if (p.light.level < p.light.optimalMin) alerts.push("te donker");
-		else if (p.light.level > p.light.optimalMax) alerts.push("te licht");
-		if (p.temperature.level < p.temperature.optimalMin) alerts.push("te koud");
-		else if (p.temperature.level > p.temperature.optimalMax) alerts.push("te warm");
+		if (p.water.level < p.water.optimalMin) alerts.push("dorst");
+		else if (p.water.level > p.water.optimalMax) alerts.push("het te nat");
+		if (p.light.level < p.light.optimalMin) alerts.push("het te donker");
+		else if (p.light.level > p.light.optimalMax) alerts.push("het te licht");
+		if (p.temperature.level < p.temperature.optimalMin) alerts.push("het te koud");
+		else if (p.temperature.level > p.temperature.optimalMax) alerts.push("het te warm");
 	}
 	return {
 		id: p.id,
@@ -53,7 +54,7 @@ const Index = () => {
 			.finally(() => setLoading(false));
 	}, []));
 
-	const homePlants = plants.map(toHomePlant);
+	const homePlants = plants.map(toHomePlant).sort((a, b) => (a.warning === b.warning ? 0 : a.warning ? -1 : 1));
 
 	const handleItemPress = (id: string) => {
 		router.push(`/(garden)/garden?selectedPlantId=${id}`);
@@ -70,7 +71,7 @@ const Index = () => {
 	if (plants.length === 0) {
 		return (
 			<StyledView>
-				<Spacer space={120} />
+				<Spacer space={scaled(120)} />
 				<StyledText type="head3" style={{ textAlign: "center" }}>
 					Je hebt nog geen planten
 				</StyledText>
@@ -105,3 +106,5 @@ const styles = StyleSheet.create({
 		alignSelf: "flex-start",
 	},
 });
+
+

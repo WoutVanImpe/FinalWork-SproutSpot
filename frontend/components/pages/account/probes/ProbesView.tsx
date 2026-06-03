@@ -7,6 +7,7 @@ import StyledIcon from "../../../style/StyledIcon";
 import AccountHeader from "../header/AccountHeader";
 import Spacer from "../../../style/Spacer";
 import { getUserProbes, ProbeInfo } from "../../../../services/probes";
+import { scaled } from "../../../../constants/scale";
 
 const stateColors: Record<string, string> = {
 	paired: Styling.Colors.green,
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
 	emptyText: {
 		color: Styling.Colors.white,
 		textAlign: "center",
-		marginTop: 40,
+		marginTop: scaled(40),
 	},
 	card: {
 		width: "100%",
@@ -137,3 +138,5 @@ const styles = StyleSheet.create({
 		textAlign: "right",
 	},
 });
+
+

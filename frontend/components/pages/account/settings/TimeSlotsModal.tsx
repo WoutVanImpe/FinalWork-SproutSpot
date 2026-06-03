@@ -4,6 +4,7 @@ import { Styling } from "../../../../constants/Styling";
 import StyledAlert from "../../../style/StyledAlert";
 import StyledText from "../../../style/StyledText";
 import Spacer from "../../../style/Spacer";
+import { scaled } from "../../../../constants/scale";
 
 interface TimeSlotsModalProps {
 	visible: boolean;
@@ -72,8 +73,8 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	hourBtn: {
-		width: 56,
-		height: 36,
+		width: scaled(56),
+		height: scaled(36),
 		borderRadius: Styling.BorderRadius.reg,
 		backgroundColor: "#e8e8e8",
 		justifyContent: "center",
@@ -89,3 +90,5 @@ const styles = StyleSheet.create({
 		color: Styling.Colors.white,
 	},
 });
+
+

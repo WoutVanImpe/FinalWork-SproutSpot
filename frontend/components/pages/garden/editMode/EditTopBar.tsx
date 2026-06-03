@@ -5,6 +5,7 @@ import StyledText from "../../../style/StyledText";
 import UndoIcon from "../../../../assets/icons/undo.svg";
 import { Styling } from "../../../../constants/Styling";
 import { BAR_MARGIN } from "../../../../constants/tabConfig";
+import { scaled } from "../../../../constants/scale";
 
 const EditTopBar = ({ onExit }: { onExit: () => void }) => {
 	return (
@@ -48,3 +49,4 @@ const styles = StyleSheet.create({
 		color: Styling.Colors.white,
 	},
 });
+

@@ -82,7 +82,7 @@ export async function enrichPlant(
 		level: latestTelemetry?.temp_c ?? 20,
 		label: `${rawPlant.temp_min ?? 0}°C - ${rawPlant.temp_max ?? 0}°C`,
 		optimalMin: stage?.thresholds?.temp_min ?? 10,
-		optimalMax: stage?.thresholds?.temp_max ?? 30,
+		optimalMax: stage?.thresholds?.temp_max ?? 40,
 	};
 
 	const statuses = [waterStatus, lightStatus, tempStatus];
