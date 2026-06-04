@@ -28,7 +28,17 @@
 		"web": {
 			"favicon": "./assets/icon.png"
 		},
-		"plugins": ["expo-router"],
+		"plugins": [
+			"expo-router",
+			[
+				"expo-build-properties",
+				{
+					"android": {
+						"usesCleartextTraffic": true
+					}
+				}
+			]
+		],
 		"extra": {
 			"apiBaseUrl": "http://178.104.50.231:5001",
 			"router": {},
