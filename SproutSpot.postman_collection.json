@@ -235,6 +235,20 @@
 					}
 				},
 				{
+					"name": "Get User Plant by ID (detail)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/gardens/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gardens", "1"]
+						}
+					}
+				},
+				{
 					"name": "Update Garden",
 					"request": {
 						"method": "PUT",
@@ -372,6 +386,24 @@
 							"raw": "{{baseUrl}}/api/probes/register",
 							"host": ["{{baseUrl}}"],
 							"path": ["api", "probes", "register"]
+						}
+					}
+				},
+				{
+					"name": "Sync Probe (no auth, ESP32 firmware call)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hardware_id\": \"80:F1:B2:64:32:99\",\n  \"pairing_code\": \"CODE1234\",\n  \"wifi_rssi\": -65,\n  \"battery_voltage\": 4.0\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/probes/sync",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "probes", "sync"]
 						}
 					}
 				},
@@ -525,6 +557,20 @@
 							"raw": "{{baseUrl}}/api/notifications",
 							"host": ["{{baseUrl}}"],
 							"path": ["api", "notifications"]
+						}
+					}
+				},
+				{
+					"name": "Get Notification Count",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications/count",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "notifications", "count"]
 						}
 					}
 				},
