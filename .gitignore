@@ -31,3 +31,4 @@ sonde
 node_modules
 #Database data
 data/
+!frontend/data

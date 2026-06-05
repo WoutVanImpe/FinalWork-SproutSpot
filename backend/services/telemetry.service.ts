@@ -99,7 +99,6 @@ export class TelemetryService {
 
 		await this.checkBattery(lastEntry.battery_voltage, linked?.userPlant?.id, linked?.userPlant?.user_id, linked?.userPlant?.nickname ?? null);
 
-		// Auto-resolve PROBE_STALE when probe comes back online
 		if (linked) {
 			const openIssues = await this.repository.findOpenIssuesByUserPlant(linked.userPlant.id);
 			const staleIssue = openIssues.find((i) => i.issue_type === "PROBE_STALE");
@@ -154,7 +153,6 @@ export class TelemetryService {
 
 		const latest = allSamples[allSamples.length - 1]!;
 
-		// Soil — instant trigger, no anti-spam
 		await this.checkAndActOnMetric(
 			"soil_moisture",
 			latest.soil_moist_pct,
@@ -167,9 +165,6 @@ export class TelemetryService {
 			plantNickname,
 		);
 
-		// Temperature — TEMP_TOO_HIGH persistent guard (3 consecutive, prevents overheating)
-		// Skipped for outdoor plants — temperature is not actionable outdoors
-		// TEMP_TOO_LOW is handled by daily average check in scheduler
 		if (plantingType !== "outdoor" && latest.temp_c > thresholds.temp_max) {
 			const required = 3;
 			let consecutive = 0;
@@ -195,7 +190,6 @@ export class TelemetryService {
 			}
 		}
 
-		// Critical frost guardrail — any single reading below 2°C triggers instant TEMP_TOO_LOW
 		const frostReading = batchEntries.find((e) => e.temp_c < 2);
 		if (frostReading) {
 			console.log(`[Telemetry] TEMP_TOO_LOW (FROST) — value=${frostReading.temp_c}°C < 2°C (critical instant trigger)`);
@@ -205,8 +199,6 @@ export class TelemetryService {
 			}
 		}
 
-		// Light — high-light protection only (3 consecutive, prevents sunburn)
-		// LIGHT_TOO_LOW is handled by daily cumulative DLI check in scheduler
 		if (latest.light_lux > thresholds.light_max) {
 			const required = 3;
 			let consecutive = 0;
@@ -232,7 +224,6 @@ export class TelemetryService {
 			}
 		}
 
-		// Auto-resolve
 		await this.autoResolveIssues(allSamples, userPlantId, thresholds);
 	}
 
@@ -255,7 +246,6 @@ export class TelemetryService {
 
 		const openIssues = await this.repository.findOpenIssuesByUserPlant(userPlantId);
 
-		// --- BATTERY_LOW (10% = 3.39V) takes priority over WARNING ---
 		if (pct < BATTERY_LOW_PCT) {
 			const existing = openIssues.find((i) => i.issue_type === "BATTERY_LOW");
 			if (existing) {
@@ -266,14 +256,12 @@ export class TelemetryService {
 			}
 			console.log(`[Telemetry] BATTERY_LOW — voltage=${batteryVoltage}, pct=${pct}% (instant trigger)`);
 		} else {
-			// Auto-resolve BATTERY_LOW bij herstel
 			const batteryIssue = openIssues.find((i) => i.issue_type === "BATTERY_LOW");
 			if (batteryIssue) {
 				console.log(`[Telemetry] Auto-resolving BATTERY_LOW (issue #${batteryIssue.id}) — battery recovered to ${pct}%`);
 				await this.repository.resolveIssue(batteryIssue.id);
 			}
 
-			// --- BATTERY_WARNING (3.5V) — only fires when LOW is not active ---
 			if (batteryVoltage <= BATTERY_WARNING_VOLTAGE && batteryVoltage > 3.3) {
 				const existing = openIssues.find((i) => i.issue_type === "BATTERY_WARNING");
 				if (!existing) {
@@ -282,7 +270,6 @@ export class TelemetryService {
 					console.log(`[Telemetry] BATTERY_WARNING — voltage=${batteryVoltage}, pct=${pct}%`);
 				}
 			} else if (batteryVoltage > BATTERY_WARNING_VOLTAGE) {
-				// Auto-resolve BATTERY_WARNING bij herstel
 				const warningIssue = openIssues.find((i) => i.issue_type === "BATTERY_WARNING");
 				if (warningIssue) {
 					console.log(`[Telemetry] Auto-resolving BATTERY_WARNING (issue #${warningIssue.id}) — voltage recovered to ${batteryVoltage}V`);

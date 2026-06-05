@@ -148,7 +148,8 @@ sproutspot/
 │   ├── migrations/          # 1 migration (all 9 tables)
 │   ├── seeds/               # 44 encyclopedia plants + growth stages
 │   └── public/images/       # Static plant images
-├── sonde/                   # ESP32-C3 resources
+├── SproutSpot_Sonde.ino     # Probe firmware source (copy)
+├── HISTORY.md               # Full development history (copy)
 ├── docker-compose.yml       # Postgres + backend + Adminer
 └── SproutSpot.postman_collection.json
 ```
@@ -220,3 +221,9 @@ cd frontend && npx tsc --noEmit     # Type check
 ssh -L 8080:localhost:8080 user@host
 open http://localhost:8080          # Adminer
 ```
+
+---
+
+## Acknowledgments
+
+This project was developed with the assistance of AI-powered tools (Opencode) to accelerate development, generate boilerplate, assist with debugging, and maintain consistency across the codebase. The full development history, including all AI-assisted decisions, is documented in [HISTORY.md](HISTORY.md).
