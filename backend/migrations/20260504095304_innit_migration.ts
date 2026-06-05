@@ -3,7 +3,6 @@ import type { Knex } from "knex";
 export async function up(knex: Knex): Promise<void> {
 	return (
 		knex.schema
-			// 1. Users & Settings
 			.createTable("users", (table) => {
 				table.increments("id").primary();
 				table.string("name").notNullable();
@@ -18,7 +17,6 @@ export async function up(knex: Knex): Promise<void> {
 				table.timestamp("created_at").defaultTo(knex.fn.now());
 			})
 
-			// 2. Plant-Encyclopedia
 			.createTable("plants", (table) => {
 				table.increments("id").primary();
 				table.string("name").notNullable();
@@ -42,7 +40,6 @@ export async function up(knex: Knex): Promise<void> {
 				table.string("total_growth_time").notNullable();
 			})
 
-			// 3. Probe
 			.createTable("probes", (table) => {
 				table.increments("id").primary();
 				table.string("hardware_id").unique().notNullable();
@@ -56,7 +53,6 @@ export async function up(knex: Knex): Promise<void> {
 				table.timestamp("last_seen").defaultTo(knex.fn.now());
 			})
 
-			// 4. Garden layout
 			.createTable("user_gardens", (table) => {
 				table.increments("id").primary();
 				table.integer("user_id").unsigned().references("id").inTable("users").onDelete("CASCADE");
@@ -65,7 +61,6 @@ export async function up(knex: Knex): Promise<void> {
 				table.timestamp("created_at").defaultTo(knex.fn.now());
 			})
 
-			// 5. Growth stadia & Thresholds
 			.createTable("plant_stages", (table) => {
 				table.increments("id").primary();
 				table.integer("plant_id").unsigned().references("id").inTable("plants").onDelete("CASCADE");
@@ -78,7 +73,6 @@ export async function up(knex: Knex): Promise<void> {
 				table.jsonb("instructions").nullable();
 			})
 
-			// 6. User plants
 			.createTable("user_plants", (table) => {
 				table.increments("id").primary();
 				table.integer("user_id").unsigned().references("id").inTable("users");
@@ -97,7 +91,6 @@ export async function up(knex: Knex): Promise<void> {
 				table.timestamp("deactivated_at").nullable().defaultTo(null);
 			})
 
-			// 7. Probe entry
 			.createTable("probe_entries", (table) => {
 				table.increments("id").primary();
 				table.string("sonde_id").references("hardware_id").inTable("probes");
@@ -109,7 +102,6 @@ export async function up(knex: Knex): Promise<void> {
 				table.timestamp("created_at").defaultTo(knex.fn.now());
 			})
 
-			// 8. Active plant issues
 			.createTable("active_issues", (table) => {
 				table.increments("id").primary();
 				table.integer("user_plant_id").unsigned().references("id").inTable("user_plants");
@@ -121,7 +113,6 @@ export async function up(knex: Knex): Promise<void> {
 				table.timestamp("last_seen").defaultTo(knex.fn.now());
 			})
 
-			// 9. Pending Notifications
 			.createTable("pending_notifications", (table) => {
 				table.increments("id").primary();
 				table.integer("user_id").unsigned().references("id").inTable("users");

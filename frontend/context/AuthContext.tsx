@@ -92,7 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				await updateProfile({ push_token: expoPushToken });
 			}
 		} catch {
-			// ignore
+	
 		}
 	};
 
@@ -101,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			const res = await getProfile();
 			if (res.data) setUser(res.data);
 		} catch {
-			// ignore
+	
 		}
 	}, []);
 
