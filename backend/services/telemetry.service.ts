@@ -291,6 +291,8 @@ export class TelemetryService {
 				continue;
 			}
 
+			const hoursSinceLastSeen = Math.round((Date.now() - new Date(probe.last_seen).getTime()) / (1000 * 60 * 60));
+
 			const openIssues = await this.repository.findOpenIssuesByUserPlant(userPlant.id);
 			const existing = openIssues.find((i) => i.issue_type === "PROBE_STALE");
 
@@ -298,7 +300,7 @@ export class TelemetryService {
 				await this.repository.incrementIssueOccurrence(existing.id);
 			} else {
 				const issue = await this.repository.createIssue(userPlant.id, "PROBE_STALE");
-				await this.dispatchNotificationForIssue(issue, userPlant.user_id, userPlant.id, userPlant.nickname);
+				await this.dispatchNotificationForIssue(issue, userPlant.user_id, userPlant.id, userPlant.nickname, hoursSinceLastSeen);
 			}
 
 			await this.probeRepository.updateState(probe.id, "offline");
@@ -386,6 +388,16 @@ export class TelemetryService {
 						await this.notificationRepository.acknowledgeNotification(n.id);
 						console.log(`[Telemetry] Auto-acknowledged snoozed notification ${n.id} — linked issue ${n.issue_id} already resolved`);
 						continue;
+					}
+
+					if (issue && issue.issue_type === "PROBE_STALE" && n.user_plant_id) {
+						const lastSeen = await this.probeRepository.findLastSeenByUserPlantId(n.user_plant_id);
+						if (lastSeen) {
+							const hours = Math.round((Date.now() - new Date(lastSeen).getTime()) / (1000 * 60 * 60));
+							const { title, message } = this.getNotificationContent("PROBE_STALE", null, hours);
+							n.title = title;
+							n.message = message;
+						}
 					}
 				}
 
@@ -569,8 +581,9 @@ export class TelemetryService {
 		userId: number,
 		userPlantId: number,
 		plantNickname: string | null,
+		elapsedHours?: number,
 	): Promise<void> {
-		const { title, message } = this.getNotificationContent(issue.issue_type, plantNickname);
+		const { title, message } = this.getNotificationContent(issue.issue_type, plantNickname, elapsedHours);
 
 		const window = await this.repository.findUserNotificationWindow(userId);
 		const now = new Date();
@@ -617,7 +630,7 @@ export class TelemetryService {
 		}
 	}
 
-	private getNotificationContent(issueType: string, plantNickname: string | null): { title: string; message: string } {
+	private getNotificationContent(issueType: string, plantNickname: string | null, elapsedHours?: number): { title: string; message: string } {
 		const name = plantNickname ?? "je plant";
 
 		switch (issueType) {
@@ -629,7 +642,13 @@ export class TelemetryService {
 			case "LIGHT_TOO_HIGH": return { title: "Te veel licht", message: `${name} staat te fel.` };
 			case "BATTERY_WARNING": return { title: "Batterij bijna leeg", message: `Laad de batterij van de sonde bij ${name} op.` };
 			case "BATTERY_LOW": return { title: "Batterij kritiek", message: `De batterij van de sonde bij ${name} is bijna leeg. Laad onmiddellijk op.` };
-			case "PROBE_STALE": return { title: "Sonde reageert niet", message: `De sonde bij ${name} stuurt al meer dan 3 uur geen data.` };
+			case "PROBE_STALE": {
+				const hours = elapsedHours ?? 3;
+				const duration = hours >= 24
+					? `${Math.floor(hours / 24)}d ${hours % 24}u`
+					: `${hours} uur`;
+				return { title: "Sonde reageert niet", message: `De sonde bij ${name} stuurt al ${duration} geen data.` };
+			}
 			default: return { title: "Sensor alert", message: `Er is een probleem met ${name}.` };
 		}
 	}

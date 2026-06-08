@@ -15,6 +15,7 @@ export interface GardenPlant {
 	id: string;
 	image: number | { uri: string };
 	warning: boolean;
+	probeOffline: boolean;
 	hasTelemetry: boolean;
 	x: number;
 	y: number;
