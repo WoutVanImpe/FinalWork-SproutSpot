@@ -126,7 +126,27 @@ const PlantSheet = ({ plant, isVisible, onClose }: { plant: GardenPlant | null; 
 							</StyledText>
 							<Spacer space={Styling.Spacing.sml} />
 
-							{plant.hasTelemetry ? (
+							{plant.probeOffline && (
+								<>
+									<View style={styles.offlineBanner}>
+										<StyledText type="paragh" style={styles.offlineBannerText}>
+											Sonde reageert niet
+										</StyledText>
+									</View>
+									<Spacer space={Styling.Spacing.sml} />
+								</>
+							)}
+							{plant.probeOffline ? (
+								<>
+									<StyledText type="head4" style={styles.sectionTitle}>
+										Advies:
+									</StyledText>
+									<Spacer space={Styling.Spacing.xsm} />
+									<StyledText type="paragh" style={styles.bodyText}>
+										{plant.advice || "Sonde reageert niet."}
+									</StyledText>
+								</>
+							) : plant.hasTelemetry ? (
 								<>
 									<StyledText type="head4" style={styles.sectionTitle}>
 										Hoe gaat het nu:
@@ -254,6 +274,18 @@ const styles = StyleSheet.create({
 	},
 	footerBtnText: {
 		color: Styling.Colors.white,
+	},
+	offlineBanner: {
+		backgroundColor: "#fce4e4",
+		paddingVertical: Styling.Padding.sml,
+		paddingHorizontal: Styling.Padding.reg,
+		borderRadius: Styling.BorderRadius.reg,
+		borderLeftWidth: 4,
+		borderLeftColor: Styling.Colors.red,
+	},
+	offlineBannerText: {
+		color: Styling.Colors.red,
+		fontWeight: "600",
 	},
 });
 

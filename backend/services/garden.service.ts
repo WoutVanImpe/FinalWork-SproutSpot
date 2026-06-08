@@ -120,11 +120,18 @@ export class GardenService {
 			latestTelemetry = entries[0] ?? null;
 		}
 
+		const openIssues = await db("active_issues")
+			.where("user_plant_id", plantId)
+			.whereNull("resolved_at")
+			.select("issue_type");
+		const openIssueTypes = openIssues.map((i: any) => i.issue_type);
+
 		return enrichPlant(
 			{ ...rawPlant, water_label: plantRecord?.water ?? "", light_label: plantRecord?.light ?? "", temp_min: plantRecord?.temperature_min, temp_max: plantRecord?.temperature_max },
 			currentStage,
 			allStages,
 			latestTelemetry,
+			openIssueTypes,
 		);
 	}
 

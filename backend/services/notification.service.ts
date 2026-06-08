@@ -34,7 +34,7 @@ export class NotificationService {
 
 		let issue: ActiveIssueRecord | null = null;
 		if (notification.issue_id) {
-			issue = await this.repository.acknowledgeIssue(notification.issue_id) ?? null;
+			issue = await this.repository.resolveIssue(notification.issue_id) ?? null;
 		}
 
 		return { notification: updatedNotification, issue };
