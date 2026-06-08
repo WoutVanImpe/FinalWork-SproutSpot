@@ -11,6 +11,7 @@ export interface EnrichedPlant {
 	id: string;
 	image: string;
 	warning: boolean;
+	probeOffline: boolean;
 	hasTelemetry: boolean;
 	x: number;
 	y: number;
@@ -96,6 +97,7 @@ export function enrichedToGardenPlant(p: EnrichedPlant) {
 		id: p.id,
 		image: p.image ? { uri: p.image } : (0 as unknown as number),
 		warning: p.warning,
+		probeOffline: p.probeOffline,
 		hasTelemetry: p.hasTelemetry,
 		x: p.x,
 		y: p.y,

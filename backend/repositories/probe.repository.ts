@@ -278,6 +278,16 @@ export class ProbeRepository {
 		return probe;
 	}
 
+	async findLastSeenByUserPlantId(userPlantId: number): Promise<Date | null> {
+		const row = await db("user_plants as up")
+			.join("probes as p", "up.sonde_id", "p.hardware_id")
+			.where("up.id", userPlantId)
+			.select("p.last_seen")
+			.first();
+
+		return row?.last_seen ?? null;
+	}
+
 	async rename(probeId: number, name: string): Promise<ProbeRecord> {
 		const [probe] = await db("probes")
 			.where("id", probeId)

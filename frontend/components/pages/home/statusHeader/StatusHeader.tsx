@@ -16,6 +16,7 @@ interface CarouselItem {
     name: string; 
     type: string;
     warning: boolean;
+    probeOffline: boolean;
     message: string;
     image: number | { uri: string };
 }
@@ -57,7 +58,10 @@ const StatusHeader = ({ items, onItemPress }: StatusHeaderProps) => {
             </View>
             <View style={styles.textContainer}>
                 <StyledText type="head2" style={styles.statusText}>
-                    {item.type} {item.name} heeft {item.message}!
+                    {item.probeOffline
+                        ? `Sonde van ${item.name} reageert niet`
+                        : `${item.type} ${item.name} heeft ${item.message}!`
+                    }
                 </StyledText>
             </View>
         </>

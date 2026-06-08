@@ -17,26 +17,33 @@ interface HomePlant {
 	name: string;
 	type: string;
 	warning: boolean;
+	probeOffline: boolean;
 	message: string;
 	image: { uri: string };
 }
 
 const toHomePlant = (p: EnrichedPlant): HomePlant => {
-	const alerts: string[] = [];
-	if (p.warning) {
-		if (p.water.level < p.water.optimalMin) alerts.push("dorst");
-		else if (p.water.level > p.water.optimalMax) alerts.push("het te nat");
-		if (p.light.level < p.light.optimalMin) alerts.push("het te donker");
-		else if (p.light.level > p.light.optimalMax) alerts.push("het te licht");
-		if (p.temperature.level < p.temperature.optimalMin) alerts.push("het te koud");
-		else if (p.temperature.level > p.temperature.optimalMax) alerts.push("het te warm");
-	}
+	const message = p.probeOffline ? "" : (() => {
+		const alerts: string[] = [];
+		if (p.warning) {
+			if (p.water.level < p.water.optimalMin) alerts.push("dorst");
+			else if (p.water.level > p.water.optimalMax) alerts.push("het te nat");
+			if (p.light.level < p.light.optimalMin) alerts.push("te weinig licht");
+			else if (p.light.level > p.light.optimalMax) alerts.push("te veel licht");
+			if (p.temperature.level < p.temperature.optimalMin) alerts.push("het te koud");
+			else if (p.temperature.level > p.temperature.optimalMax) alerts.push("het te warm");
+		}
+		return alerts.length > 1
+			? alerts.slice(0, -1).join(", ") + " en " + alerts[alerts.length - 1]
+			: alerts[0] || "niks nodig";
+	})();
 	return {
 		id: p.id,
 		name: p.nickname.split(" ").slice(1).join(" ") || p.nickname,
 		type: p.type,
 		warning: p.warning,
-		message: alerts.join(", ") || "niks nodig",
+		probeOffline: p.probeOffline,
+		message,
 		image: typeof p.image === "string" ? { uri: p.image } : p.image,
 	};
 };
