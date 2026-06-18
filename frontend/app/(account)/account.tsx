@@ -79,22 +79,27 @@ const Account = () => {
 			if (!isValidatingRef.current) {
 				setCurrentView("main");
 			}
-			getNotifications(true)
-				.then((res) => { if (res.data) setNotifications(res.data.map(apiNotifToView)); })
-				.catch(console.error);
-			getProfile()
-				.then((res) => {
-					if (res.data) {
-						setName(res.data.name);
-						setEmail(res.data.email);
-						setPairingCode(res.data.pairing_code);
-						setPushEnabled(res.data.push_enabled);
-						if (res.data.notification_window_start && res.data.notification_window_end) {
-							setActiveHours(parseTimeRangeToHours(res.data.notification_window_start, res.data.notification_window_end));
+			const fetchData = () => {
+				getNotifications(true)
+					.then((res) => { if (res.data) setNotifications(res.data.map(apiNotifToView)); })
+					.catch(console.error);
+				getProfile()
+					.then((res) => {
+						if (res.data) {
+							setName(res.data.name);
+							setEmail(res.data.email);
+							setPairingCode(res.data.pairing_code);
+							setPushEnabled(res.data.push_enabled);
+							if (res.data.notification_window_start && res.data.notification_window_end) {
+								setActiveHours(parseTimeRangeToHours(res.data.notification_window_start, res.data.notification_window_end));
+							}
 						}
-					}
-				})
-				.catch(console.error);
+					})
+					.catch(console.error);
+			};
+			fetchData();
+			const interval = setInterval(fetchData, 15000);
+			return () => clearInterval(interval);
 		}, []),
 	);
 

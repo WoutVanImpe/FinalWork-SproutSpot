@@ -54,6 +54,9 @@ const Garden = () => {
 	const [isMoving, setIsMoving] = useState(false);
 	const [selectedPlant, setSelectedPlant] = useState<GardenPlant | null>(null);
 	const [alertConfig, setAlertConfig] = useState<{ title: string; message: string; buttons?: AlertButton[] } | null>(null);
+	const isEditingRef = useRef(false);
+
+	useEffect(() => { isEditingRef.current = isEditing; }, [isEditing]);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -69,6 +72,21 @@ const Garden = () => {
 				})
 				.catch(console.error)
 				.finally(() => setLoading(false));
+
+			const interval = setInterval(() => {
+				if (isEditingRef.current) return;
+				getGarden()
+					.then((res) => {
+						if (res.data) {
+							setPlants(res.data.plants.map(enrichedToGardenPlant));
+							setGardenId(res.data.garden.id);
+							setCols(res.data.garden.width);
+							setRows(res.data.garden.height);
+						}
+					})
+					.catch(console.error);
+			}, 15000);
+			return () => clearInterval(interval);
 		}, []),
 	);
 
