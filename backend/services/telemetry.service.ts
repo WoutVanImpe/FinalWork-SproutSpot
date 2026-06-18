@@ -730,7 +730,7 @@ export class TelemetryService {
 
 	mapSoilMoisture(rawValue: number): number {
 		const DRY_THRESHOLD = 2765;
-		const WET_THRESHOLD = 1690;
+		const WET_THRESHOLD = 1880;
 
 		if (rawValue <= WET_THRESHOLD) return 100;
 		if (rawValue >= DRY_THRESHOLD) return 0;

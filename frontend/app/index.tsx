@@ -55,10 +55,15 @@ const Index = () => {
 
 	useFocusEffect(useCallback(() => {
 		setLoading(true);
-		getDashboard()
-			.then((res) => { if (res.data) setPlants(res.data.plants); })
-			.catch(console.error)
-			.finally(() => setLoading(false));
+		const fetchData = () => {
+			getDashboard()
+				.then((res) => { if (res.data) setPlants(res.data.plants); })
+				.catch(console.error)
+				.finally(() => setLoading(false));
+		};
+		fetchData();
+		const interval = setInterval(fetchData, 15000);
+		return () => clearInterval(interval);
 	}, []));
 
 	const homePlants = plants.map(toHomePlant).sort((a, b) => (a.warning === b.warning ? 0 : a.warning ? -1 : 1));

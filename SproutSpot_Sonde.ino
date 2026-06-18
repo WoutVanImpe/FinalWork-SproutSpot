@@ -21,7 +21,7 @@ const char* telemetryUrl = "http://178.104.50.231:5001/api/telemetry/upload";
 const char* syncUrl = "http://178.104.50.231:5001/api/probes/sync";
 
 const int SOIL_AIR_VALUE = 2765;
-const int SOIL_WATER_VALUE = 1690;
+const int SOIL_WATER_VALUE = 1880;
 const int SOIL_PIN = A0;
 const int BATTERY_PIN = A1;
 const int RESET_BUTTON_PIN = D2;
@@ -30,8 +30,8 @@ const int RESET_BUTTON_PIN = D2;
 
 #if defined(DEV_MODE)
   const unsigned long CHARGE_UPLOAD_INTERVAL = 30000;
-  const uint64_t SLEEP_TIME_SECONDS = 30;
-  const uint64_t INACTIVE_SLEEP_SECONDS = 30;
+  const uint64_t SLEEP_TIME_SECONDS = 2;
+  const uint64_t INACTIVE_SLEEP_SECONDS = 2;
 #else
   const unsigned long CHARGE_UPLOAD_INTERVAL = 180000;
   const uint64_t SLEEP_TIME_SECONDS = 900;
@@ -321,7 +321,11 @@ void setup() {
       WiFi.begin(ssid.c_str(), pass.c_str());
       
       int attempts = 0;
-      while (WiFi.status() != WL_CONNECTED && attempts < 30) { delay(500); attempts++; }
+      #if defined(DEV_MODE)
+        while (WiFi.status() != WL_CONNECTED && attempts < 10) { delay(500); attempts++; }
+      #else
+        while (WiFi.status() != WL_CONNECTED && attempts < 30) { delay(500); attempts++; }
+      #endif
       
       if (WiFi.status() == WL_CONNECTED) {
         configTime(0, 0, "pool.ntp.org", "time.google.com");
@@ -343,7 +347,11 @@ void setup() {
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid.c_str(), pass.c_str());
     int attempts = 0;
-    while (WiFi.status() != WL_CONNECTED && attempts < 20) { delay(500); attempts++; }
+    #if defined(DEV_MODE)
+      while (WiFi.status() != WL_CONNECTED && attempts < 10) { delay(500); attempts++; }
+    #else
+      while (WiFi.status() != WL_CONNECTED && attempts < 20) { delay(500); attempts++; }
+    #endif
     if (WiFi.status() == WL_CONNECTED) {
       configTime(0, 0, "pool.ntp.org", "time.google.com");
       WiFi.disconnect();
@@ -420,6 +428,7 @@ void loop() {
     batch[measurementCount].temp = sht31.getTemperature();
     batch[measurementCount].lux = TSL2561.readVisibleLux();
     batch[measurementCount].soilRaw = readSoilMoisture();
+    Serial.printf("[SOIL] Raw ADC: %d\n", batch[measurementCount].soilRaw);
     batch[measurementCount].battery = readBatteryVoltage();
     batch[measurementCount].rssi = -50; 
 
@@ -446,7 +455,11 @@ void sendTelemetryBatch() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid.c_str(), pass.c_str());
   int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 30) { delay(500); attempts++; }
+  #if defined(DEV_MODE)
+    while (WiFi.status() != WL_CONNECTED && attempts < 10) { delay(500); attempts++; }
+  #else
+    while (WiFi.status() != WL_CONNECTED && attempts < 30) { delay(500); attempts++; }
+  #endif
 
   if (WiFi.status() != WL_CONNECTED) return; 
 
@@ -513,7 +526,11 @@ void triggerManualSync() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid.c_str(), pass.c_str());
   int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 30) { delay(500); attempts++; }
+  #if defined(DEV_MODE)
+    while (WiFi.status() != WL_CONNECTED && attempts < 10) { delay(500); attempts++; }
+  #else
+    while (WiFi.status() != WL_CONNECTED && attempts < 30) { delay(500); attempts++; }
+  #endif
 
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
